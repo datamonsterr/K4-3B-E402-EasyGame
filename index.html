@@ -144,10 +144,11 @@
         <nav class="flex flex-col gap-1 pt-1" id="main-nav">
           <div class="flex items-center justify-between px-2 py-1 text-[10px] font-mono text-text-subtle uppercase tracking-wider font-semibold">
             <span>Views & Tools</span>
+            <span id="nav-role-badge" class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">Learner</span>
           </div>
 
           <!-- Tab 1: Learner Workspace (Chat) -->
-          <button onclick="switchTab('chat')" id="nav-btn-chat" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md bg-surface-elevation-2 text-primary border-l-2 border-primary transition-colors text-left group">
+          <button onclick="switchTab('chat')" id="nav-btn-chat" data-role="learner,coach" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md bg-surface-elevation-2 text-primary border-l-2 border-primary transition-colors text-left group">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[16px]">chat</span>
               <span class="text-xs font-medium">Workspace Chat</span>
@@ -155,8 +156,8 @@
             <span class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">B1</span>
           </button>
 
-          <!-- Tab 2: Tickets & SLA Radar -->
-          <button onclick="switchTab('radar')" id="nav-btn-radar" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
+          <!-- Tab 2: Tickets & SLA Radar (Coach Only) -->
+          <button onclick="switchTab('radar')" id="nav-btn-radar" data-role="coach" class="w-full hidden items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[16px]">radar</span>
               <span class="text-xs">Tickets & Radar</span>
@@ -167,8 +168,8 @@
             </div>
           </button>
 
-          <!-- Tab 3: Manage Channels & Message Ingestion -->
-          <button onclick="switchTab('channels')" id="nav-btn-channels" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
+          <!-- Tab 3: Manage Channels & Message Ingestion (Coach Only) -->
+          <button onclick="switchTab('channels')" id="nav-btn-channels" data-role="coach" class="w-full hidden items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[16px]">dns</span>
               <span class="text-xs">Manage Channels</span>
@@ -176,8 +177,17 @@
             <span class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-surface-elevation-3 text-text-muted border border-surface-border">4</span>
           </button>
 
+          <!-- Tab: News & Announcements Dispatcher -->
+          <button onclick="switchTab('news')" id="nav-btn-news" data-role="learner,coach" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[16px]">campaign</span>
+              <span id="nav-btn-news-label" class="text-xs">Official Notices</span>
+            </div>
+            <span id="nav-btn-news-badge" class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">Ground</span>
+          </button>
+
           <!-- Tab 4: Clean Daily Digest (22:00) -->
-          <button onclick="switchTab('digest')" id="nav-btn-digest" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
+          <button onclick="switchTab('digest')" id="nav-btn-digest" data-role="learner,coach" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[16px]">article</span>
               <span class="text-xs">22:00 Daily Digest</span>
@@ -186,21 +196,12 @@
           </button>
 
           <!-- Tab 5: Post-Demo Feedback & QR Code -->
-          <button onclick="switchTab('feedback')" id="nav-btn-feedback" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
+          <button onclick="switchTab('feedback')" id="nav-btn-feedback" data-role="learner,coach" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[16px]">qr_code_2</span>
               <span class="text-xs">Feedback & QR</span>
             </div>
             <span class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">Forms</span>
-          </button>
-
-          <!-- Tab 6: Design System Specs -->
-          <button onclick="switchTab('design')" id="nav-btn-design" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-muted hover:bg-surface-elevation-2 hover:text-white transition-colors text-left group">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[16px]">palette</span>
-              <span class="text-xs">Design System</span>
-            </div>
-            <span class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-surface-elevation-3 text-text-subtle">Specs</span>
           </button>
         </nav>
 
@@ -598,6 +599,10 @@
                         <span class="material-symbols-outlined text-[13px]">person_check</span>
                         <span>Claim Ticket</span>
                       </button>
+                      <button onclick="openQuickAnswerModal('ticket-104')" class="px-2.5 py-1 rounded bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/30 transition-colors flex items-center gap-1 font-semibold shadow-sm">
+                        <span class="material-symbols-outlined text-[13px]">quickreply</span>
+                        <span>Quick Answer</span>
+                      </button>
                       <button onclick="jumpToDiscordContext('M41569')" class="px-2.5 py-1 rounded bg-surface-elevation-1 text-text-body hover:bg-surface-elevation-3 border border-surface-border transition-colors flex items-center gap-1">
                         <span class="material-symbols-outlined text-[13px]">open_in_new</span>
                         <span>Jump to Discord</span>
@@ -645,6 +650,10 @@
                         <span class="material-symbols-outlined text-[13px]">person_check</span>
                         <span>Claim Ticket</span>
                       </button>
+                      <button onclick="openQuickAnswerModal('ticket-103')" class="px-2.5 py-1 rounded bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/30 transition-colors flex items-center gap-1 font-semibold shadow-sm">
+                        <span class="material-symbols-outlined text-[13px]">quickreply</span>
+                        <span>Quick Answer</span>
+                      </button>
                       <button onclick="jumpToDiscordContext('M79611')" class="px-2.5 py-1 rounded bg-surface-elevation-1 text-text-body hover:bg-surface-elevation-3 border border-surface-border transition-colors flex items-center gap-1">
                         <span class="material-symbols-outlined text-[13px]">open_in_new</span>
                         <span>Jump to Discord</span>
@@ -687,6 +696,10 @@
                       <button onclick="claimTicket('ticket-105')" id="claim-btn-105" class="px-2.5 py-1 rounded bg-primary text-base-canvas font-semibold hover:bg-primary-hover transition-colors flex items-center gap-1">
                         <span class="material-symbols-outlined text-[13px]">person_check</span>
                         <span>Claim Ticket</span>
+                      </button>
+                      <button onclick="openQuickAnswerModal('ticket-105')" class="px-2.5 py-1 rounded bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/30 transition-colors flex items-center gap-1 font-semibold shadow-sm">
+                        <span class="material-symbols-outlined text-[13px]">quickreply</span>
+                        <span>Quick Answer</span>
                       </button>
                       <button onclick="jumpToDiscordContext('M63574')" class="px-2.5 py-1 rounded bg-surface-elevation-1 text-text-body hover:bg-surface-elevation-3 border border-surface-border transition-colors flex items-center gap-1">
                         <span class="material-symbols-outlined text-[13px]">open_in_new</span>
@@ -1489,123 +1502,87 @@
       </section>
 
       <!-- ========================================================================= -->
-      <!-- VIEW 6: DESIGN SYSTEM SPECS (SCREEN 6: OBSIDIAN SIGNAL / TECHNICAL CYAN MINIMAL) -->
+      <!-- VIEW 6: OFFICIAL ANNOUNCEMENTS & NEWS DISPATCHER (CREATE & EDITABLE) -->
       <!-- ========================================================================= -->
-      <section id="view-design" class="flex-1 flex flex-col h-full overflow-hidden hidden">
+      <section id="view-news" class="flex-1 flex flex-col h-full overflow-hidden hidden">
         <header class="h-12 border-b border-surface-border px-6 flex items-center justify-between bg-surface-elevation-1 sticky top-0 z-30 flex-shrink-0">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[18px]">palette</span>
+            <span class="material-symbols-outlined text-primary text-[18px]">campaign</span>
             <h1 class="text-xs font-semibold text-white tracking-tight flex items-center gap-1.5">
-              <span>Technical Cyan Minimal Design System</span>
-              <span class="text-text-subtle font-mono text-[11px] font-normal">/ Token Architecture & Domain Specs</span>
+              <span id="news-header-title">Official Announcements & News Dispatcher</span>
+              <span class="text-text-subtle font-mono text-[11px] font-normal">/ Track B Ground Truth Authority</span>
             </h1>
           </div>
-          <span class="text-xs font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/30">Fidelity 100%</span>
+
+          <!-- Telemetry Badges -->
+          <div class="hidden sm:flex items-center gap-2 font-mono text-[11px]">
+            <div class="flex items-center gap-1.5 bg-base-canvas text-primary border border-surface-border px-2.5 py-0.5 rounded-full">
+              <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+              <span id="news-sync-status">Vector DB Synced (100%)</span>
+            </div>
+            <div class="flex items-center gap-1 bg-base-canvas text-secondary border border-surface-border px-2.5 py-0.5 rounded-full">
+              <span class="material-symbols-outlined text-[13px] text-secondary">push_pin</span>
+              <span id="news-count-badge">4 Pinned Notices</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
+            <!-- Create News Button (Coach only) -->
+            <button id="news-create-btn" onclick="openNewsModal()" class="h-8 px-3 bg-primary hover:bg-primary-hover text-base-canvas font-semibold rounded text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95">
+              <span class="material-symbols-outlined text-[15px]">add_circle</span>
+              <span>+ Create Announcement</span>
+            </button>
+            <button onclick="switchTab('chat')" class="h-8 px-2.5 border border-surface-border text-xs text-text-muted hover:text-white hover:bg-surface-elevation-2 rounded flex items-center gap-1.5 transition-colors">
+              <span class="material-symbols-outlined text-[14px]">chat</span>
+              <span class="hidden md:inline">Ask Assistant</span>
+            </button>
+          </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto custom-scrollbar p-6 max-w-5xl w-full mx-auto space-y-6">
-
-          <!-- Design Principles -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-lg bg-surface-elevation-1 border border-surface-border space-y-2">
-              <div class="flex items-center gap-2 text-primary font-mono text-xs font-semibold">
-                <span class="material-symbols-outlined text-[16px]">layers</span>
-                <span>Tonal Stratification</span>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-6 max-w-5xl w-full mx-auto space-y-5">
+          <!-- Policy Guidance Banner -->
+          <div class="p-3.5 rounded-lg bg-surface-elevation-1 border border-primary/30 flex items-start justify-between gap-3 shadow-sm">
+            <div class="flex items-start gap-2.5">
+              <span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0">verified_user</span>
+              <div class="text-xs space-y-1">
+                <span class="text-white font-medium">Ground Truth Authority & Timestamp Resolution Engine:</span>
+                <p class="text-text-muted text-[12px] leading-relaxed font-sans">
+                  Các thông báo phát đi tại đây là căn cứ duy nhất để AI Assistant trả lời học viên. Khi có sự thay đổi (như hạn nộp bài), thông báo có dấu thời gian mới nhất sẽ tự động ghi đè thông báo cũ theo quy tắc Deterministic Conflict Resolution.
+                </p>
               </div>
-              <p class="text-xs text-text-muted leading-relaxed">
-                Replaces ambient drop shadows with high-contrast structural elevation levels: Level 0 (<code class="text-white">#09090b</code>), Level 1 (<code class="text-white">#121215</code>), Level 2 (<code class="text-white">#18181b</code>).
-              </p>
+            </div>
+            <span class="font-mono text-[10px] text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded flex-shrink-0">
+              RAG Strict Mode
+            </span>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="bg-surface-elevation-1 border border-surface-border rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="relative w-72">
+              <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-text-subtle text-[14px]">search</span>
+              <input id="news-search-input" oninput="filterNewsList(this.value)" class="bg-base-canvas border border-surface-border rounded h-8 pl-8 pr-3 text-xs font-mono text-white placeholder-text-subtle focus:border-primary focus:outline-none w-full transition-colors" placeholder="Filter announcements by keyword, tag..." type="text"/>
             </div>
 
-            <div class="p-4 rounded-lg bg-surface-elevation-1 border border-surface-border space-y-2">
-              <div class="flex items-center gap-2 text-secondary font-mono text-xs font-semibold">
-                <span class="material-symbols-outlined text-[16px]">bolt</span>
-                <span>Luminescent Telemetry</span>
-              </div>
-              <p class="text-xs text-text-muted leading-relaxed">
-                Electric Cyan (<code class="text-primary">#06b6d4</code>) and Cyan Glow (<code class="text-secondary">#22d3ee</code>) serve as contextual cognitive beacons for verified answers and real-time activity.
-              </p>
-            </div>
-
-            <div class="p-4 rounded-lg bg-surface-elevation-1 border border-surface-border space-y-2">
-              <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs font-semibold">
-                <span class="material-symbols-outlined text-[16px]">terminal</span>
-                <span>Instrument Precision</span>
-              </div>
-              <p class="text-xs text-text-muted leading-relaxed">
-                Strict dual typography: <code class="text-white">Geist</code> for headers and prose; <code class="text-white">JetBrains Mono</code> for timestamps, hashes, intent routing, and diagnostics.
-              </p>
+            <div class="flex items-center gap-2 font-mono text-xs">
+              <select id="news-filter-channel" onchange="filterNewsList()" class="bg-base-canvas border border-surface-border rounded h-8 px-2.5 text-xs text-white focus:outline-none">
+                <option value="all">All Channels</option>
+                <option value="#announcements">#announcements</option>
+                <option value="#ta-radar">#ta-radar</option>
+                <option value="#discussion">#discussion</option>
+              </select>
+              <button onclick="dispatchAllNotices()" id="dispatch-all-btn" class="h-8 px-2.5 bg-surface-elevation-2 hover:bg-surface-elevation-3 text-text-high border border-surface-border rounded flex items-center gap-1.5 transition-colors" title="Re-sync all notices to Vector Store">
+                <span class="material-symbols-outlined text-[14px] text-primary">sync</span>
+                <span>Sync All Notices</span>
+              </button>
             </div>
           </div>
 
-          <!-- Color Tokens Palette -->
-          <div class="bg-surface-elevation-1 border border-surface-border rounded-xl p-5 space-y-4">
-            <h3 class="text-xs font-mono font-semibold text-white uppercase tracking-wider">Theme Color Tokens</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 font-mono text-xs">
-              <div class="space-y-1.5 cursor-pointer" onclick="navigator.clipboard.writeText('#09090b')">
-                <div class="h-12 rounded border border-surface-border bg-[#09090b]"></div>
-                <div class="text-[11px] text-white">#09090b</div>
-                <div class="text-[9px] text-text-subtle">Base Canvas</div>
-              </div>
-              <div class="space-y-1.5 cursor-pointer" onclick="navigator.clipboard.writeText('#121215')">
-                <div class="h-12 rounded border border-surface-border bg-[#121215]"></div>
-                <div class="text-[11px] text-white">#121215</div>
-                <div class="text-[9px] text-text-subtle">Elevation 1 (Nav)</div>
-              </div>
-              <div class="space-y-1.5 cursor-pointer" onclick="navigator.clipboard.writeText('#18181b')">
-                <div class="h-12 rounded border border-surface-border bg-[#18181b]"></div>
-                <div class="text-[11px] text-white">#18181b</div>
-                <div class="text-[9px] text-text-subtle">Elevation 2 (Cards)</div>
-              </div>
-              <div class="space-y-1.5 cursor-pointer" onclick="navigator.clipboard.writeText('#06b6d4')">
-                <div class="h-12 rounded bg-[#06b6d4]"></div>
-                <div class="text-[11px] text-primary">#06b6d4</div>
-                <div class="text-[9px] text-text-subtle">Electric Cyan</div>
-              </div>
-              <div class="space-y-1.5 cursor-pointer" onclick="navigator.clipboard.writeText('#22d3ee')">
-                <div class="h-12 rounded bg-[#22d3ee]"></div>
-                <div class="text-[11px] text-secondary">#22d3ee</div>
-                <div class="text-[9px] text-text-subtle">Cyan Secondary</div>
-              </div>
-              <div class="space-y-1.5 cursor-pointer" onclick="navigator.clipboard.writeText('#ef4444')">
-                <div class="h-12 rounded bg-[#ef4444]"></div>
-                <div class="text-[11px] text-red-400">#ef4444</div>
-                <div class="text-[9px] text-text-subtle">SLA Breach Red</div>
-              </div>
-            </div>
+          <!-- Announcements Cards List Container -->
+          <div id="announcements-container" class="space-y-3.5">
+            <!-- Populated by renderNewsList() -->
           </div>
-
-          <!-- Domain Language Boundaries (CONTEXT.md mapping) -->
-          <div class="bg-surface-elevation-1 border border-surface-border rounded-xl p-5 space-y-4">
-            <h3 class="text-xs font-mono font-semibold text-white uppercase tracking-wider">EasyGame Domain Specification (CONTEXT.md)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1">
-                <span class="text-primary font-mono font-bold">Grounded Response Rule:</span>
-                <p class="text-text-muted leading-relaxed">
-                  Factual answers strictly capped at <strong>≤3 sentences (≤300 characters)</strong> citing an authentic pinned announcement with an exact jump link. Avoid speculative hallucination.
-                </p>
-              </div>
-              <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1">
-                <span class="text-secondary font-mono font-bold">Timestamp Resolution:</span>
-                <p class="text-text-muted leading-relaxed">
-                  Deterministic conflict resolution prioritizing the <strong>latest official notice timestamp</strong> when multiple announcements modify the same deadline (e.g. Notice #2 15:00 overrides #1 09:00).
-                </p>
-              </div>
-              <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1">
-                <span class="text-amber-400 font-mono font-bold">Graceful Fallback & Intent Router:</span>
-                <p class="text-text-muted leading-relaxed">
-                  Confidence &lt;0.70 triggers safe refusal + automatic TA escalation tag. Intent Router partitions queries into Logistics_Deadline, Technical_Code, Policy_Attendance, and Chitchat.
-                </p>
-              </div>
-              <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1">
-                <span class="text-red-400 font-mono font-bold">Non-Intrusive Radar Escalation:</span>
-                <p class="text-text-muted leading-relaxed">
-                  Alerts escalate strictly to staff channel <code>#ta-radar</code> (Tier 1 Soft Warning at 2h, Tier 2 Urgent Ping at 4h). No unsolicited student DMs.
-                </p>
-              </div>
-            </div>
-          </div>
-
         </main>
       </section>
 
@@ -1613,83 +1590,409 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- MODAL 1: MESSAGE TELEMETRY INSPECTOR (GLASS-BOX DRAWER) -->
+  <!-- MODAL 1: DIRECT TICKET QUICK ANSWER -->
   <!-- ========================================================================= -->
-  <div id="inspector-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-end hidden">
-    <div class="w-full max-w-xl bg-surface-elevation-1 border-l border-surface-border h-full flex flex-col justify-between shadow-2xl p-5 overflow-y-auto custom-scrollbar">
-      <div class="space-y-4">
-        <!-- Header -->
-        <div class="flex items-center justify-between border-b border-surface-border pb-3">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[18px]">terminal</span>
-            <span class="font-mono text-xs font-bold text-white uppercase">Glass-Box Agent Inspector</span>
+  <div id="quick-answer-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-xl bg-surface-elevation-1 border border-surface-border rounded-xl shadow-2xl overflow-hidden font-sans text-xs">
+      <!-- Header -->
+      <div class="px-5 py-3.5 bg-surface-elevation-2 border-b border-surface-border flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-[18px]">quickreply</span>
+          <h2 class="text-sm font-semibold text-white">Direct Ticket Quick Answer</h2>
+          <span id="qa-ticket-id" class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-secondary/15 text-secondary border border-secondary/30">#TICK-104</span>
+        </div>
+        <button onclick="closeQuickAnswerModal()" class="text-text-subtle hover:text-white p-1">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 space-y-4">
+        <!-- Ticket Context Brief -->
+        <div class="p-3 rounded-lg bg-base-canvas border border-surface-border space-y-1 font-mono text-[11px]">
+          <div class="flex items-center justify-between text-text-subtle">
+            <span id="qa-ticket-author">Learner: @MinhTuan_K4</span>
+            <span id="qa-ticket-channel" class="text-white">Channel: #discussion</span>
           </div>
-          <button onclick="closeInspectorModal()" class="text-text-subtle hover:text-white p-1 rounded">
+          <div id="qa-ticket-title" class="text-white font-medium text-xs font-sans">TypeError load_dataset trong bài Lab 1</div>
+        </div>
+
+        <!-- Preset Quick Templates -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle uppercase">
+            <span>One-Click Answer Presets</span>
+            <span class="text-secondary">Click to prefill answer</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px]" id="qa-templates-container">
+            <!-- Populated dynamically based on ticket context -->
+          </div>
+        </div>
+
+        <!-- Answer Textarea -->
+        <div class="space-y-1">
+          <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle uppercase">
+            <span>Response Message to Student</span>
+            <span id="qa-char-count" class="text-text-subtle">0 / 300 chars (Grounded Policy)</span>
+          </div>
+          <textarea id="qa-answer-text" rows="4" oninput="updateQaCharCount()" class="w-full bg-base-canvas border border-surface-border focus:border-secondary focus:ring-1 focus:ring-secondary rounded-lg p-2.5 text-xs text-white placeholder-text-subtle font-sans resize-none" placeholder="Nhập câu trả lời trực tiếp cho học viên..."></textarea>
+        </div>
+
+        <!-- Options Checkboxes -->
+        <div class="space-y-2 pt-1 font-mono text-[11px]">
+          <label class="flex items-center gap-2 cursor-pointer text-text-body">
+            <input type="checkbox" id="qa-opt-resolve" checked class="rounded bg-surface-elevation-3 border-surface-border text-secondary focus:ring-0 w-3.5 h-3.5">
+            <span>Mark Ticket as Resolved & Stop SLA Clock</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-text-body">
+            <input type="checkbox" id="qa-opt-discord" checked class="rounded bg-surface-elevation-3 border-surface-border text-secondary focus:ring-0 w-3.5 h-3.5">
+            <span>Dispatch directly into student's Discord thread</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-5 py-3 bg-surface-elevation-2 border-t border-surface-border flex items-center justify-between">
+        <button onclick="closeQuickAnswerModal()" class="px-3 py-1.5 rounded bg-surface-elevation-3 hover:bg-surface-elevation-2 text-text-muted hover:text-white font-mono text-xs border border-surface-border transition-colors">
+          Cancel
+        </button>
+        <button onclick="submitQuickAnswer()" class="px-4 py-1.5 rounded bg-secondary hover:bg-primary-hover text-base-canvas font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm active:scale-95">
+          <span class="material-symbols-outlined text-[15px]">send</span>
+          <span>Submit Answer Directly</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: DISCORD MESSAGE ACTION CENTER (5 ACTIONS) -->
+  <!-- ========================================================================= -->
+  <div id="discord-actions-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex justify-end hidden">
+    <div class="w-full max-w-2xl bg-surface-elevation-1 border-l border-surface-border h-full flex flex-col justify-between shadow-2xl overflow-hidden font-sans text-xs">
+      <!-- Modal Top Bar -->
+      <div class="p-4 bg-surface-elevation-2 border-b border-surface-border flex-shrink-0 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">forum</span>
+            <span class="font-mono text-xs font-bold text-white uppercase">Discord Message Actions & Telemetry</span>
+            <span id="dact-msg-id" class="font-mono text-[10px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/30">#M41569</span>
+          </div>
+          <button onclick="closeDiscordActionsModal()" class="text-text-subtle hover:text-white p-1 rounded">
             <span class="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
-        <!-- Details Grid -->
-        <div class="space-y-3 font-mono text-xs">
-          <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1.5">
-            <div class="flex items-center justify-between text-text-subtle text-[11px]">
-              <span>MESSAGE IDENTITY</span>
-              <span id="insp-id" class="text-primary font-bold">#M99769</span>
+        <!-- Tab Selector for the 5 Action Areas -->
+        <div class="grid grid-cols-5 p-0.5 bg-base-canvas rounded-lg border border-surface-border font-mono text-[11px] text-center">
+          <button onclick="switchDiscordActionTab('reply')" id="dact-tab-btn-reply" class="py-1.5 rounded text-white bg-surface-elevation-2 border border-surface-border shadow-sm flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">reply</span>
+            <span>Reply</span>
+          </button>
+          <button onclick="switchDiscordActionTab('context')" id="dact-tab-btn-context" class="py-1.5 rounded text-text-muted hover:text-white flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">explore</span>
+            <span>Context</span>
+          </button>
+          <button onclick="switchDiscordActionTab('profile')" id="dact-tab-btn-profile" class="py-1.5 rounded text-text-muted hover:text-white flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">account_circle</span>
+            <span>Profile</span>
+          </button>
+          <button onclick="switchDiscordActionTab('files')" id="dact-tab-btn-files" class="py-1.5 rounded text-text-muted hover:text-white flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">folder_open</span>
+            <span>Files</span>
+          </button>
+          <button onclick="switchDiscordActionTab('history')" id="dact-tab-btn-history" class="py-1.5 rounded text-text-muted hover:text-white flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">history</span>
+            <span>History</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Tab Panels) -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
+        <!-- TAB 1: REPLY -->
+        <div id="dact-panel-reply" class="space-y-4">
+          <!-- Message Quote -->
+          <div class="p-3 rounded-lg bg-base-canvas border border-surface-border space-y-1">
+            <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle">
+              <span id="dact-reply-author">Author: @MinhTuan_K4</span>
+              <span id="dact-reply-time">11:24:05</span>
             </div>
-            <div class="text-white text-sm" id="insp-content">
-              "@Assistant hạn nộp bài Lab 1 hôm nay là mấy giờ thế ạ?"
+            <p id="dact-reply-content" class="text-text-high text-xs italic font-mono"></p>
+          </div>
+
+          <!-- Quick Templates -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle uppercase">
+              <span>Quick Reply Templates</span>
+              <span class="text-primary">Click to insert</span>
             </div>
-            <div class="text-[11px] text-text-subtle flex items-center gap-2 pt-1 border-t border-surface-border/60">
-              <span id="insp-author">Author: @NguyenVanAn</span>
-              <span>•</span>
-              <span id="insp-channel">Channel: #discussion</span>
-              <span>•</span>
-              <span id="insp-time">15:42:11</span>
+            <div class="flex flex-wrap gap-1.5 text-[11px]" id="dact-quick-reply-templates">
+              <!-- Inserted via JS -->
             </div>
           </div>
 
-          <!-- Intent Breakdown -->
-          <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-2">
-            <span class="text-[11px] text-text-subtle uppercase font-semibold">Semantic Intent Router</span>
-            <div class="space-y-1 text-[11px]">
-              <div class="flex justify-between items-center">
-                <span class="text-white">Primary Classification:</span>
-                <span id="insp-intent" class="text-primary font-semibold">Logistics_Deadline (0.96)</span>
+          <!-- Textarea -->
+          <div class="space-y-1">
+            <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle">
+              <span>Your Response as @TA_MinhHai (Lab Coach)</span>
+              <span class="text-primary">Direct Thread Reply</span>
+            </div>
+            <textarea id="dact-reply-input" rows="4" class="w-full bg-base-canvas border border-surface-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg p-2.5 text-xs text-white placeholder-text-subtle font-sans resize-none" placeholder="Viết câu trả lời cho học viên trong luồng Discord này..."></textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <span class="font-mono text-[10px] text-text-subtle">Posts to channel and saves to thread history</span>
+            <button onclick="sendDiscordReply()" class="px-4 py-1.5 rounded bg-primary hover:bg-primary-hover text-base-canvas font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm">
+              <span class="material-symbols-outlined text-[14px]">send</span>
+              <span>Send Reply</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 2: CONTEXT -->
+        <div id="dact-panel-context" class="space-y-3.5 hidden font-mono text-xs">
+          <!-- Channel & Intent Metadata -->
+          <div class="p-3 rounded-lg bg-base-canvas border border-surface-border space-y-2">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-text-subtle">CHANNEL CONTEXT</span>
+              <span id="dact-ctx-channel" class="text-primary font-bold">#discussion</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-text-subtle">TIMESTAMP</span>
+              <span id="dact-ctx-time" class="text-white">11:24:05</span>
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-text-subtle">ROUTING INTENT</span>
+              <span id="dact-ctx-intent" class="text-secondary font-bold">Technical_Code</span>
+            </div>
+            <div class="space-y-1 pt-1 border-t border-surface-border">
+              <div class="flex justify-between text-[10px] text-text-subtle">
+                <span>Confidence Score:</span>
+                <span id="dact-ctx-conf" class="text-primary font-bold">91%</span>
               </div>
               <div class="w-full bg-surface-elevation-3 h-1.5 rounded-full overflow-hidden">
-                <div id="insp-bar" class="bg-primary h-full w-[96%]"></div>
-              </div>
-              <div class="flex justify-between text-[10px] text-text-subtle">
-                <span>Routing Target: Notice_Vector_Store</span>
-                <span>Threshold: &gt;0.70 (Passed)</span>
+                <div id="dact-ctx-conf-bar" class="bg-primary h-full w-[91%]"></div>
               </div>
             </div>
           </div>
 
-          <!-- Grounded Context Resolution -->
-          <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1.5">
-            <span class="text-[11px] text-text-subtle uppercase font-semibold">Timestamp Conflict Resolution</span>
-            <div class="text-[11px] text-text-body space-y-1 leading-relaxed">
-              <div>• Notice #1 (12/09 09:00): Lab 1 deadline originally 23:59 Friday.</div>
-              <div class="text-emerald-400 font-semibold">• Notice #2 (14/09 15:00): Extended to Saturday 12:00 PM (19/09).</div>
-              <div class="text-text-subtle text-[10px]">Decision: Timestamp #2 &gt; #1 → Deterministically select 19/09 12:00.</div>
+          <!-- Surrounding Context Snippet -->
+          <div class="p-3 rounded-lg bg-base-canvas border border-surface-border space-y-1.5">
+            <span class="text-[10px] text-text-subtle uppercase tracking-wider font-semibold">Surrounding Channel Messages</span>
+            <div class="space-y-2 text-[11px] font-sans pt-1" id="dact-ctx-surrounding">
+              <!-- Dynamically populated -->
             </div>
           </div>
 
-          <!-- Raw Telemetry Payload -->
-          <div class="p-3 rounded bg-base-canvas border border-surface-border space-y-1.5">
+          <!-- JSON Telemetry Payload -->
+          <div class="p-3 rounded-lg bg-base-canvas border border-surface-border space-y-1.5">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] text-text-subtle uppercase font-semibold">JSON Telemetry Payload</span>
-              <button onclick="copyInspectorPayload()" class="text-[10px] text-primary hover:underline">Copy JSON</button>
+              <span class="text-[10px] text-text-subtle uppercase">Telemetry JSON Payload</span>
+              <button onclick="copyDiscordPayload()" class="text-[10px] text-primary hover:underline flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]">content_copy</span>
+                <span>Copy JSON</span>
+              </button>
             </div>
-            <pre id="insp-json" class="p-2 rounded bg-surface-elevation-1 text-[10px] text-text-muted overflow-x-auto custom-scrollbar font-mono leading-tight max-h-40">{}</pre>
+            <pre id="dact-ctx-json" class="p-2 rounded bg-surface-elevation-1 text-[10px] text-text-muted overflow-x-auto custom-scrollbar font-mono leading-tight max-h-36"></pre>
+          </div>
+        </div>
+
+        <!-- TAB 3: USERNAME + PROFILE -->
+        <div id="dact-panel-profile" class="space-y-4 hidden">
+          <!-- Profile Card -->
+          <div class="p-4 rounded-xl bg-base-canvas border border-surface-border space-y-4">
+            <div class="flex items-center gap-3">
+              <div id="dact-prof-avatar" class="w-12 h-12 rounded-xl bg-surface-elevation-3 border border-surface-border-strong text-primary font-mono text-base font-bold flex items-center justify-center flex-shrink-0">
+                MT
+              </div>
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                  <h3 id="dact-prof-name" class="text-sm font-semibold text-white">Trần Minh Tuấn</h3>
+                  <span id="dact-prof-badge" class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">Verified Learner</span>
+                </div>
+                <div id="dact-prof-handle" class="font-mono text-xs text-text-subtle">@MinhTuan_K4 · minhtuan_k4#4821</div>
+              </div>
+            </div>
+
+            <!-- Profile Details Grid -->
+            <div class="grid grid-cols-2 gap-2.5 font-mono text-[11px] pt-2 border-t border-surface-border">
+              <div class="p-2 rounded bg-surface-elevation-1 border border-surface-border">
+                <span class="text-text-subtle block text-[10px]">Student ID (MSSV)</span>
+                <span id="dact-prof-mssv" class="text-white font-medium">23010482</span>
+              </div>
+              <div class="p-2 rounded bg-surface-elevation-1 border border-surface-border">
+                <span class="text-text-subtle block text-[10px]">VinUni Email</span>
+                <span id="dact-prof-email" class="text-white font-medium truncate block">tuan.tm23@vinuni.edu.vn</span>
+              </div>
+              <div class="p-2 rounded bg-surface-elevation-1 border border-surface-border">
+                <span class="text-text-subtle block text-[10px]">Cohort & Track</span>
+                <span class="text-primary font-medium">AI20K K4 · Track B</span>
+              </div>
+              <div class="p-2 rounded bg-surface-elevation-1 border border-surface-border">
+                <span class="text-text-subtle block text-[10px]">Team Assigned</span>
+                <span id="dact-prof-team" class="text-secondary font-medium">Phoenix L3-4 (Team 07)</span>
+              </div>
+            </div>
+
+            <!-- Activity Stats -->
+            <div class="p-3 rounded-lg bg-surface-elevation-1 border border-surface-border font-mono text-[11px] space-y-1.5">
+              <span class="text-[10px] text-text-subtle uppercase tracking-wider font-semibold">Inquiry History & Activity</span>
+              <div class="flex items-center justify-between text-text-body">
+                <span>• Total Inquiries Posted:</span>
+                <span id="dact-prof-msgs" class="text-white font-bold">14 messages</span>
+              </div>
+              <div class="flex items-center justify-between text-text-body">
+                <span>• Escalated Tickets:</span>
+                <span id="dact-prof-tickets" class="text-amber-400 font-bold">2 tickets (1 resolved)</span>
+              </div>
+              <div class="flex items-center justify-between text-text-body">
+                <span>• Assigned Lab Coach:</span>
+                <span class="text-emerald-400 font-bold">@TA_MinhHai (E402)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: OVERVIEW OF PROBLEMS RELATED FILES -->
+        <div id="dact-panel-files" class="space-y-3.5 hidden">
+          <!-- Problem Overview Banner -->
+          <div class="p-3.5 rounded-lg bg-base-canvas border border-surface-border space-y-1">
+            <span class="text-[10px] font-mono text-red-400 uppercase tracking-wider font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+              Problem Diagnostic Overview
+            </span>
+            <h4 id="dact-files-summary" class="text-xs font-medium text-white"></h4>
+            <p id="dact-files-detail" class="text-[11px] text-text-muted leading-relaxed font-sans"></p>
+          </div>
+
+          <!-- Files List -->
+          <div class="space-y-2">
+            <span class="text-[10px] font-mono text-text-subtle uppercase tracking-wider font-semibold">Related Course Files & Repositories</span>
+            <div id="dact-files-list" class="space-y-2 font-mono text-xs">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Code Snippet Preview -->
+          <div class="p-3 rounded-lg bg-base-canvas border border-surface-border space-y-2">
+            <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle">
+              <span id="dact-files-code-title">Code Snippet Preview</span>
+              <button onclick="copySnippetCode()" class="text-primary hover:underline">Copy Snippet</button>
+            </div>
+            <pre id="dact-files-code" class="p-2.5 rounded bg-surface-elevation-1 text-[11px] text-emerald-400 font-mono leading-relaxed overflow-x-auto custom-scrollbar border border-surface-border"></pre>
+          </div>
+        </div>
+
+        <!-- TAB 5: HISTORY CHAT / REPLIES -->
+        <div id="dact-panel-history" class="space-y-3 hidden">
+          <div class="flex items-center justify-between font-mono text-[10px] text-text-subtle pb-1 border-b border-surface-border">
+            <span>THREAD HISTORY & CHAT REPLIES</span>
+            <span id="dact-hist-count">3 entries</span>
+          </div>
+
+          <div id="dact-hist-timeline" class="space-y-3 font-sans text-xs">
+            <!-- Timeline items populated dynamically -->
           </div>
         </div>
       </div>
 
-      <div class="pt-4 border-t border-surface-border flex justify-end">
-        <button onclick="closeInspectorModal()" class="px-4 py-1.5 rounded bg-surface-elevation-2 hover:bg-surface-elevation-3 text-white font-mono text-xs border border-surface-border">
-          Close Inspector
+      <!-- Modal Bottom Bar -->
+      <div class="p-4 bg-surface-elevation-2 border-t border-surface-border flex items-center justify-between flex-shrink-0">
+        <span class="font-mono text-[10px] text-text-subtle">EasyGame Track B Telemetry Inspector</span>
+        <button onclick="closeDiscordActionsModal()" class="px-4 py-1.5 rounded bg-surface-elevation-3 hover:bg-surface-elevation-2 text-white font-mono text-xs border border-surface-border transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3: CREATE & EDIT ANNOUNCEMENT (NEWS DISPATCHER) -->
+  <!-- ========================================================================= -->
+  <div id="news-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-xl bg-surface-elevation-1 border border-surface-border rounded-xl shadow-2xl overflow-hidden font-sans text-xs">
+      <div class="px-5 py-3.5 bg-surface-elevation-2 border-b border-surface-border flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[18px]">campaign</span>
+          <h2 id="news-modal-title" class="text-sm font-semibold text-white">Create New Announcement</h2>
+        </div>
+        <button onclick="closeNewsModal()" class="text-text-subtle hover:text-white p-1">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <!-- Title -->
+        <div class="space-y-1">
+          <label class="block font-mono text-[10px] text-text-subtle uppercase">Announcement Title</label>
+          <input id="news-input-title" class="w-full bg-base-canvas border border-surface-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-3 py-2 text-xs text-white placeholder-text-subtle font-sans" placeholder="e.g. Gia hạn nộp bài Lab 1 & Cập nhật repo Classroom...">
+        </div>
+
+        <!-- Channel & Audience Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-mono text-[10px] text-text-subtle uppercase">Target Channel</label>
+            <select id="news-input-channel" class="w-full bg-base-canvas border border-surface-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+              <option value="#announcements">#announcements (Ground Truth)</option>
+              <option value="#discussion">#discussion (Public Chat)</option>
+              <option value="#q-and-a">#q-and-a (Help Desk)</option>
+              <option value="#ta-radar">#ta-radar (Staff Only)</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="block font-mono text-[10px] text-text-subtle uppercase">Target Audience</label>
+            <select id="news-input-target" class="w-full bg-base-canvas border border-surface-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+              <option value="All Cohort K4">All Cohort K4</option>
+              <option value="Track B Learners">Track B Learners</option>
+              <option value="Level 2-3 Learners">Level 2-3 Learners</option>
+              <option value="Level 3-4 Learners">Level 3-4 Learners</option>
+              <option value="Lab Coaches & Staff">Lab Coaches & Staff</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Priority & Notice Identifier Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-mono text-[10px] text-text-subtle uppercase">Notice Type / Priority</label>
+            <select id="news-input-priority" class="w-full bg-base-canvas border border-surface-border rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+              <option value="High Override">High Override (Overrides earlier deadline)</option>
+              <option value="Pinned Policy">Pinned Policy</option>
+              <option value="Routine Logistics">Routine Logistics</option>
+              <option value="Urgent Alert">Urgent Alert</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="block font-mono text-[10px] text-text-subtle uppercase">Notice Identifier</label>
+            <input id="news-input-notice-id" class="w-full bg-base-canvas border border-surface-border rounded-lg px-3 py-1.5 text-xs text-white font-mono" placeholder="Notice #05">
+          </div>
+        </div>
+
+        <!-- Content Textarea -->
+        <div class="space-y-1">
+          <label class="block font-mono text-[10px] text-text-subtle uppercase">Announcement Content</label>
+          <textarea id="news-input-content" rows="4" class="w-full bg-base-canvas border border-surface-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg p-2.5 text-xs text-white placeholder-text-subtle font-sans resize-none" placeholder="Nội dung thông báo chính thức..."></textarea>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="space-y-2 pt-1 font-mono text-[11px]">
+          <label class="flex items-center gap-2 cursor-pointer text-text-body">
+            <input type="checkbox" id="news-opt-pin" checked class="rounded bg-surface-elevation-3 border-surface-border text-primary focus:ring-0 w-3.5 h-3.5">
+            <span>Pin as Ground Truth in RAG Vector Store</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer text-text-body">
+            <input type="checkbox" id="news-opt-dispatch" checked class="rounded bg-surface-elevation-3 border-surface-border text-primary focus:ring-0 w-3.5 h-3.5">
+            <span>Broadcast webhook dispatch to Discord channel</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 bg-surface-elevation-2 border-t border-surface-border flex items-center justify-between">
+        <button onclick="closeNewsModal()" class="px-3 py-1.5 rounded bg-surface-elevation-3 hover:bg-surface-elevation-2 text-text-muted hover:text-white font-mono text-xs border border-surface-border transition-colors">
+          Cancel
+        </button>
+        <button onclick="saveNewsAnnouncement()" class="px-4 py-1.5 rounded bg-primary hover:bg-primary-hover text-base-canvas font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-sm active:scale-95">
+          <span class="material-symbols-outlined text-[15px]">send</span>
+          <span id="news-submit-btn-text">🚀 Save & Dispatch Announcement</span>
         </button>
       </div>
     </div>
@@ -1742,12 +2045,12 @@
           </span>
           <span class="text-[10px] text-text-subtle">Tab 5</span>
         </button>
-        <button onclick="switchTab('design'); toggleShortcutsModal();" class="w-full text-left px-3 py-2 rounded hover:bg-surface-elevation-2 flex items-center justify-between text-white transition-colors">
+        <button onclick="switchTab('news'); toggleShortcutsModal();" class="w-full text-left px-3 py-2 rounded hover:bg-surface-elevation-2 flex items-center justify-between text-white transition-colors">
           <span class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[15px] text-primary">palette</span>
-            <span>View Design System Tokens</span>
+            <span class="material-symbols-outlined text-[15px] text-primary">campaign</span>
+            <span>Switch to Official Announcements & News</span>
           </span>
-          <span class="text-[10px] text-text-subtle">Tab 6</span>
+          <span class="text-[10px] text-text-subtle">News</span>
         </button>
         <button onclick="toggleBuggyDigestComparison(); toggleShortcutsModal();" class="w-full text-left px-3 py-2 rounded hover:bg-surface-elevation-2 flex items-center justify-between text-white transition-colors">
           <span class="flex items-center gap-2">
@@ -1775,38 +2078,677 @@
       activeTab: 'chat',
       persona: 'learner', // 'learner' or 'coach'
       surveyPersona: 'student',
+      editingNewsId: null,
+      activeTicketForAnswer: null,
+      activeDiscordMsg: null,
+      roleViews: {
+        learner: ['chat', 'news', 'digest', 'feedback'],
+        coach: ['radar', 'channels', 'news', 'digest', 'chat', 'feedback']
+      },
       tickets: [
-        { id: 'ticket-104', status: 'urgent', title: 'TypeError load_dataset trong bài Lab 1', author: '@MinhTuan_K4', time: '11:24', claimedBy: null, severity: 'P1 High', channel: '#discussion' },
-        { id: 'ticket-103', status: 'urgent', title: 'Link Colab template báo 404 không truy cập được', author: '@ThuTrang_K4', time: '11:37', claimedBy: null, severity: 'P1 High', channel: '#general-qa' },
-        { id: 'ticket-105', status: 'warning', title: 'Xin phép vắng mặt buổi lab Thứ Sáu tuần này', author: '@QuangHuy_K4', time: '13:22', claimedBy: null, severity: 'P2 Medium', channel: '#announcements' },
-        { id: 'ticket-102', status: 'resolved', title: 'Hạn nộp link GitHub Classroom repo', author: '@TA_MinhHai', time: '14:15', claimedBy: '@TA_MinhHai', severity: 'P3 Low', channel: '#announcements' },
-        { id: 'ticket-101', status: 'resolved', title: 'Cài đặt Conda virtual environment bị timeout khi tải PyTorch', author: '@TA_MinhHai', time: '10:05', claimedBy: '@TA_MinhHai', severity: 'P2 Medium', channel: '#env-setup' }
+        { 
+          id: 'ticket-104', 
+          msgId: 'M41569',
+          status: 'urgent', 
+          title: 'TypeError load_dataset trong bài Lab 1', 
+          author: '@MinhTuan_K4', 
+          time: '11:24', 
+          claimedBy: null, 
+          severity: 'P1 High', 
+          channel: '#discussion',
+          errorSnippet: "FileNotFoundError: Couldn't find a dataset script at easygame/nlp_trackb_lab1.py",
+          answer: null
+        },
+        { 
+          id: 'ticket-103', 
+          msgId: 'M79611',
+          status: 'urgent', 
+          title: 'Link Colab template báo 404 không truy cập được', 
+          author: '@ThuTrang_K4', 
+          time: '11:37', 
+          claimedBy: null, 
+          severity: 'P1 High', 
+          channel: '#general-qa',
+          errorSnippet: "drive.google.com/file/d/1axytKPkexBc... need VinUni org email whitelisting",
+          answer: null
+        },
+        { 
+          id: 'ticket-105', 
+          msgId: 'M63574',
+          status: 'warning', 
+          title: 'Xin phép vắng mặt buổi lab Thứ Sáu tuần này', 
+          author: '@QuangHuy_K4', 
+          time: '13:22', 
+          claimedBy: null, 
+          severity: 'P2 Medium', 
+          channel: '#announcements',
+          errorSnippet: "Bot policy: Cannot grant attendance exceptions autonomously. Transferred to TA.",
+          answer: null
+        },
+        { 
+          id: 'ticket-102', 
+          msgId: 'M47011',
+          status: 'resolved', 
+          title: 'Hạn nộp link GitHub Classroom repo', 
+          author: '@TA_MinhHai', 
+          time: '14:15', 
+          claimedBy: '@TA_MinhHai', 
+          severity: 'P3 Low', 
+          channel: '#announcements',
+          errorSnippet: "Resolved by @TA_MinhHai • 14:15 • Automated Grounded Notice match",
+          answer: "Đã gia hạn nộp repo GitHub Classroom đến 12:00 trưa Thứ Bảy (19/09/2026)."
+        },
+        { 
+          id: 'ticket-101', 
+          msgId: 'M56157',
+          status: 'resolved', 
+          title: 'Cài đặt Conda virtual environment bị timeout khi tải PyTorch', 
+          author: '@TA_MinhHai', 
+          time: '10:05', 
+          claimedBy: '@TA_MinhHai', 
+          severity: 'P2 Medium', 
+          channel: '#env-setup',
+          errorSnippet: "Resolved by @TA_MinhHai • 10:05",
+          answer: "Sử dụng pip index mirror của VinUni hoặc tải wheel offline tại thư mục /shared/pytorch."
+        }
       ],
-      // Authentic messages synthesized from data/discord-pack/k4_messages.csv
+      // Official Announcements & News List
+      announcements: [
+        {
+          id: 'NOTICE-02',
+          noticeNumber: 'Notice #02',
+          title: 'Gia hạn nộp bài Lab 1 & Cú pháp nộp GitHub Classroom',
+          channel: '#announcements',
+          target: 'All Cohort K4',
+          priority: 'High Override',
+          time: '14/09 15:00',
+          author: '@D8938 · Lead TA',
+          content: 'Hạn nộp bài Lab 1 được gia hạn đến 12:00 trưa Thứ Bảy (19/09/2026). Vui lòng nộp link GitHub repo qua form trước mốc này. Lưu ý: Học viên phải fork repo từ GitHub Classroom của lớp về tài khoản cá nhân rồi mới clone. Thông báo này ghi đè mốc nộp cũ lúc 23:59 Thứ Sáu.',
+          pinned: true,
+          isOverride: true,
+          vectorSynced: true
+        },
+        {
+          id: 'NOTICE-04',
+          noticeNumber: 'Notice #04',
+          title: 'Hướng dẫn nhận Thẻ học viên & Check-in sảnh E402',
+          channel: '#announcements',
+          target: 'All Cohort K4',
+          priority: 'Pinned Policy',
+          time: '12/09 14:00',
+          author: '@D8938 · Lead TA',
+          content: 'Học viên chưa nhận thẻ tại lễ khai giảng vui lòng liên hệ bàn điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn kèm MSSV để nhận thẻ trong tuần đầu.',
+          pinned: true,
+          isOverride: false,
+          vectorSynced: true
+        },
+        {
+          id: 'NOTICE-03',
+          noticeNumber: 'Notice #03',
+          title: 'Quy chế Điểm danh Workshop & Hoạt động Build Phase',
+          channel: '#announcements',
+          target: 'All Cohort K4',
+          priority: 'Pinned Policy',
+          time: '13/09 10:00',
+          author: '@D3694 · Academic Coordinator',
+          content: 'Dữ liệu điểm danh workshop cập nhật trên app MyVinUni sau 24h. Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.',
+          pinned: true,
+          isOverride: false,
+          vectorSynced: true
+        },
+        {
+          id: 'NOTICE-12',
+          noticeNumber: 'Notice #12',
+          title: 'Quy tắc Ghép Đội Phoenix L3-4',
+          channel: '#announcements',
+          target: 'Level 3 & Level 4',
+          priority: 'Team Formation',
+          time: '11/09 16:30',
+          author: '@D8938 · Lead TA',
+          content: 'Mỗi đội có tối đa 5 thành viên và bắt buộc cùng Level (Level 2-3 lập nhóm riêng, Level 3-4 riêng). Hạn chót chốt danh sách đội trên Phoenix là 18:00 ngày 15/09/2026.',
+          pinned: true,
+          isOverride: false,
+          vectorSynced: true
+        }
+      ],
+      // Authentic messages synthesized from k4_messages.csv with rich metadata
       ingestedMessages: [
-        { id: '#M99769', time: '15:42:11', channel: '#discussion', author: '@NguyenVanAn', role: 'Student', content: '@Assistant hạn nộp bài Lab 1 hôm nay là mấy giờ thế ạ?', intent: 'Logistics_Deadline', confidence: 96, status: 'Grounded', latency: '1.1s' },
-        { id: '#M41569', time: '11:24:05', channel: '#discussion', author: '@MinhTuan_K4', role: 'Student', content: 'Cho em hỏi bài tập 2 Lab 1 chạy bị lỗi TypeError load_dataset...', intent: 'Technical_Code', confidence: 91, status: 'Escalated', latency: '340ms' },
-        { id: '#M56157', time: '10:15:20', channel: '#discussion', author: '@DucAnh_K4', role: 'Student', content: '[@BOT] mình hôm khai giảng chưa nhận thẻ học viên thì làm sao', intent: 'Onboarding_Card', confidence: 95, status: 'Bot Auto-FAQ', latency: '420ms' },
-        { id: '#M89035', time: '14:02:18', channel: '#q-and-a', author: '@HoangNam_K4', role: 'Student', content: '[@BOT] Bài lab1 tôi clone code, không fork thì bị tính là fail rồi đúng không?', intent: 'Policy_Submission', confidence: 94, status: 'Grounded', latency: '890ms' },
-        { id: '#M13974', time: '09:30:14', channel: '#q-and-a', author: '@MaiLinh_K4', role: 'Student', content: '[@BOT] cho mình hỏi việc mình được điểm danh hay chưa có thể check ở đâu ạ', intent: 'Policy_Attendance', confidence: 97, status: 'Grounded', latency: '650ms' },
-        { id: '#M79611', time: '16:45:00', channel: '#discussion', author: '@QuocBao_K4', role: 'Student', content: '[@BOT] khi tôi commit tại sao ko thấy lịch sử bên activity ở kênh discord này', intent: 'Technical_Git', confidence: 88, status: 'Escalated', latency: '510ms' },
-        { id: '#M19079', time: '21:10:45', channel: '#discussion', author: '@PhuongThao_K4', role: 'Student', content: '[@BOT] Record của những buổi workshop tối được lưu ở đâu?', intent: 'Logistics_Materials', confidence: 99, status: 'Grounded', latency: '720ms' },
-        { id: '#M03059', time: '10:21:00', channel: '#discussion', author: '@D4964', role: 'Student', content: 'Em đang cần hỗ trợ về vấn đề giấy tờ gấp thì em liên lạc đến bộ phận nào ạ', intent: 'Admin_Support', confidence: 92, status: 'Grounded', latency: '680ms' },
-        { id: '#M47011', time: '09:39:12', channel: '#announcements', author: '@D8938', role: 'Official', content: '@everyone Để BTC và các Lab Coach thuận tiện đổi tên theo cú pháp: Mã Nhóm - Họ và tên - 5 số cuối...', intent: 'Official_Policy', confidence: 100, status: 'Grounded', latency: '120ms' },
-        { id: '#M12505', time: '09:40:00', channel: '#announcements', author: '@D8938', role: 'Official', content: 'Quy chế ghép đội Phoenix: Tối đa 5 thành viên cùng Level 3-4, không ghép khác level...', intent: 'Official_Policy', confidence: 100, status: 'Grounded', latency: '110ms' },
-        { id: '#M58687', time: '07:35:00', channel: '#discussion', author: '@D3694', role: 'Official', content: 'Câu hỏi này để hôm workshop chủ nhật trao đổi luôn nhé học viên', intent: 'Chitchat_Mod', confidence: 90, status: 'Open', latency: '190ms' },
-        { id: '#M63574', time: '11:06:12', channel: '#discussion', author: '@D3082', role: 'Student', content: 'Anh ơi cho em hỏi, buổi workshop chủ nhật ngày mai thì có tính vào số buổi nghỉ không ạ?', intent: 'Policy_Attendance', confidence: 95, status: 'Grounded', latency: '610ms' },
-        { id: '#M43132', time: '11:08:00', channel: '#discussion', author: '@D3694', role: 'Official', content: 'Build phase sẽ không tính vào hoạt động học trên lớp các buổi nghỉ đâu nhé.', intent: 'Official_Policy', confidence: 99, status: 'Grounded', latency: '210ms' },
-        { id: '#M69081', time: '12:04:30', channel: '#discussion', author: '@D2313', role: 'Student', content: 'có điểm danh workshop không ạ hay chỉ xem qua Zoom?', intent: 'Policy_Attendance', confidence: 94, status: 'Grounded', latency: '590ms' }
+        { 
+          id: '#M99769', 
+          time: '15:42:11', 
+          channel: '#discussion', 
+          author: '@NguyenVanAn', 
+          role: 'Student', 
+          content: '@Assistant hạn nộp bài Lab 1 hôm nay là mấy giờ thế ạ?', 
+          intent: 'Logistics_Deadline', 
+          confidence: 96, 
+          status: 'Grounded', 
+          latency: '1.1s',
+          profile: {
+            name: 'Nguyễn Văn An',
+            handle: '@NguyenVanAn',
+            discord: 'nguyenvanan#1042',
+            avatar: 'AN',
+            mssv: '23010192',
+            email: 'an.nv23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L2-3 (Team 04)',
+            messages: 8,
+            tickets: 0,
+            adherence: '98%'
+          },
+          problemFiles: {
+            summary: 'Tra cứu hạn chót nộp bài Lab 1 và link GitHub repo Classroom',
+            detail: 'Học viên tra cứu hạn nộp bài sau khi có thông báo dời lịch. Hệ thống tự động kích hoạt bộ giải quyết mâu thuẫn thời gian: Notice #2 (14/09 15:00) ghi đè Notice #1 (12/09 09:00).',
+            files: [
+              { name: 'Lab1_Submission_Guide.pdf', path: 'docs/syllabi/Lab1_Submission_Guide.pdf', type: 'doc', desc: 'Mục 2: Thời hạn nộp & barem tính điểm' },
+              { name: 'GitHub Classroom Invite Link', path: 'https://classroom.github.com/a/easygame-k4-lab1', type: 'link', desc: 'Repo nộp bài tập chính thức' },
+              { name: 'Notice_02_Deadline_Extension.md', path: 'notices/Notice_02_Deadline_Extension.md', type: 'notice', desc: 'Thông báo gia hạn đến 12:00 Thứ Bảy' }
+            ],
+            snippet: `# Syllabus Schedule v3 - Notice #2 Override
+# Deadline Lab 1 updated: Saturday 19/09/2026 @ 12:00 PM (Noon)
+# Late submission penalty: 10% per 12 hours. Fork required before clone.`
+          },
+          replies: [
+            { author: '@NguyenVanAn', role: 'Student', time: '15:42:11', content: '@Assistant hạn nộp bài Lab 1 hôm nay là mấy giờ thế ạ?' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '15:42:12', content: 'Hạn nộp bài Lab 1 được gia hạn đến 12:00 trưa Thứ Bảy (19/09/2026). Vui lòng nộp link GitHub repo qua form trước mốc này.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M41569', 
+          time: '11:24:05', 
+          channel: '#discussion', 
+          author: '@MinhTuan_K4', 
+          role: 'Student', 
+          content: 'Cho em hỏi bài tập 2 Lab 1 chạy bị lỗi TypeError load_dataset...', 
+          intent: 'Technical_Code', 
+          confidence: 91, 
+          status: 'Escalated', 
+          latency: '340ms',
+          profile: {
+            name: 'Trần Minh Tuấn',
+            handle: '@MinhTuan_K4',
+            discord: 'minhtuan_k4#4821',
+            avatar: 'MT',
+            mssv: '23010482',
+            email: 'tuan.tm23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L3-4 (Team 07)',
+            messages: 14,
+            tickets: 2,
+            adherence: '92%'
+          },
+          problemFiles: {
+            summary: 'Lỗi FileNotFoundError / TypeError khi gọi load_dataset trong bài Lab 1',
+            detail: 'Học viên gặp lỗi khi load bộ dữ liệu NLP Track B qua thư viện datasets v2.14 do đường dẫn local script bị thiếu hoặc xung đột phiên bản cache.',
+            files: [
+              { name: 'nlp_trackb_lab1.py', path: 'codebase/easygame/nlp_trackb_lab1.py', type: 'code', desc: 'Script bài Lab 1 NLP baseline' },
+              { name: 'requirements.txt', path: 'codebase/requirements.txt', type: 'code', desc: 'Yêu cầu datasets>=2.16.1' },
+              { name: 'Lab1_Guide.pdf', path: 'docs/Lab1_Guide.pdf', type: 'doc', desc: 'Trang 4: Hugging Face dataset setup' }
+            ],
+            snippet: `# File: easygame/nlp_trackb_lab1.py - Line 42
+from datasets import load_dataset
+# Lỗi phát sinh: FileNotFoundError: Couldn't find a dataset script at easygame/nlp_trackb_lab1.py
+dataset = load_dataset("easygame/nlp_trackb_lab1.py", split="train")`
+          },
+          replies: [
+            { author: '@MinhTuan_K4', role: 'Student', time: '11:24:05', content: 'Cho em hỏi bài tập 2 Lab 1 chạy bị lỗi TypeError load_dataset...' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '11:24:06', content: 'Lỗi kỹ thuật đã được hệ thống ghi nhận và chuyển tiếp lên radar của Lab Coach (@TA_MinhHai). Vé hỗ trợ #TICK-104 đã được tạo.', isBot: true },
+            { author: '@TA_MinhHai', role: 'Lab Coach', time: '11:40:12', content: 'Minh Tuấn kiểm tra version datasets trong môi trường conda nhé, chạy pip install -U datasets==2.16.1.', isCoach: true }
+          ]
+        },
+        { 
+          id: '#M56157', 
+          time: '10:15:20', 
+          channel: '#discussion', 
+          author: '@DucAnh_K4', 
+          role: 'Student', 
+          content: '[@BOT] mình hôm khai giảng chưa nhận thẻ học viên thì làm sao', 
+          intent: 'Onboarding_Card', 
+          confidence: 95, 
+          status: 'Bot Auto-FAQ', 
+          latency: '420ms',
+          profile: {
+            name: 'Nguyễn Đức Anh',
+            handle: '@DucAnh_K4',
+            discord: 'ducanh_k4#9012',
+            avatar: 'DA',
+            mssv: '23010311',
+            email: 'anh.nd23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L2-3 (Team 02)',
+            messages: 5,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Chưa nhận Thẻ học viên tại Lễ khai giảng',
+            detail: 'Thủ tục nhận bù thẻ học viên tại bàn điều phối hoặc đăng ký qua email BTC trong tuần đầu tiên.',
+            files: [
+              { name: 'The_Hoc_Vien_Danh_Sach_Nhan_E402.xlsx', path: 'admin/The_Hoc_Vien_Danh_Sach_Nhan_E402.xlsx', type: 'doc', desc: 'Danh sách đối soát phát thẻ' },
+              { name: 'Notice_04_Onboarding.md', path: 'notices/Notice_04_Onboarding.md', type: 'notice', desc: 'Thông báo nhận thẻ bổ sung' }
+            ],
+            snippet: `Học viên chưa nhận thẻ tại lễ khai giảng vui lòng liên hệ bàn điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn kèm MSSV.`
+          },
+          replies: [
+            { author: '@DucAnh_K4', role: 'Student', time: '10:15:20', content: '[@BOT] mình hôm khai giảng chưa nhận thẻ học viên thì làm sao' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '10:15:21', content: 'Học viên chưa nhận thẻ tại lễ khai giảng vui lòng liên hệ bàn điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn kèm MSSV để nhận thẻ trong tuần đầu.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M89035', 
+          time: '14:02:18', 
+          channel: '#q-and-a', 
+          author: '@HoangNam_K4', 
+          role: 'Student', 
+          content: '[@BOT] Bài lab1 tôi clone code, không fork thì bị tính là fail rồi đúng không?', 
+          intent: 'Policy_Submission', 
+          confidence: 94, 
+          status: 'Grounded', 
+          latency: '890ms',
+          profile: {
+            name: 'Lê Hoàng Nam',
+            handle: '@HoangNam_K4',
+            discord: 'hoangnam#3341',
+            avatar: 'HN',
+            mssv: '23010519',
+            email: 'nam.lh23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L3-4 (Team 05)',
+            messages: 9,
+            tickets: 0,
+            adherence: '96%'
+          },
+          problemFiles: {
+            summary: 'Quy chế nộp bài Lab 1 qua GitHub Classroom (Fork vs Clone)',
+            detail: 'Học viên phải fork repo về GitHub cá nhân để GitHub Classroom chấm điểm tự động qua GitHub Actions CI.',
+            files: [
+              { name: 'Git_Classroom_Guideline_v2.pdf', path: 'docs/Git_Classroom_Guideline_v2.pdf', type: 'doc', desc: 'Hướng dẫn Fork và nộp bài' }
+            ],
+            snippet: `Học viên bắt buộc phải fork repo từ GitHub Classroom của lớp về tài khoản cá nhân rồi mới clone. Nếu clone trực tiếp sẽ không tạo được pull request nộp bài hợp lệ.`
+          },
+          replies: [
+            { author: '@HoangNam_K4', role: 'Student', time: '14:02:18', content: '[@BOT] Bài lab1 tôi clone code, không fork thì bị tính là fail rồi đúng không?' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '14:02:19', content: 'Học viên bắt buộc phải fork repo từ GitHub Classroom của lớp về tài khoản cá nhân rồi mới clone. Nếu clone trực tiếp sẽ không tạo được pull request nộp bài hợp lệ.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M13974', 
+          time: '09:30:14', 
+          channel: '#q-and-a', 
+          author: '@MaiLinh_K4', 
+          role: 'Student', 
+          content: '[@BOT] cho mình hỏi việc mình được điểm danh hay chưa có thể check ở đâu ạ', 
+          intent: 'Policy_Attendance', 
+          confidence: 97, 
+          status: 'Grounded', 
+          latency: '650ms',
+          profile: {
+            name: 'Phạm Mai Linh',
+            handle: '@MaiLinh_K4',
+            discord: 'mailinh#7829',
+            avatar: 'ML',
+            mssv: '23010245',
+            email: 'linh.pm23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L2-3 (Team 01)',
+            messages: 7,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Tra cứu dữ liệu điểm danh Workshop trên app MyVinUni',
+            detail: 'Dữ liệu đồng bộ sau 24h kết thúc workshop. Học viên kiểm tra tại mục Điểm danh trên ứng dụng MyVinUni.',
+            files: [
+              { name: 'Notice_03_Attendance.md', path: 'notices/Notice_03_Attendance.md', type: 'notice', desc: 'Chính sách điểm danh và bù giờ' }
+            ],
+            snippet: `Dữ liệu điểm danh workshop cập nhật trên app MyVinUni sau 24h. Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.`
+          },
+          replies: [
+            { author: '@MaiLinh_K4', role: 'Student', time: '09:30:14', content: '[@BOT] cho mình hỏi việc mình được điểm danh hay chưa có thể check ở đâu ạ' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '09:30:15', content: 'Dữ liệu điểm danh workshop cập nhật trên app MyVinUni sau 24h. Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M79611', 
+          time: '16:45:00', 
+          channel: '#discussion', 
+          author: '@QuocBao_K4', 
+          role: 'Student', 
+          content: '[@BOT] khi tôi commit tại sao ko thấy lịch sử bên activity ở kênh discord này', 
+          intent: 'Technical_Git', 
+          confidence: 88, 
+          status: 'Escalated', 
+          latency: '510ms',
+          profile: {
+            name: 'Đặng Quốc Bảo',
+            handle: '@QuocBao_K4',
+            discord: 'quocbao#8911',
+            avatar: 'QB',
+            mssv: '23010672',
+            email: 'bao.dq23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L3-4 (Team 03)',
+            messages: 11,
+            tickets: 1,
+            adherence: '94%'
+          },
+          problemFiles: {
+            summary: 'Webhook GitHub Classroom commit activity không bắn về kênh #github-activity',
+            detail: 'Do quyền webhook trên GitHub organization vinuni-k4 bị giới hạn nhánh main thay vì pull request.',
+            files: [
+              { name: 'github-webhook-config.json', path: 'infra/github-webhook-config.json', type: 'code', desc: 'Cấu hình webhook Discord bot' }
+            ],
+            snippet: `Webhook status 403: Forbidden - Need organization owner permission to publish commit events to #github-activity.`
+          },
+          replies: [
+            { author: '@QuocBao_K4', role: 'Student', time: '16:45:00', content: '[@BOT] khi tôi commit tại sao ko thấy lịch sử bên activity ở kênh discord này' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '16:45:01', content: 'Lỗi đồng bộ GitHub Webhook đã được chuyển tiếp đến Lab Coach để cấu hình lại quyền ứng dụng.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M19079', 
+          time: '21:10:45', 
+          channel: '#discussion', 
+          author: '@PhuongThao_K4', 
+          role: 'Student', 
+          content: '[@BOT] Record của những buổi workshop tối được lưu ở đâu?', 
+          intent: 'Logistics_Materials', 
+          confidence: 99, 
+          status: 'Grounded', 
+          latency: '720ms',
+          profile: {
+            name: 'Vũ Phương Thảo',
+            handle: '@PhuongThao_K4',
+            discord: 'phuongthao#5542',
+            avatar: 'PT',
+            mssv: '23010834',
+            email: 'thao.vp23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L2-3 (Team 06)',
+            messages: 6,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Thư mục Google Drive lưu trữ video record Workshop tối',
+            detail: 'Toàn bộ record được tải lên thư mục AI20K Cohort 4 - Workshop Recordings trong vòng 12h sau buổi học.',
+            files: [
+              { name: 'Workshop_Recordings_Index.url', path: 'https://drive.google.com/drive/folders/ai20k-recordings', type: 'link', desc: 'Drive lưu video' }
+            ],
+            snippet: `Record của các buổi workshop tối được lưu tại thư mục Google Drive 'AI20K Cohort 4 - Workshop Recordings'. Link truy cập đã ghim trên đầu kênh #announcements.`
+          },
+          replies: [
+            { author: '@PhuongThao_K4', role: 'Student', time: '21:10:45', content: '[@BOT] Record của những buổi workshop tối được lưu ở đâu?' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '21:10:46', content: 'Record của các buổi workshop tối được lưu tại thư mục Google Drive \'AI20K Cohort 4 - Workshop Recordings\'. Link truy cập đã ghim trên đầu kênh #announcements.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M03059', 
+          time: '10:21:00', 
+          channel: '#discussion', 
+          author: '@D4964', 
+          role: 'Student', 
+          content: 'Em đang cần hỗ trợ về vấn đề giấy tờ gấp thì em liên lạc đến bộ phận nào ạ', 
+          intent: 'Admin_Support', 
+          confidence: 92, 
+          status: 'Grounded', 
+          latency: '680ms',
+          profile: {
+            name: 'Ngô Hải Đăng',
+            handle: '@D4964',
+            discord: 'haidang#4964',
+            avatar: 'HD',
+            mssv: '23010721',
+            email: 'dang.nh23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L3-4 (Team 08)',
+            messages: 4,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Kênh liên hệ hành chính & chứng nhận sinh viên',
+            detail: 'Học viên gửi email tới ban điều phối chương trình AIthucchien@vinuni.edu.vn hoặc tới trực tiếp phòng E402.',
+            files: [
+              { name: 'Student_Support_Contacts.pdf', path: 'docs/Student_Support_Contacts.pdf', type: 'doc', desc: 'Sổ tay liên hệ hành chính' }
+            ],
+            snippet: `Vui lòng liên hệ ban điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn để được hỗ trợ giấy tờ gấp.`
+          },
+          replies: [
+            { author: '@D4964', role: 'Student', time: '10:21:00', content: 'Em đang cần hỗ trợ về vấn đề giấy tờ gấp thì em liên lạc đến bộ phận nào ạ' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '10:21:01', content: 'Vui lòng liên hệ ban điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn để được hỗ trợ giấy tờ gấp.', isBot: true }
+          ]
+        },
+        { 
+          id: '#M47011', 
+          time: '09:39:12', 
+          channel: '#announcements', 
+          author: '@D8938', 
+          role: 'Official', 
+          content: '@everyone Để BTC và các Lab Coach thuận tiện đổi tên theo cú pháp: Mã Nhóm - Họ và tên - 5 số cuối...', 
+          intent: 'Official_Policy', 
+          confidence: 100, 
+          status: 'Grounded', 
+          latency: '120ms',
+          profile: {
+            name: 'Dương Quang Y (Lead TA)',
+            handle: '@D8938',
+            discord: 'quangy#8938',
+            avatar: 'QY',
+            mssv: 'STAFF_TA',
+            email: 'y.dq@vinuni.edu.vn',
+            role: 'Official Notice Authority · Lead TA',
+            team: 'Teaching Staff (E402)',
+            messages: 45,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Quy chuẩn đặt nickname trên server Discord K4',
+            detail: 'Cú pháp bắt buộc: [Mã Nhóm] - Họ và tên - 5 số cuối MSSV. Ví dụ: [B02] - Nguyễn Văn An - 01042.',
+            files: [
+              { name: 'Discord_Rules_K4.md', path: 'notices/Discord_Rules_K4.md', type: 'doc', desc: 'Quy định đặt tên server' }
+            ],
+            snippet: `@everyone Để BTC và các Lab Coach thuận tiện đổi tên theo cú pháp: Mã Nhóm - Họ và tên - 5 số cuối MSSV.`
+          },
+          replies: [
+            { author: '@D8938', role: 'Official', time: '09:39:12', content: '@everyone Để BTC và các Lab Coach thuận tiện đổi tên theo cú pháp: Mã Nhóm - Họ và tên - 5 số cuối...' }
+          ]
+        },
+        { 
+          id: '#M12505', 
+          time: '09:40:00', 
+          channel: '#announcements', 
+          author: '@D8938', 
+          role: 'Official', 
+          content: 'Quy chế ghép đội Phoenix: Tối đa 5 thành viên cùng Level 3-4, không ghép khác level...', 
+          intent: 'Official_Policy', 
+          confidence: 100, 
+          status: 'Grounded', 
+          latency: '110ms',
+          profile: {
+            name: 'Dương Quang Y (Lead TA)',
+            handle: '@D8938',
+            discord: 'quangy#8938',
+            avatar: 'QY',
+            mssv: 'STAFF_TA',
+            email: 'y.dq@vinuni.edu.vn',
+            role: 'Official Notice Authority · Lead TA',
+            team: 'Teaching Staff (E402)',
+            messages: 45,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Quy chế ghép nhóm nền tảng Phoenix Level 3 & 4',
+            detail: 'Mỗi đội tối đa 5 thành viên và bắt buộc cùng Level. Hạn chót chốt danh sách đội là 18:00 ngày 15/09/2026.',
+            files: [
+              { name: 'Phoenix_Team_Formation.pdf', path: 'docs/Phoenix_Team_Formation.pdf', type: 'doc', desc: 'Hướng dẫn ghép đội Phoenix' }
+            ],
+            snippet: `Quy chế ghép đội Phoenix: Tối đa 5 thành viên cùng Level 3-4, không ghép khác level. Hạn chót 18:00 15/09/2026.`
+          },
+          replies: [
+            { author: '@D8938', role: 'Official', time: '09:40:00', content: 'Quy chế ghép đội Phoenix: Tối đa 5 thành viên cùng Level 3-4, không ghép khác level...' }
+          ]
+        },
+        { 
+          id: '#M58687', 
+          time: '07:35:00', 
+          channel: '#discussion', 
+          author: '@D3694', 
+          role: 'Official', 
+          content: 'Câu hỏi này để hôm workshop chủ nhật trao đổi luôn nhé học viên', 
+          intent: 'Chitchat_Mod', 
+          confidence: 90, 
+          status: 'Open', 
+          latency: '190ms',
+          profile: {
+            name: 'Thầy Trần Mạnh Hùng (Academic)',
+            handle: '@D3694',
+            discord: 'manhhung#3694',
+            avatar: 'MH',
+            mssv: 'STAFF_COORD',
+            email: 'hung.tm@vinuni.edu.vn',
+            role: 'Official Coordinator',
+            team: 'Program Leadership',
+            messages: 32,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Lịch trao đổi chuyên sâu trong workshop Chủ Nhật',
+            detail: 'Thảo luận mở các chủ đề kiến trúc nâng cao trong buổi workshop hàng tuần.',
+            files: [],
+            snippet: `Câu hỏi này để hôm workshop chủ nhật trao đổi luôn nhé học viên.`
+          },
+          replies: [
+            { author: '@D3694', role: 'Official', time: '07:35:00', content: 'Câu hỏi này để hôm workshop chủ nhật trao đổi luôn nhé học viên' }
+          ]
+        },
+        { 
+          id: '#M63574', 
+          time: '11:06:12', 
+          channel: '#discussion', 
+          author: '@D3082', 
+          role: 'Student', 
+          content: 'Anh ơi cho em hỏi, buổi workshop chủ nhật ngày mai thì có tính vào số buổi nghỉ không ạ?', 
+          intent: 'Policy_Attendance', 
+          confidence: 95, 
+          status: 'Grounded', 
+          latency: '610ms',
+          profile: {
+            name: 'Phạm Quang Huy',
+            handle: '@D3082',
+            discord: 'quanghuy#3082',
+            avatar: 'QH',
+            mssv: '23010419',
+            email: 'huy.pq23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L2-3 (Team 03)',
+            messages: 8,
+            tickets: 1,
+            adherence: '98%'
+          },
+          problemFiles: {
+            summary: 'Chính sách tính số buổi vắng học phần thực chiến',
+            detail: 'Build phase và workshop tối không tính vào giới hạn nghỉ học 20% trên lớp.',
+            files: [
+              { name: 'Cohort4_Syllabus_Regulations_v2.pdf', path: 'docs/Cohort4_Syllabus_Regulations_v2.pdf', type: 'doc', desc: 'Quy chế học phần' }
+            ],
+            snippet: `Build phase sẽ không tính vào hoạt động học trên lớp các buổi nghỉ đâu nhé.`
+          },
+          replies: [
+            { author: '@D3082', role: 'Student', time: '11:06:12', content: 'Anh ơi cho em hỏi, buổi workshop chủ nhật ngày mai thì có tính vào số buổi nghỉ không ạ?' },
+            { author: '@D3694', role: 'Official', time: '11:08:00', content: 'Build phase sẽ không tính vào hoạt động học trên lớp các buổi nghỉ đâu nhé.', isCoach: true }
+          ]
+        },
+        { 
+          id: '#M43132', 
+          time: '11:08:00', 
+          channel: '#discussion', 
+          author: '@D3694', 
+          role: 'Official', 
+          content: 'Build phase sẽ không tính vào hoạt động học trên lớp các buổi nghỉ đâu nhé.', 
+          intent: 'Official_Policy', 
+          confidence: 99, 
+          status: 'Grounded', 
+          latency: '210ms',
+          profile: {
+            name: 'Thầy Trần Mạnh Hùng',
+            handle: '@D3694',
+            discord: 'manhhung#3694',
+            avatar: 'MH',
+            mssv: 'STAFF_COORD',
+            email: 'hung.tm@vinuni.edu.vn',
+            role: 'Official Coordinator',
+            team: 'Program Leadership',
+            messages: 32,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: 'Xác nhận quy chế điểm danh hoạt động Build Phase',
+            detail: 'Xác nhận chính thức từ điều phối viên chương trình.',
+            files: [],
+            snippet: `Build phase sẽ không tính vào hoạt động học trên lớp các buổi nghỉ đâu nhé.`
+          },
+          replies: [
+            { author: '@D3694', role: 'Official', time: '11:08:00', content: 'Build phase sẽ không tính vào hoạt động học trên lớp các buổi nghỉ đâu nhé.' }
+          ]
+        },
+        { 
+          id: '#M69081', 
+          time: '12:04:30', 
+          channel: '#discussion', 
+          author: '@D2313', 
+          role: 'Student', 
+          content: 'có điểm danh workshop không ạ hay chỉ xem qua Zoom?', 
+          intent: 'Policy_Attendance', 
+          confidence: 94, 
+          status: 'Grounded', 
+          latency: '590ms',
+          profile: {
+            name: 'Nguyễn Thị Thu Trang',
+            handle: '@D2313',
+            discord: 'thutrang#2313',
+            avatar: 'TT',
+            mssv: '23010582',
+            email: 'trang.nt23@vinuni.edu.vn',
+            role: 'Learner · Track B',
+            team: 'Team Phoenix L3-4 (Team 02)',
+            messages: 9,
+            tickets: 1,
+            adherence: '95%'
+          },
+          problemFiles: {
+            summary: 'Phương thức điểm danh qua Zoom meeting report',
+            detail: 'Hệ thống tự động trích xuất log tham gia từ Zoom report với thời lượng tối thiểu 45 phút.',
+            files: [
+              { name: 'Zoom_Attendance_Sync.log', path: 'logs/Zoom_Attendance_Sync.log', type: 'code', desc: 'Log điểm danh tự động' }
+            ],
+            snippet: `Zoom log report ghi nhận thời lượng tham dự. Điểm danh cập nhật MyVinUni sau 24h.`
+          },
+          replies: [
+            { author: '@D2313', role: 'Student', time: '12:04:30', content: 'có điểm danh workshop không ạ hay chỉ xem qua Zoom?' },
+            { author: 'EasyGame Bot', role: 'Bot', time: '12:04:31', content: 'Dữ liệu điểm danh workshop cập nhật trên app MyVinUni sau 24h từ Zoom report.', isBot: true }
+          ]
+        }
       ]
     };
 
-    // --- TAB SWITCHING ---
+    // --- TAB SWITCHING & ROLE GUARDS ---
     function switchTab(tabId) {
+      // Role-based access check
+      if (state.persona === 'learner' && !state.roleViews.learner.includes(tabId)) {
+        showToast("⚠️ Access Restricted: Tickets Radar & Channels are reserved for Lab Coaches");
+        tabId = 'chat';
+      }
+
       state.activeTab = tabId;
-      const views = ['chat', 'radar', 'channels', 'digest', 'feedback', 'design'];
+      const allViews = ['chat', 'radar', 'channels', 'news', 'digest', 'feedback'];
       
-      views.forEach(v => {
+      allViews.forEach(v => {
         const el = document.getElementById('view-' + v);
         const navBtn = document.getElementById('nav-btn-' + v);
         if (el) {
@@ -1824,9 +2766,13 @@
           }
         }
       });
+
+      if (tabId === 'news') {
+        renderNewsList();
+      }
     }
 
-    // --- PERSONA SWITCHER ---
+    // --- ROLE-BASED SIDEBAR & PERSONA SWITCHER ---
     function setPersona(persona) {
       state.persona = persona;
       const learnerBtn = document.getElementById('persona-btn-learner');
@@ -1835,9 +2781,14 @@
       const nameEl = document.getElementById('user-name');
       const roleTextEl = document.getElementById('user-role-text');
       const roleDotEl = document.getElementById('user-role-dot');
+      const roleBadge = document.getElementById('nav-role-badge');
+      const newsLabel = document.getElementById('nav-btn-news-label');
+      const newsBadge = document.getElementById('nav-btn-news-badge');
+      const newsCreateBtn = document.getElementById('news-create-btn');
+      const newsHeaderTitle = document.getElementById('news-header-title');
 
       if (persona === 'learner') {
-        learnerBtn.className = "py-1 rounded text-center transition-all bg-surface-elevation-2 text-primary border border-surface-border/80 shadow-sm flex items-center justify-center gap-1";
+        learnerBtn.className = "py-1 rounded text-center transition-all bg-surface-elevation-2 text-primary border border-surface-border/80 shadow-sm flex items-center justify-center gap-1 font-semibold";
         coachBtn.className = "py-1 rounded text-center text-text-muted hover:text-white transition-all flex items-center justify-center gap-1";
         
         avatarEl.innerText = "AN";
@@ -1846,9 +2797,32 @@
         roleTextEl.innerText = "Role: Learner";
         roleTextEl.className = "font-mono text-[10px] text-primary truncate leading-tight";
         roleDotEl.className = "w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0";
-        showToast("Switched persona to Learner (@NguyenVanAn)");
+        
+        if (roleBadge) {
+          roleBadge.innerText = "Learner";
+          roleBadge.className = "font-mono text-[9px] px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20";
+        }
+        if (newsLabel) newsLabel.innerText = "Official Notices";
+        if (newsBadge) newsBadge.innerText = "Ground";
+        if (newsCreateBtn) newsCreateBtn.classList.add('hidden');
+        if (newsHeaderTitle) newsHeaderTitle.innerText = "Official Announcements & Notices";
+
+        // Filter sidebar: HIDE coach-only views
+        document.querySelectorAll('#main-nav button[data-role="coach"]').forEach(btn => {
+          btn.classList.add('hidden');
+        });
+        document.querySelectorAll('#main-nav button[data-role*="learner"]').forEach(btn => {
+          btn.classList.remove('hidden');
+        });
+
+        // If currently on coach-only tab, redirect to chat
+        if (state.activeTab === 'radar' || state.activeTab === 'channels') {
+          switchTab('chat');
+        }
+
+        showToast("Switched persona to Learner (@NguyenVanAn) · Sidebar updated to Learner Views");
       } else {
-        coachBtn.className = "py-1 rounded text-center transition-all bg-surface-elevation-2 text-secondary border border-surface-border/80 shadow-sm flex items-center justify-center gap-1";
+        coachBtn.className = "py-1 rounded text-center transition-all bg-surface-elevation-2 text-secondary border border-surface-border/80 shadow-sm flex items-center justify-center gap-1 font-semibold";
         learnerBtn.className = "py-1 rounded text-center text-text-muted hover:text-white transition-all flex items-center justify-center gap-1";
         
         avatarEl.innerText = "MH";
@@ -1857,8 +2831,26 @@
         roleTextEl.innerText = "Lab Coach · Duty E402";
         roleTextEl.className = "font-mono text-[10px] text-secondary truncate leading-tight";
         roleDotEl.className = "w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0";
-        showToast("Switched persona to Lab Coach (@TA_MinhHai)");
+        
+        if (roleBadge) {
+          roleBadge.innerText = "Lab Coach";
+          roleBadge.className = "font-mono text-[9px] px-1.5 py-0.2 rounded bg-secondary/15 text-secondary border border-secondary/30";
+        }
+        if (newsLabel) newsLabel.innerText = "Dispatch News";
+        if (newsBadge) newsBadge.innerText = "Broadcast";
+        if (newsCreateBtn) newsCreateBtn.classList.remove('hidden');
+        if (newsHeaderTitle) newsHeaderTitle.innerText = "Official Announcements & News Dispatcher";
+
+        // Filter sidebar: SHOW all coach tools
+        document.querySelectorAll('#main-nav button').forEach(btn => {
+          btn.classList.remove('hidden');
+        });
+
+        showToast("Switched persona to Lab Coach (@TA_MinhHai) · All Operational Radar Tools Active");
       }
+
+      // Re-render news list with appropriate edit controls
+      renderNewsList();
     }
 
     // --- RECENT CHAT TOPICS ---
@@ -1866,7 +2858,7 @@
       switchTab('chat');
       const headerTitle = document.getElementById('chat-header-title');
       const dynamicWrapper = document.getElementById('dynamic-messages');
-      dynamicWrapper.innerHTML = ''; // reset dynamic msgs
+      dynamicWrapper.innerHTML = '';
 
       if (topic === 'lab1') {
         headerTitle.innerText = "Lab 1 Deadline & Repo";
@@ -1907,7 +2899,6 @@
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const dynamicWrapper = document.getElementById('dynamic-messages');
 
-      // Append User Bubble
       const userHtml = `
         <div class="flex flex-col items-end space-y-1 pt-2">
           <div class="bg-surface-elevation-2 border border-surface-border rounded-xl rounded-tr-sm px-3.5 py-2.5 text-xs text-text-high max-w-lg shadow-sm leading-relaxed">
@@ -1922,11 +2913,9 @@
       `;
       dynamicWrapper.insertAdjacentHTML('beforeend', userHtml);
 
-      // Scroll down
       const chatContainer = document.getElementById('chat-container');
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      // Synthesize Realistic Grounded Response
       synthesizeAgentResponse(query, time);
     }
 
@@ -1934,7 +2923,6 @@
       const dynamicWrapper = document.getElementById('dynamic-messages');
       const qLower = query.toLowerCase();
 
-      // Determine intent & response based on real k4 domain knowledge
       let intent = "Logistics_General";
       let confidence = 0.94;
       let traceTool = 'query_pinned_notices("Logistics")';
@@ -1982,7 +2970,6 @@
         answerText = "Mỗi đội có tối đa 5 thành viên và bắt buộc cùng Level (Level 2-3 lập nhóm riêng, Level 3-4 riêng). Hạn chót chốt danh sách đội trên Phoenix là 18:00 ngày 15/09/2026.";
       }
 
-      // Render Thinking + Grounded Answer
       const responseHtml = `
         <div class="space-y-3 pt-2">
           <!-- Thinking Accordion -->
@@ -2031,7 +3018,7 @@
             </p>
 
             <div class="pt-2 border-t border-surface-border/80 flex flex-wrap items-center gap-2 font-mono text-[11px]">
-              <a href="#" onclick="switchTab('channels'); return false;" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-colors">
+              <a href="#" onclick="switchTab('news'); return false;" class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-colors">
                 <span class="material-symbols-outlined text-[13px]">push_pin</span>
                 <span>${jumpLink}</span>
               </a>
@@ -2056,15 +3043,693 @@
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    // --- QUICK ANSWER TO TICKET DIRECTLY ---
+    function openQuickAnswerModal(ticketId) {
+      const ticket = state.tickets.find(t => t.id === ticketId);
+      if (!ticket) return;
+
+      state.activeTicketForAnswer = ticket;
+
+      document.getElementById('qa-ticket-id').innerText = ticket.id.toUpperCase();
+      document.getElementById('qa-ticket-author').innerText = `Learner: ${ticket.author}`;
+      document.getElementById('qa-ticket-channel').innerText = `Channel: ${ticket.channel}`;
+      document.getElementById('qa-ticket-title').innerText = ticket.title;
+
+      // Smart presets tailored to ticket content
+      const templatesContainer = document.getElementById('qa-templates-container');
+      templatesContainer.innerHTML = '';
+
+      let presets = [];
+      if (ticket.id === 'ticket-104') {
+        presets = [
+          { label: '📦 Cài datasets>=2.16.1', text: 'Bạn mở terminal conda chạy "pip install -U datasets==2.16.1" và kiểm tra lại đường dẫn nlp_trackb_lab1.py là chạy bình thường nhé.' },
+          { label: '🌿 Fork lại repo cá nhân', text: 'Lỗi phát sinh do chưa fork repo Classroom về tài khoản cá nhân. Bạn hãy fork repo rồi clone lại nhé.' },
+          { label: '⏳ Gia hạn thông báo #02', text: 'Hạn nộp Lab 1 đã được gia hạn đến 12:00 trưa Thứ Bảy (19/09) theo thông báo #02 kênh #announcements.' },
+          { label: '🔍 Lab Coach đang vào repo', text: 'Lab Coach (@TA_MinhHai) đã ghi nhận mã lỗi và đang kiểm tra trực tiếp commit của bạn trên GitHub Classroom.' }
+        ];
+      } else if (ticket.id === 'ticket-103') {
+        presets = [
+          { label: '🔑 Whitelist quyền Colab', text: 'Đã cấp quyền truy cập Colab template cho toàn bộ tài khoản @vinuni.edu.vn, bạn tải lại trang là mở được nhé.' },
+          { label: '📁 Link Google Drive dự phòng', text: 'Link Colab dự phòng đã upload tại Google Drive: AI20K Cohort 4 / Week1_Resources / Colab_Template.ipynb.' },
+          { label: '🔒 Đăng nhập email trường', text: 'Vui lòng kiểm tra trình duyệt đã chuyển sang tài khoản VinUni org email thay vì tài khoản Gmail cá nhân.' },
+          { label: '✅ Xác nhận resolved', text: 'Sự cố phân quyền Colab đã được khắc phục toàn hệ thống lúc 12:00.' }
+        ];
+      } else {
+        presets = [
+          { label: '✅ Ghi nhận đơn MyVinUni', text: 'Đơn xin phép vắng của bạn đã được ghi nhận trên hệ thống MyVinUni. Bạn có thể tham gia lớp học bù ca tối Chủ Nhật.' },
+          { label: '📋 Quy chế buổi tối', text: 'Quy chế chính thức: Buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.' },
+          { label: '📼 Link xem lại record', text: 'Record buổi học được cập nhật sau 12h trên Google Drive AI20K Cohort 4. Link đã ghim tại #announcements.' },
+          { label: '🎓 Chuyển Lead TA phê duyệt', text: 'Đã chuyển đơn của bạn cho Lead TA (@D8938) phê duyệt ngoại lệ trên hệ thống học vụ.' }
+        ];
+      }
+
+      presets.forEach(p => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'px-2.5 py-1.5 rounded bg-base-canvas hover:bg-surface-elevation-2 text-text-muted hover:text-white border border-surface-border text-left transition-colors truncate';
+        btn.innerText = p.label;
+        btn.onclick = () => {
+          document.getElementById('qa-answer-text').value = p.text;
+          updateQaCharCount();
+        };
+        templatesContainer.appendChild(btn);
+      });
+
+      // Default textarea prefill
+      document.getElementById('qa-answer-text').value = presets[0].text;
+      updateQaCharCount();
+
+      document.getElementById('quick-answer-modal').classList.remove('hidden');
+    }
+
+    function closeQuickAnswerModal() {
+      document.getElementById('quick-answer-modal').classList.add('hidden');
+      state.activeTicketForAnswer = null;
+    }
+
+    function updateQaCharCount() {
+      const val = document.getElementById('qa-answer-text').value;
+      const countEl = document.getElementById('qa-char-count');
+      countEl.innerText = `${val.length} / 300 chars (${val.length <= 300 ? '✅ Grounded Policy OK' : '⚠️ Exceeds 300 chars'})`;
+      countEl.className = val.length <= 300 ? 'text-emerald-400 font-mono text-[10px]' : 'text-amber-400 font-mono text-[10px] font-bold';
+    }
+
+    function submitQuickAnswer() {
+      const ticket = state.activeTicketForAnswer;
+      if (!ticket) return;
+
+      const answerText = document.getElementById('qa-answer-text').value.trim();
+      if (!answerText) {
+        showToast("⚠️ Vui lòng nhập câu trả lời cho ticket!");
+        return;
+      }
+
+      const autoResolve = document.getElementById('qa-opt-resolve').checked;
+      const dispatchDiscord = document.getElementById('qa-opt-discord').checked;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Save answer to ticket
+      ticket.answer = answerText;
+      ticket.claimedBy = '@TA_MinhHai';
+
+      // Update card in DOM
+      const card = document.getElementById(ticket.id);
+      if (card) {
+        if (autoResolve) {
+          ticket.status = 'resolved';
+          card.setAttribute('data-status', 'resolved');
+          card.className = "ticket-card bg-surface-elevation-2 border border-surface-border rounded-lg p-3.5 space-y-2.5 opacity-90 hover:opacity-100 transition-all border-l-2 border-l-emerald-500";
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-semibold text-white">${ticket.id.toUpperCase()}</span>
+                <span class="text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+                  ✅ Resolved by @TA_MinhHai (${time})
+                </span>
+                <span class="bg-surface-elevation-3 text-text-subtle text-[11px] px-2 py-0.5 rounded font-mono">${ticket.channel}</span>
+              </div>
+              <span class="text-[11px] font-mono text-emerald-400">Closed</span>
+            </div>
+            <div>
+              <h3 class="font-medium text-sm text-text-high leading-snug">${ticket.title}</h3>
+              <p class="text-xs text-text-subtle mt-0.5">
+                Learner: <span class="text-text-muted font-mono">${ticket.author}</span> • Answered directly via Quick Answer
+              </p>
+            </div>
+            <div class="bg-base-canvas border border-surface-border rounded p-2.5 text-xs text-emerald-300 font-sans border-l-2 border-l-emerald-400">
+              <div class="font-mono text-[10px] text-text-subtle mb-1">Direct Answer Dispatched:</div>
+              "${escapeHtml(answerText)}"
+            </div>
+            <div class="flex items-center justify-between pt-1 font-mono text-xs">
+              <span class="text-text-subtle text-[11px]">SLA Clock Stopped · Ticket Closed</span>
+              <button onclick="jumpToDiscordContext('${ticket.msgId}')" class="px-2.5 py-1 rounded bg-surface-elevation-1 text-text-body hover:bg-surface-elevation-3 border border-surface-border transition-colors flex items-center gap-1">
+                <span class="material-symbols-outlined text-[13px]">open_in_new</span>
+                <span>View Thread in Discord</span>
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      // If requested, dispatch directly to Discord message thread
+      if (dispatchDiscord && ticket.msgId) {
+        const msg = state.ingestedMessages.find(m => m.id.includes(ticket.msgId) || ticket.msgId.includes(m.id.replace('#', '')));
+        if (msg) {
+          msg.replies.push({
+            author: '@TA_MinhHai',
+            role: 'Lab Coach',
+            time: time,
+            content: answerText,
+            isCoach: true
+          });
+          msg.status = 'Grounded';
+        }
+      }
+
+      updateRadarCounts();
+      closeQuickAnswerModal();
+      showToast(`⚡ Quick Answer dispatched to ${ticket.id.toUpperCase()} (${ticket.author})!`);
+    }
+
+    // --- DISCORD MESSAGE ACTIONS MODAL (5 ACTIONS) ---
+    function openDiscordActionsModal(msgOrId, defaultTab) {
+      let msg = typeof msgOrId === 'string' 
+        ? state.ingestedMessages.find(m => m.id === msgOrId || m.id.replace('#', '') === msgOrId.replace('#', '')) 
+        : msgOrId;
+
+      if (!msg) {
+        msg = state.ingestedMessages[0];
+      }
+
+      state.activeDiscordMsg = msg;
+
+      // Populate Top Bar
+      document.getElementById('dact-msg-id').innerText = msg.id;
+
+      // Tab 1: Reply
+      document.getElementById('dact-reply-author').innerText = `Author: ${msg.author} (${msg.role})`;
+      document.getElementById('dact-reply-time').innerText = msg.time;
+      document.getElementById('dact-reply-content').innerText = `"${msg.content}"`;
+      document.getElementById('dact-reply-input').value = '';
+
+      const quickTplContainer = document.getElementById('dact-quick-reply-templates');
+      quickTplContainer.innerHTML = '';
+      const replyPresets = [
+        'Lab Coach đã ghi nhận lỗi và đang kiểm tra repo của bạn.',
+        'Vui lòng xem thông báo chính thức số #02 tại kênh #announcements.',
+        'Đã cấp quyền truy cập Colab / Google Drive cho tài khoản VinUni.',
+        'Bạn chạy pip install -U datasets==2.16.1 trong môi trường conda nhé.'
+      ];
+      replyPresets.forEach(txt => {
+        const chip = document.createElement('button');
+        chip.className = 'px-2 py-1 rounded bg-surface-elevation-2 hover:bg-surface-elevation-3 text-text-muted hover:text-white border border-surface-border text-left truncate max-w-xs transition-colors';
+        chip.innerText = txt;
+        chip.onclick = () => {
+          document.getElementById('dact-reply-input').value = txt;
+        };
+        quickTplContainer.appendChild(chip);
+      });
+
+      // Tab 2: Context
+      document.getElementById('dact-ctx-channel').innerText = msg.channel;
+      document.getElementById('dact-ctx-time').innerText = msg.time;
+      document.getElementById('dact-ctx-intent').innerText = `${msg.intent} (${msg.confidence}%)`;
+      document.getElementById('dact-ctx-conf').innerText = `${msg.confidence}%`;
+      document.getElementById('dact-ctx-conf-bar').style.width = `${msg.confidence}%`;
+
+      const surrounding = document.getElementById('dact-ctx-surrounding');
+      surrounding.innerHTML = `
+        <div class="p-2 rounded bg-surface-elevation-1 border border-surface-border/80 text-text-subtle">
+          <span class="font-mono text-[10px] text-primary">#discussion [T-1m]:</span> Học viên hỏi về cách cài đặt môi trường virtualenv
+        </div>
+        <div class="p-2.5 rounded bg-surface-elevation-2 border border-primary/40 text-white font-medium">
+          <span class="font-mono text-[10px] text-primary font-bold">CURRENT:</span> "${escapeHtml(msg.content)}"
+        </div>
+        <div class="p-2 rounded bg-surface-elevation-1 border border-surface-border/80 text-text-subtle">
+          <span class="font-mono text-[10px] text-secondary">#discussion [T+1m]:</span> Bot tự động phân loại intent ${msg.intent}
+        </div>
+      `;
+
+      const payload = {
+        message_id: msg.id,
+        timestamp: msg.time,
+        channel: msg.channel,
+        author_profile: msg.profile || { handle: msg.author, role: msg.role },
+        raw_text: msg.content,
+        intent_classifier: {
+          intent: msg.intent,
+          confidence: msg.confidence / 100,
+          vector_similarity: (msg.confidence / 100 * 0.98).toFixed(4)
+        },
+        grounding: {
+          status: msg.status,
+          policy: "Strict <=3 sentences (<=300 chars)",
+          authority: "Notice #2 overrides Notice #1 (main/syllabus-v3)"
+        }
+      };
+      document.getElementById('dact-ctx-json').innerText = JSON.stringify(payload, null, 2);
+
+      // Tab 3: Username + Profile
+      const prof = msg.profile || {
+        name: msg.author.replace('@', ''),
+        handle: msg.author,
+        discord: msg.author.replace('@', '').toLowerCase() + '#4020',
+        avatar: msg.author.substring(1, 3).toUpperCase(),
+        mssv: '23010' + Math.floor(100 + Math.random() * 900),
+        email: msg.author.replace('@', '').toLowerCase() + '@vinuni.edu.vn',
+        role: msg.role === 'Student' ? 'Learner · Track B' : 'Official Staff',
+        team: 'Phoenix L3-4 (Team 04)',
+        messages: 12,
+        tickets: 1,
+        adherence: '95%'
+      };
+      document.getElementById('dact-prof-avatar').innerText = prof.avatar;
+      document.getElementById('dact-prof-name').innerText = prof.name;
+      document.getElementById('dact-prof-handle').innerText = `${prof.handle} · ${prof.discord}`;
+      document.getElementById('dact-prof-mssv').innerText = prof.mssv;
+      document.getElementById('dact-prof-email').innerText = prof.email;
+      document.getElementById('dact-prof-team').innerText = prof.team;
+      document.getElementById('dact-prof-msgs').innerText = `${prof.messages} messages`;
+      document.getElementById('dact-prof-tickets').innerText = `${prof.tickets} tickets escalated`;
+
+      // Tab 4: Overview of Problems Related Files
+      const pFiles = msg.problemFiles || {
+        summary: msg.content,
+        detail: 'Học viên tra cứu thông tin logistics hoặc báo lỗi mã nguồn trong khuôn khổ Track B.',
+        files: [
+          { name: 'Lab1_Submission_Guide.pdf', path: 'docs/syllabi/Lab1_Submission_Guide.pdf', type: 'doc', desc: 'Tài liệu hướng dẫn bài Lab' },
+          { name: 'GitHub Classroom Repo', path: 'https://classroom.github.com/a/easygame-trackb', type: 'link', desc: 'Kho mã nguồn nộp bài' }
+        ],
+        snippet: `# Diagnostic snippet for message ${msg.id}
+# Channel: ${msg.channel} - ${msg.time}
+query: "${msg.content}"`
+      };
+      document.getElementById('dact-files-summary').innerText = pFiles.summary;
+      document.getElementById('dact-files-detail').innerText = pFiles.detail;
+
+      const filesList = document.getElementById('dact-files-list');
+      filesList.innerHTML = '';
+      if (pFiles.files && pFiles.files.length > 0) {
+        pFiles.files.forEach(f => {
+          const item = document.createElement('div');
+          item.className = "p-2.5 rounded-lg bg-surface-elevation-1 border border-surface-border flex items-center justify-between hover:border-primary/40 transition-colors";
+          item.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="material-symbols-outlined text-primary text-[18px]">
+                ${f.type === 'code' ? 'terminal' : (f.type === 'link' ? 'open_in_new' : 'description')}
+              </span>
+              <div class="min-w-0">
+                <span class="text-white font-medium text-xs truncate block">${escapeHtml(f.name)}</span>
+                <span class="text-[10px] text-text-subtle font-mono truncate block">${escapeHtml(f.path)}</span>
+              </div>
+            </div>
+            <button onclick="navigator.clipboard.writeText('${f.path}'); showToast('Copied file path: ${f.name}');" class="px-2 py-1 rounded bg-base-canvas hover:bg-surface-elevation-2 text-text-muted hover:text-white border border-surface-border text-[10px] font-mono flex-shrink-0">
+              Copy Path
+            </button>
+          `;
+          filesList.appendChild(item);
+        });
+      } else {
+        filesList.innerHTML = '<div class="p-3 text-text-subtle italic font-mono text-center">Không có file đính kèm liên quan</div>';
+      }
+
+      document.getElementById('dact-files-code').innerText = pFiles.snippet || '# No code snippet available';
+
+      // Tab 5: History Chat / Replies
+      renderDiscordHistoryTimeline(msg);
+
+      // Open tab
+      switchDiscordActionTab(defaultTab || 'reply');
+      document.getElementById('discord-actions-modal').classList.remove('hidden');
+    }
+
+    function switchDiscordActionTab(tab) {
+      const tabs = ['reply', 'context', 'profile', 'files', 'history'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('dact-tab-btn-' + t);
+        const panel = document.getElementById('dact-panel-' + t);
+        if (t === tab) {
+          btn.className = "py-1.5 rounded text-white bg-surface-elevation-2 border border-surface-border shadow-sm flex items-center justify-center gap-1 font-semibold text-primary";
+          panel.classList.remove('hidden');
+        } else {
+          btn.className = "py-1.5 rounded text-text-muted hover:text-white flex items-center justify-center gap-1";
+          panel.classList.add('hidden');
+        }
+      });
+    }
+
+    function renderDiscordHistoryTimeline(msg) {
+      const timeline = document.getElementById('dact-hist-timeline');
+      timeline.innerHTML = '';
+
+      const replies = msg.replies || [
+        { author: msg.author, role: msg.role, time: msg.time, content: msg.content }
+      ];
+
+      document.getElementById('dact-hist-count').innerText = `${replies.length} entries`;
+
+      replies.forEach((r, idx) => {
+        const item = document.createElement('div');
+        const isBot = r.isBot;
+        const isCoach = r.isCoach;
+
+        item.className = `p-3 rounded-lg border ${
+          isBot ? 'bg-primary/5 border-primary/30' : (isCoach ? 'bg-secondary/5 border-secondary/30' : 'bg-base-canvas border-surface-border')
+        } space-y-1`;
+
+        item.innerHTML = `
+          <div class="flex items-center justify-between font-mono text-[10px]">
+            <div class="flex items-center gap-1.5">
+              <span class="font-semibold ${isCoach ? 'text-secondary' : (isBot ? 'text-primary' : 'text-white')}">${r.author}</span>
+              <span class="text-[9px] px-1 rounded bg-surface-elevation-3 text-text-subtle">${r.role}</span>
+            </div>
+            <span class="text-text-subtle">${r.time}</span>
+          </div>
+          <p class="text-xs text-text-body font-sans leading-relaxed">${escapeHtml(r.content)}</p>
+        `;
+        timeline.appendChild(item);
+      });
+    }
+
+    function sendDiscordReply() {
+      const msg = state.activeDiscordMsg;
+      if (!msg) return;
+
+      const input = document.getElementById('dact-reply-input');
+      const val = input.value.trim();
+      if (!val) {
+        showToast("⚠️ Vui lòng nhập nội dung trả lời!");
+        return;
+      }
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (!msg.replies) msg.replies = [];
+
+      msg.replies.push({
+        author: '@TA_MinhHai',
+        role: 'Lab Coach',
+        time: time,
+        content: val,
+        isCoach: true
+      });
+
+      // Update status to Grounded
+      msg.status = 'Grounded';
+      input.value = '';
+
+      renderDiscordHistoryTimeline(msg);
+      switchDiscordActionTab('history');
+      renderIngestionTable(state.ingestedMessages);
+
+      showToast(`💬 Reply dispatched to thread ${msg.id} (@${msg.author})!`);
+    }
+
+    function closeDiscordActionsModal() {
+      document.getElementById('discord-actions-modal').classList.add('hidden');
+    }
+
+    function copyDiscordPayload() {
+      const code = document.getElementById('dact-ctx-json').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast("Copied JSON Telemetry Payload to clipboard");
+      });
+    }
+
+    function copySnippetCode() {
+      const code = document.getElementById('dact-files-code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast("Copied problem code snippet to clipboard");
+      });
+    }
+
+    // --- OFFICIAL ANNOUNCEMENTS & NEWS DISPATCHER (CREATE & EDITABLE) ---
+    function renderNewsList(filteredItems) {
+      const container = document.getElementById('announcements-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const items = filteredItems || state.announcements;
+      const isCoach = state.persona === 'coach';
+
+      // Update badge
+      const countBadge = document.getElementById('news-count-badge');
+      if (countBadge) countBadge.innerText = `${items.length} Pinned Notices`;
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-text-subtle font-mono text-xs bg-surface-elevation-1 border border-surface-border rounded-xl space-y-2">
+            <span class="material-symbols-outlined text-[32px] text-text-subtle">search_off</span>
+            <p>No announcements found matching the criteria.</p>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(notice => {
+        const card = document.createElement('div');
+        card.id = `notice-${notice.id}`;
+        card.className = `bg-surface-elevation-1 border ${
+          notice.isOverride ? 'border-primary/60 shadow-[0_0_12px_-2px_rgba(6,182,212,0.18)]' : 'border-surface-border'
+        } rounded-xl p-4 md:p-5 space-y-3 transition-all hover:border-surface-border-strong`;
+
+        card.innerHTML = `
+          <!-- Notice Header -->
+          <div class="flex items-start justify-between gap-2 flex-wrap">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30">
+                ${notice.noticeNumber}
+              </span>
+              ${notice.isOverride ? `
+                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[12px]">update</span>
+                  LATEST OVERRIDE
+                </span>
+              ` : ''}
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-surface-elevation-2 text-text-body border border-surface-border font-medium">
+                ${notice.channel}
+              </span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-base-canvas text-text-subtle border border-surface-border">
+                Target: ${notice.target}
+              </span>
+            </div>
+            <div class="font-mono text-[11px] text-text-subtle flex items-center gap-2">
+              <span>${notice.author}</span>
+              <span>•</span>
+              <span class="text-white">${notice.time}</span>
+            </div>
+          </div>
+
+          <!-- Title & Content -->
+          <div>
+            <h3 class="text-sm md:text-base font-semibold text-white tracking-tight leading-snug">${escapeHtml(notice.title)}</h3>
+            <p class="text-xs text-text-body font-sans leading-relaxed mt-1.5 whitespace-pre-line">${escapeHtml(notice.content)}</p>
+          </div>
+
+          <!-- RAG Grounding Strip & Action Controls -->
+          <div class="pt-3 border-t border-surface-border/80 flex items-center justify-between flex-wrap gap-2 font-mono text-xs">
+            <div class="flex items-center gap-2 text-text-subtle text-[11px]">
+              <span class="material-symbols-outlined text-[14px] text-emerald-400">verified</span>
+              <span class="text-emerald-400 font-medium">Ground Truth Verified</span>
+              <span>•</span>
+              <span>k-NN Similarity 100%</span>
+            </div>
+
+            <!-- Action Buttons based on Persona -->
+            <div class="flex items-center gap-1.5">
+              ${isCoach ? `
+                <button onclick="openNewsModal('${notice.id}')" class="px-2.5 py-1 rounded bg-surface-elevation-2 hover:bg-surface-elevation-3 text-text-high border border-surface-border hover:border-primary/40 transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-primary">edit</span>
+                  <span>Edit</span>
+                </button>
+                <button onclick="dispatchNewsDirectly('${notice.id}')" class="px-2.5 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px]">send</span>
+                  <span>Dispatch</span>
+                </button>
+                <button onclick="deleteNewsAnnouncement('${notice.id}')" class="p-1 rounded text-text-subtle hover:text-red-400 transition-colors" title="Delete Announcement">
+                  <span class="material-symbols-outlined text-[15px]">delete</span>
+                </button>
+              ` : `
+                <button onclick="askAssistantAboutNotice('${notice.id}')" class="px-3 py-1 rounded bg-primary/15 hover:bg-primary/25 text-primary border border-primary/30 transition-colors flex items-center gap-1.5 font-medium">
+                  <span class="material-symbols-outlined text-[13px]">chat</span>
+                  <span>Ask Assistant About This ↗</span>
+                </button>
+                <button onclick="navigator.clipboard.writeText('${escapeHtml(notice.content)}'); showToast('Copied notice text to clipboard');" class="p-1 rounded text-text-subtle hover:text-white transition-colors" title="Copy Notice Text">
+                  <span class="material-symbols-outlined text-[15px]">content_copy</span>
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterNewsList(query) {
+      const q = (query || document.getElementById('news-search-input').value).toLowerCase();
+      const channel = document.getElementById('news-filter-channel').value;
+
+      const filtered = state.announcements.filter(n => {
+        const matchesQuery = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q) || n.noticeNumber.toLowerCase().includes(q);
+        const matchesChannel = channel === 'all' || n.channel === channel;
+        return matchesQuery && matchesChannel;
+      });
+
+      renderNewsList(filtered);
+    }
+
+    function openNewsModal(newsId) {
+      if (newsId) {
+        // Edit Mode
+        const notice = state.announcements.find(n => n.id === newsId);
+        if (!notice) return;
+        state.editingNewsId = newsId;
+
+        document.getElementById('news-modal-title').innerText = `Edit Announcement // ${notice.noticeNumber}`;
+        document.getElementById('news-input-title').value = notice.title;
+        document.getElementById('news-input-channel').value = notice.channel;
+        document.getElementById('news-input-target').value = notice.target;
+        document.getElementById('news-input-priority').value = notice.priority;
+        document.getElementById('news-input-notice-id').value = notice.noticeNumber;
+        document.getElementById('news-input-content').value = notice.content;
+        document.getElementById('news-submit-btn-text').innerText = "💾 Save Changes & Re-Dispatch";
+      } else {
+        // Create Mode
+        state.editingNewsId = null;
+        const nextNum = state.announcements.length + 1;
+        document.getElementById('news-modal-title').innerText = "Create New Announcement";
+        document.getElementById('news-input-title').value = '';
+        document.getElementById('news-input-channel').value = '#announcements';
+        document.getElementById('news-input-target').value = 'All Cohort K4';
+        document.getElementById('news-input-priority').value = 'Pinned Policy';
+        document.getElementById('news-input-notice-id').value = `Notice #0${nextNum}`;
+        document.getElementById('news-input-content').value = '';
+        document.getElementById('news-submit-btn-text').innerText = "🚀 Save & Dispatch Announcement";
+      }
+
+      document.getElementById('news-modal').classList.remove('hidden');
+    }
+
+    function closeNewsModal() {
+      document.getElementById('news-modal').classList.add('hidden');
+      state.editingNewsId = null;
+    }
+
+    function saveNewsAnnouncement() {
+      const title = document.getElementById('news-input-title').value.trim();
+      const channel = document.getElementById('news-input-channel').value;
+      const target = document.getElementById('news-input-target').value;
+      const priority = document.getElementById('news-input-priority').value;
+      const noticeNumber = document.getElementById('news-input-notice-id').value.trim() || 'Notice #' + (state.announcements.length + 1);
+      const content = document.getElementById('news-input-content').value.trim();
+      const pinOpt = document.getElementById('news-opt-pin').checked;
+      const time = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (!title || !content) {
+        showToast("⚠️ Vui lòng điền đầy đủ Tiêu đề và Nội dung thông báo!");
+        return;
+      }
+
+      if (state.editingNewsId) {
+        // Update existing
+        const notice = state.announcements.find(n => n.id === state.editingNewsId);
+        if (notice) {
+          notice.title = title;
+          notice.channel = channel;
+          notice.target = target;
+          notice.priority = priority;
+          notice.noticeNumber = noticeNumber;
+          notice.content = content;
+          notice.time = time;
+          notice.pinned = pinOpt;
+          notice.vectorSynced = true;
+          showToast(`✅ Updated ${notice.noticeNumber} & Re-synced Vector Store!`);
+        }
+      } else {
+        // Create new
+        const newNotice = {
+          id: 'NOTICE-' + Date.now().toString().slice(-4),
+          noticeNumber: noticeNumber,
+          title: title,
+          channel: channel,
+          target: target,
+          priority: priority,
+          time: time,
+          author: '@TA_MinhHai · Lab Coach',
+          content: content,
+          pinned: pinOpt,
+          isOverride: priority.includes('Override'),
+          vectorSynced: true
+        };
+
+        state.announcements.unshift(newNotice);
+
+        // Also add to ingested messages for Discord Telemetry
+        state.ingestedMessages.unshift({
+          id: '#M' + Math.floor(10000 + Math.random() * 90000),
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          channel: channel,
+          author: '@TA_MinhHai',
+          role: 'Official',
+          content: `${title}: ${content}`,
+          intent: 'Official_Policy',
+          confidence: 100,
+          status: 'Grounded',
+          latency: '95ms',
+          profile: {
+            name: 'Đoàn Minh Hải',
+            handle: '@TA_MinhHai',
+            discord: 'minhhai_ta#402',
+            avatar: 'MH',
+            mssv: 'STAFF_E402',
+            email: 'hai.dm@vinuni.edu.vn',
+            role: 'Lab Coach · Track B Duty',
+            team: 'Lab Coach E402',
+            messages: 28,
+            tickets: 0,
+            adherence: '100%'
+          },
+          problemFiles: {
+            summary: title,
+            detail: content,
+            files: [
+              { name: `${noticeNumber}.md`, path: `notices/${noticeNumber}.md`, type: 'notice', desc: 'Ground Truth Official Policy' }
+            ],
+            snippet: `${title}
+${content}`
+          },
+          replies: [
+            { author: '@TA_MinhHai', role: 'Official', time: 'Vừa xong', content: `${title}: ${content}` }
+          ]
+        });
+
+        renderIngestionTable(state.ingestedMessages);
+        showToast(`🚀 Dispatched "${title}" to ${channel} & Synced to Vector DB!`);
+      }
+
+      closeNewsModal();
+      renderNewsList();
+    }
+
+    function deleteNewsAnnouncement(newsId) {
+      if (!confirm("Bạn có chắc chắn muốn xóa thông báo này? Thao tác này sẽ gỡ bỏ căn cứ Ground Truth khỏi Vector Store.")) return;
+      state.announcements = state.announcements.filter(n => n.id !== newsId);
+      renderNewsList();
+      showToast("🗑️ Announcement removed from Ground Truth Store");
+    }
+
+    function dispatchNewsDirectly(newsId) {
+      const notice = state.announcements.find(n => n.id === newsId);
+      if (!notice) return;
+      showToast(`📡 Re-dispatched ${notice.noticeNumber} to ${notice.channel} webhook!`);
+    }
+
+    function dispatchAllNotices() {
+      const btn = document.getElementById('dispatch-all-btn');
+      if (btn) btn.classList.add('animate-pulse');
+      setTimeout(() => {
+        if (btn) btn.classList.remove('animate-pulse');
+        showToast("✅ All 4 Pinned Notices synchronized with RAG Vector Store");
+      }, 1000);
+    }
+
+    function askAssistantAboutNotice(newsId) {
+      const notice = state.announcements.find(n => n.id === newsId);
+      if (!notice) return;
+      switchTab('chat');
+      fillAndSend(`Thông tin chi tiết về ${notice.noticeNumber}: ${notice.title}?`);
+    }
+
     // --- TICKETS & SLA RADAR ACTIONS ---
     function filterRadarTickets(filter) {
       const tabs = ['all', 'urgent', 'warning', 'resolved'];
       tabs.forEach(t => {
         const btn = document.getElementById('rf-' + t);
-        if (t === filter) {
-          btn.className = "text-primary border-b-2 border-primary pb-2 -mb-2 font-medium flex items-center gap-1.5";
-        } else {
-          btn.className = "text-text-muted hover:text-white pb-2 -mb-2 transition-colors flex items-center gap-1.5";
+        if (btn) {
+          if (t === filter) {
+            btn.className = "text-primary border-b-2 border-primary pb-2 -mb-2 font-medium flex items-center gap-1.5";
+          } else {
+            btn.className = "text-text-muted hover:text-white pb-2 -mb-2 transition-colors flex items-center gap-1.5";
+          }
         }
       });
 
@@ -2093,7 +3758,6 @@
     }
 
     function claimTicket(ticketId) {
-      const card = document.getElementById(ticketId);
       const btn = document.getElementById('claim-btn-' + ticketId.replace('ticket-', ''));
       if (btn) {
         btn.innerHTML = `<span class="material-symbols-outlined text-[13px]">check</span><span>Claimed (@TA_MinhHai)</span>`;
@@ -2107,7 +3771,7 @@
       const card = document.getElementById(ticketId);
       if (!card) return;
       card.setAttribute('data-status', 'resolved');
-      card.className = "ticket-card bg-surface-elevation-2 border border-surface-border rounded-lg p-3 space-y-1.5 opacity-80 hover:opacity-100 transition-opacity";
+      card.className = "ticket-card bg-surface-elevation-2 border border-surface-border rounded-lg p-3.5 space-y-1.5 opacity-80 hover:opacity-100 transition-opacity border-l-2 border-l-emerald-500";
       card.innerHTML = `
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -2129,29 +3793,44 @@
       const warningCount = document.querySelectorAll('.ticket-card[data-status="warning"]').length;
       const resolvedCount = 28 + document.querySelectorAll('.ticket-card[data-status="resolved"]').length - 2;
 
-      document.getElementById('count-breaches').innerText = `🚨 ${urgentCount} Breaches (>4h)`;
-      document.getElementById('count-warnings').innerText = `⚠️ ${warningCount} Warning (>2h)`;
-      document.getElementById('count-resolved').innerText = `✅ ${resolvedCount} Resolved`;
+      const breachEl = document.getElementById('count-breaches');
+      const warnEl = document.getElementById('count-warnings');
+      const resEl = document.getElementById('count-resolved');
 
-      document.getElementById('rf-count-urgent').innerText = urgentCount;
-      document.getElementById('rf-count-warning').innerText = warningCount;
-      document.getElementById('rf-count-resolved').innerText = document.querySelectorAll('.ticket-card[data-status="resolved"]').length;
+      if (breachEl) breachEl.innerText = `🚨 ${urgentCount} Breaches (>4h)`;
+      if (warnEl) warnEl.innerText = `⚠️ ${warningCount} Warning (>2h)`;
+      if (resEl) resEl.innerText = `✅ ${resolvedCount} Resolved`;
+
+      const rfU = document.getElementById('rf-count-urgent');
+      const rfW = document.getElementById('rf-count-warning');
+      const rfR = document.getElementById('rf-count-resolved');
+
+      if (rfU) rfU.innerText = urgentCount;
+      if (rfW) rfW.innerText = warningCount;
+      if (rfR) rfR.innerText = document.querySelectorAll('.ticket-card[data-status="resolved"]').length;
     }
 
     function simulateSyncRadar() {
       const icon = document.getElementById('radar-sync-icon');
-      icon.classList.add('animate-spin');
+      if (icon) icon.classList.add('animate-spin');
       setTimeout(() => {
-        icon.classList.remove('animate-spin');
+        if (icon) icon.classList.remove('animate-spin');
         showToast("Radar synced with Discord daemon · No new SLA breaches detected");
       }, 1000);
     }
 
     function jumpToDiscordContext(msgId) {
       switchTab('channels');
-      document.getElementById('ingestion-search-input').value = msgId;
-      filterIngestedMessages();
-      showToast(`Jumped to message ${msgId} in Ingestion Telemetry`);
+      const cleanId = msgId.startsWith('#') ? msgId : '#' + msgId;
+      const input = document.getElementById('ingestion-search-input');
+      if (input) {
+        input.value = cleanId;
+        filterIngestedMessages();
+      }
+
+      // Automatically open the rich Discord Message Actions modal
+      openDiscordActionsModal(cleanId, 'reply');
+      showToast(`Jumped to message ${cleanId} in Discord Telemetry with Actions`);
     }
 
     function dispatchDigestToStaff() {
@@ -2171,6 +3850,7 @@
     // --- INGESTION TABLE RENDERING & FILTERING ---
     function renderIngestionTable(messages) {
       const tbody = document.getElementById('ingestion-table-body');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       messages.forEach(msg => {
@@ -2184,10 +3864,10 @@
         }
 
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-surface-elevation-2/80 transition-colors cursor-pointer";
-        tr.onclick = () => openInspectorModal(msg);
+        tr.className = "hover:bg-surface-elevation-2/80 transition-colors cursor-pointer group";
+        tr.onclick = () => openDiscordActionsModal(msg, 'context');
         tr.innerHTML = `
-          <td class="py-2.5 px-3 font-mono text-[11px] text-primary font-medium">${msg.id}</td>
+          <td class="py-2.5 px-3 font-mono text-[11px] text-primary font-medium group-hover:underline">${msg.id}</td>
           <td class="py-2.5 px-3 font-mono text-[11px] text-text-muted">${msg.time}</td>
           <td class="py-2.5 px-3 font-mono text-[11px] text-white">${msg.channel}</td>
           <td class="py-2.5 px-3">
@@ -2209,7 +3889,8 @@
         tbody.appendChild(tr);
       });
 
-      document.getElementById('table-record-count').innerText = `Showing ${messages.length} messages (indexed from k4_messages.csv)`;
+      const countEl = document.getElementById('table-record-count');
+      if (countEl) countEl.innerText = `Showing ${messages.length} messages (indexed from k4_messages.csv)`;
     }
 
     function filterIngestedMessages() {
@@ -2231,17 +3912,19 @@
 
     function simulateSyncGateway() {
       const icon = document.getElementById('gateway-sync-icon');
-      icon.classList.add('animate-spin');
+      if (icon) icon.classList.add('animate-spin');
       setTimeout(() => {
-        icon.classList.remove('animate-spin');
+        if (icon) icon.classList.remove('animate-spin');
         showToast("Synced with Discord Gateway · 1,092 messages indexed into Vector Store");
       }, 1200);
     }
 
     function exportTableToCSV() {
-      let csv = "msg_id,created_at,channel,author,role,content,intent,confidence,status,latency\n";
+      let csv = "msg_id,created_at,channel,author,role,content,intent,confidence,status,latency
+";
       state.ingestedMessages.forEach(m => {
-        csv += `"${m.id}","${m.time}","${m.channel}","${m.author}","${m.role}","${m.content.replace(/"/g, '""')}","${m.intent}","${m.confidence}%","${m.status}","${m.latency}"\n`;
+        csv += `"${m.id}","${m.time}","${m.channel}","${m.author}","${m.role}","${m.content.replace(/"/g, '""')}","${m.intent}","${m.confidence}%","${m.status}","${m.latency}"
+`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -2252,49 +3935,6 @@
       link.click();
       document.body.removeChild(link);
       showToast("Exported easygame_telemetry_export.csv");
-    }
-
-    // --- GLASS-BOX INSPECTOR MODAL ---
-    function openInspectorModal(msg) {
-      document.getElementById('insp-id').innerText = msg.id;
-      document.getElementById('insp-content').innerText = `"${msg.content}"`;
-      document.getElementById('insp-author').innerText = `Author: ${msg.author} (${msg.role})`;
-      document.getElementById('insp-channel').innerText = `Channel: ${msg.channel}`;
-      document.getElementById('insp-time').innerText = msg.time;
-      document.getElementById('insp-intent').innerText = `${msg.intent} (${msg.confidence}%)`;
-      document.getElementById('insp-bar').style.width = `${msg.confidence}%`;
-
-      const payload = {
-        message_id: msg.id,
-        timestamp: msg.time,
-        source_channel: msg.channel,
-        user_metadata: { author: msg.author, role: msg.role },
-        raw_text: msg.content,
-        intent_classifier: {
-          predicted_label: msg.intent,
-          score: msg.confidence / 100,
-          vector_similarity: (msg.confidence / 100 * 0.98).toFixed(4)
-        },
-        grounding_context: {
-          policy: "Strict <=3 sentences",
-          notice_overrides: "Notice #2 overrides Notice #1",
-          source: "Course Sync Repo main/syllabus-v3"
-        }
-      };
-      document.getElementById('insp-json').innerText = JSON.stringify(payload, null, 2);
-
-      document.getElementById('inspector-modal').classList.remove('hidden');
-    }
-
-    function closeInspectorModal() {
-      document.getElementById('inspector-modal').classList.add('hidden');
-    }
-
-    function copyInspectorPayload() {
-      const code = document.getElementById('insp-json').innerText;
-      navigator.clipboard.writeText(code).then(() => {
-        showToast("Copied JSON Telemetry Payload to clipboard");
-      });
     }
 
     // --- FEEDBACK & QR ACTIONS ---
@@ -2354,7 +3994,7 @@
     }
 
     function toggleInspectorInfo() {
-      openInspectorModal(state.ingestedMessages[0]);
+      openDiscordActionsModal(state.ingestedMessages[0], 'context');
     }
 
     function filterCmdList(query) {
@@ -2389,6 +4029,7 @@
     }
 
     function escapeHtml(text) {
+      if (!text) return '';
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
@@ -2402,14 +4043,22 @@
       }
       if (e.key === 'Escape') {
         document.getElementById('cmd-modal').classList.add('hidden');
-        document.getElementById('inspector-modal').classList.add('hidden');
+        const dact = document.getElementById('discord-actions-modal');
+        if (dact) dact.classList.add('hidden');
+        const qact = document.getElementById('quick-answer-modal');
+        if (qact) qact.classList.add('hidden');
+        const nact = document.getElementById('news-modal');
+        if (nact) nact.classList.add('hidden');
       }
     });
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
       renderIngestionTable(state.ingestedMessages);
+      renderNewsList();
+      setPersona('learner'); // Default persona is learner
     });
+
   </script>
 </body>
 </html>
