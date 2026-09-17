@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EasyGame: Tickets &amp; SLA Radar View (Lab Coach View)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#00cbe6",
+            "surface-tint": "#4cd7f6",
+            "on-error-container": "#ffdad6",
+            "surface-container-lowest": "#0e0e10",
+            "on-primary": "#003640",
+            "on-tertiary-fixed": "#1b1b1e",
+            "surface-container-low": "#1c1b1d",
+            "inverse-primary": "#00687a",
+            "surface": "#131315",
+            "surface-bright": "#39393b",
+            "on-tertiary-container": "#3c3c3f",
+            "on-primary-fixed-variant": "#004e5c",
+            "background": "#131315",
+            "tertiary-container": "#a8a6a9",
+            "primary-container": "#06b6d4",
+            "error-container": "#93000a",
+            "primary-fixed-dim": "#4cd7f6",
+            "on-primary-fixed": "#001f26",
+            "inverse-surface": "#e5e1e4",
+            "on-primary-container": "#00424f",
+            "on-secondary-fixed": "#001f25",
+            "on-secondary": "#00363e",
+            "surface-dim": "#131315",
+            "on-surface": "#e5e1e4",
+            "surface-container-highest": "#353437",
+            "surface-variant": "#353437",
+            "secondary-fixed-dim": "#2fd9f4",
+            "tertiary-fixed-dim": "#c8c6c9",
+            "on-secondary-container": "#00515d",
+            "inverse-on-surface": "#313032",
+            "surface-container": "#201f22",
+            "secondary-fixed": "#a2eeff",
+            "tertiary-fixed": "#e4e1e5",
+            "on-secondary-fixed-variant": "#004e5a",
+            "error": "#ffb4ab",
+            "on-background": "#e5e1e4",
+            "surface-container-high": "#2a2a2c",
+            "on-error": "#690005",
+            "secondary": "#5de6ff",
+            "primary": "#4cd7f6",
+            "outline-variant": "#3d494c",
+            "on-surface-variant": "#bcc9cd",
+            "tertiary": "#c8c6c9",
+            "outline": "#869397",
+            "on-tertiary": "#303033",
+            "primary-fixed": "#acedff",
+            "on-tertiary-fixed-variant": "#47464a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-xl": "1.5rem",
+            "space-md": "0.75rem",
+            "gutter": "1rem",
+            "space-lg": "1rem",
+            "margin": "1.5rem"
+          },
+          "fontFamily": {
+            "label-sm": ["JetBrains Mono"],
+            "code-md": ["JetBrains Mono"],
+            "code-sm": ["JetBrains Mono"],
+            "body-lg": ["Geist"],
+            "label-md": ["JetBrains Mono"],
+            "body-sm": ["Geist"],
+            "display": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "code-lg": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "headline-lg": ["Geist"],
+            "headline-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "code-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "code-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "code-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 16px;
+      line-height: 1;
+    }
+    body {
+      background-color: #09090b;
+      color: #fafafa;
+      font-family: 'Geist', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#09090b] text-[#fafafa] flex antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
+<!-- LEFT WORKSPACE SIDEBAR -->
+<aside class="fixed top-0 left-0 h-screen w-[240px] flex flex-col justify-between border-r border-[#27272a] bg-[#121215] z-40">
+<div class="flex flex-col p-3 space-y-3">
+<!-- Header / Brand -->
+<div class="flex items-center justify-between px-1 pt-1">
+<div class="flex items-center gap-2">
+<span class="font-display font-semibold text-[15px] tracking-tight text-white">EasyGame</span>
+<span class="bg-[#06b6d4]/15 text-[#22d3ee] text-[10px] px-1.5 py-0.5 rounded font-mono border border-[#06b6d4]/30">Track B</span>
+</div>
+<span class="material-symbols-outlined text-[#71717a] cursor-pointer hover:text-white transition-colors" data-icon="terminal">terminal</span>
+</div>
+<!-- Action CTA -->
+<button class="bg-[#06b6d4] text-[#09090b] font-medium py-1.5 px-3 rounded-md text-xs hover:bg-[#22d3ee] transition-colors w-full flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99]">
+<span class="material-symbols-outlined text-[14px]" data-icon="add">add</span>
+<span>+ New Chat</span>
+</button>
+<!-- Navigation Hierarchy -->
+<nav class="space-y-1 pt-2">
+<div class="text-[11px] text-[#71717a] uppercase font-mono px-2 py-1 tracking-wider font-semibold">Workspace</div>
+<!-- Recent Chats -->
+<button class="w-full text-xs text-[#a1a1aa] flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-[#18181b] hover:text-white transition-colors group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#71717a] group-hover:text-white" data-icon="forum">forum</span>
+<span>Recent Chats</span>
+</div>
+<span class="material-symbols-outlined text-[14px] text-[#71717a]" data-icon="expand_more">expand_more</span>
+</button>
+<!-- Manage Channels -->
+<button class="w-full text-xs text-[#a1a1aa] px-2.5 py-1.5 rounded-md hover:bg-[#18181b] hover:text-white flex items-center justify-between transition-colors group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#71717a] group-hover:text-white" data-icon="tag">tag</span>
+<span>Manage Channels</span>
+</div>
+<span class="bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.2 rounded text-[10px] font-mono">4</span>
+</button>
+<!-- Tickets (ACTIVE) -->
+<button class="w-full bg-[#18181b] text-white border-l-2 border-[#06b6d4] px-2.5 py-1.5 rounded-r-md text-xs font-medium flex items-center justify-between transition-colors shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#22d3ee]" data-icon="confirmation_number">confirmation_number</span>
+<span class="text-white">Tickets</span>
+</div>
+<span class="bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.2 rounded text-[10px] font-mono font-medium">2</span>
+</button>
+<!-- Notifications -->
+<button class="w-full text-xs text-[#a1a1aa] px-2.5 py-1.5 rounded-md hover:bg-[#18181b] hover:text-white flex items-center justify-between transition-colors group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#71717a] group-hover:text-white" data-icon="notifications">notifications</span>
+<span>Notifications</span>
+</div>
+<span class="bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.2 rounded text-[10px] font-mono">3</span>
+</button>
+<!-- Project -->
+<button class="w-full text-xs text-[#a1a1aa] px-2.5 py-1.5 rounded-md hover:bg-[#18181b] hover:text-white flex items-center justify-between transition-colors group">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#71717a] group-hover:text-white" data-icon="folder">folder</span>
+<span>Project</span>
+</div>
+</button>
+</nav>
+<!-- Persona Toggle -->
+<div class="pt-3">
+<div class="text-[10px] font-mono text-[#71717a] uppercase mb-1.5 px-1 tracking-wider">Active View Mode</div>
+<div class="bg-[#18181b] border border-[#27272a] p-0.5 rounded-md flex items-center text-[11px]">
+<button class="flex-1 text-[#71717a] py-1 px-2 rounded text-center hover:text-[#a1a1aa] transition-colors">Learner</button>
+<button class="flex-1 bg-[#27272a] text-[#22d3ee] font-medium py-1 px-2 rounded text-center shadow-sm border border-[#3f3f46]/40 flex items-center justify-center gap-1">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-[#06b6d4]"></span>
+<span>Lab Coach</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sidebar Footer: Profile -->
+<div class="p-3 border-t border-[#27272a] bg-[#121215]/80">
+<div class="flex items-center justify-between p-1">
+<div class="flex items-center gap-2.5">
+<div class="relative">
+<div class="w-7 h-7 rounded bg-[#27272a] border border-[#3f3f46] text-[#22d3ee] text-xs font-mono font-medium flex items-center justify-center">
+              MH
+            </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#121215]"></span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-medium text-white leading-tight">@TA_MinhHai</span>
+<span class="text-[10px] text-[#71717a] font-mono leading-tight">Lab Coach</span>
+</div>
+</div>
+<button class="text-[#71717a] hover:text-white transition-colors p-1" title="Settings">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- MAIN WRAPPER (Offset by sidebar width 240px) -->
+<div class="ml-[240px] flex-1 flex flex-col min-h-screen bg-[#09090b]">
+<!-- TOP BAR -->
+<header class="h-12 border-b border-[#27272a] px-6 flex items-center justify-between bg-[#09090b] sticky top-0 z-30">
+<!-- Left: Breadcrumb / Title -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#06b6d4] text-[18px]" data-icon="radar">radar</span>
+<h1 class="text-xs font-medium text-white tracking-tight flex items-center gap-1.5">
+<span>Tickets &amp; SLA Radar</span>
+<span class="text-[#71717a] font-mono text-[11px] font-normal">/ Active Inquiries</span>
+</h1>
+</div>
+<!-- Center: Telemetry Badges -->
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5 bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+<span>🚨 2 Breaches (&gt;4h)</span>
+</div>
+<div class="flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+<span>⚠️ 1 Warning (&gt;2h)</span>
+</div>
+<div class="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span>✅ 28 Resolved</span>
+</div>
+</div>
+<!-- Right: Action Buttons -->
+<div class="flex items-center gap-3">
+<button class="border border-[#27272a] text-xs text-[#d4d4d8] hover:bg-[#18181b] hover:text-white px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px] text-[#22d3ee]" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span>Feedback (QR Form)</span>
+</button>
+<button class="p-1 text-[#71717a] hover:text-white transition-colors" title="Sync Radar">
+<span class="material-symbols-outlined text-[18px]" data-icon="sync">sync</span>
+</button>
+</div>
+</header>
+<!-- WORKSPACE CANVAS -->
+<main class="p-6 max-w-[1600px] w-full mx-auto">
+<div class="grid grid-cols-12 gap-6 items-start">
+<!-- LEFT COLUMN: TICKETS FEED & TELEMETRY -->
+<div class="col-span-12 xl:col-span-8 space-y-3.5">
+<!-- Filter Tabs & Controls Row -->
+<div class="flex items-center justify-between border-b border-[#27272a] pb-2">
+<div class="flex items-center gap-4 text-xs">
+<button class="text-[#22d3ee] border-b-2 border-[#06b6d4] pb-2 -mb-2 font-medium flex items-center gap-1.5">
+<span>All</span>
+<span class="font-mono text-[10px] bg-[#06b6d4]/10 text-[#22d3ee] px-1.5 py-0.2 rounded border border-[#06b6d4]/30">5</span>
+</button>
+<button class="text-[#a1a1aa] hover:text-white pb-2 -mb-2 transition-colors flex items-center gap-1.5">
+<span>Urgent &gt;4h</span>
+<span class="font-mono text-[10px] bg-red-500/10 text-red-400 px-1.5 py-0.2 rounded border border-red-500/20">2</span>
+</button>
+<button class="text-[#a1a1aa] hover:text-white pb-2 -mb-2 transition-colors flex items-center gap-1.5">
+<span>Warning &gt;2h</span>
+<span class="font-mono text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/20">1</span>
+</button>
+<button class="text-[#a1a1aa] hover:text-white pb-2 -mb-2 transition-colors flex items-center gap-1.5">
+<span>Resolved</span>
+<span class="font-mono text-[10px] bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.2 rounded">2</span>
+</button>
+</div>
+<!-- Quick Search Input -->
+<div class="relative w-52">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-[14px] text-[#71717a]" data-icon="search">search</span>
+<input class="w-full bg-[#121215] border border-[#27272a] rounded-md text-xs py-1.5 pl-7 pr-2.5 text-white placeholder-[#71717a] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4] transition-all font-mono" placeholder="Filter by user, tag, ID..." type="text"/>
+</div>
+</div>
+<!-- TICKET CARD 1: URGENT >4h (SLA Breach) -->
+<div class="bg-[#18181b] border-l-2 border-l-red-500 border border-[#27272a] rounded-lg p-3.5 space-y-2.5 shadow-sm transition-all hover:border-[#3f3f46]">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-semibold text-white tracking-wide">TICKET #TICK-104</span>
+<span class="red text-xs font-mono bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                  🚨 4h 18m Overdue
+                </span>
+<span class="bg-[#27272a] text-[#a1a1aa] text-[11px] px-2 py-0.5 rounded font-mono border border-[#3f3f46]/40">#discussion</span>
+</div>
+<span class="text-[11px] font-mono text-[#71717a]">Severity: P1 High</span>
+</div>
+<!-- Issue Title -->
+<div>
+<h3 class="font-medium text-sm text-white leading-snug">TypeError load_dataset trong bài Lab 1</h3>
+<p class="text-xs text-[#a1a1aa] mt-0.5">
+                By <span class="text-[#d4d4d8] font-mono font-medium">@MinhTuan_K4</span> • <span class="font-mono">11:24</span> • Code issue escalated from bot
+              </p>
+</div>
+<!-- Agent Trace Snippet -->
+<div class="bg-[#09090b] border border-[#27272a] rounded p-2 text-[11px] font-mono text-[#a1a1aa] border-l-2 border-l-[#06b6d4]">
+<div class="flex items-center justify-between text-[#71717a] mb-1">
+<span>Trace: HuggingFace Datasets API v2.14</span>
+<span class="text-[#22d3ee]">Automated Bot Diagnosis: Unresolved</span>
+</div>
+<p class="text-[#d4d4d8] truncate">FileNotFoundError: Couldn't find a dataset script at easygame/nlp_trackb_lab1.py</p>
+</div>
+<!-- Action Chips Row -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<a class="text-[#22d3ee] bg-[#06b6d4]/10 border border-[#06b6d4]/30 px-2.5 py-1 rounded text-xs font-mono hover:bg-[#06b6d4]/20 transition-colors flex items-center gap-1" href="#discord">
+<span>📌 Discord Link</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="north_east">north_east</span>
+</a>
+<button class="bg-[#27272a] hover:bg-[#3f3f46] text-white px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1 border border-[#3f3f46]/40">
+<span class="material-symbols-outlined text-[14px]" data-icon="pan_tool">pan_tool</span>
+<span>✋ Claim Ticket</span>
+</button>
+<button class="bg-[#27272a] hover:bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+<span>✅ Mark Resolved</span>
+</button>
+</div>
+<span class="text-[11px] text-[#71717a] font-mono">Target SLA: 120m</span>
+</div>
+</div>
+<!-- TICKET CARD 2: WARNING >2h -->
+<div class="bg-[#18181b] border-l-2 border-l-amber-500 border border-[#27272a] rounded-lg p-3.5 space-y-2.5 shadow-sm transition-all hover:border-[#3f3f46]">
+<!-- Top Badges Row -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-semibold text-white tracking-wide">TICKET #TICK-105</span>
+<span class="amber text-xs font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+                  ⚠️ 2h 25m Pending
+                </span>
+<span class="bg-[#27272a] text-[#a1a1aa] text-[11px] px-2 py-0.5 rounded font-mono border border-[#3f3f46]/40">#q-and-a</span>
+</div>
+<span class="text-[11px] font-mono text-[#71717a]">Severity: P2 Medium</span>
+</div>
+<!-- Issue Title -->
+<div>
+<h3 class="font-medium text-sm text-white leading-snug">Xin phép điểm danh bù do trùng lịch thi chứng chỉ</h3>
+<p class="text-xs text-[#a1a1aa] mt-0.5">
+                By <span class="text-[#d4d4d8] font-mono font-medium">@KhanhLinh</span> • <span class="font-mono">13:17</span> • Attendance rule
+              </p>
+</div>
+<!-- Action Chips Row -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<a class="text-[#22d3ee] bg-[#06b6d4]/10 border border-[#06b6d4]/30 px-2.5 py-1 rounded text-xs font-mono hover:bg-[#06b6d4]/20 transition-colors flex items-center gap-1" href="#discord">
+<span>📌 Discord Link</span>
+<span class="material-symbols-outlined text-[13px]" data-icon="north_east">north_east</span>
+</a>
+<button class="bg-[#27272a] hover:bg-[#3f3f46] text-white px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1 border border-[#3f3f46]/40">
+<span class="material-symbols-outlined text-[14px]" data-icon="assignment">assignment</span>
+<span>Send Form</span>
+</button>
+</div>
+<span class="text-[11px] text-[#71717a] font-mono">Warn Threshold: 180m</span>
+</div>
+</div>
+<!-- TICKET CARD 3: RESOLVED -->
+<div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3 space-y-1.5 opacity-75 hover:opacity-100 transition-opacity">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs text-[#a1a1aa] font-medium">TICKET #TICK-102</span>
+<span class="emerald text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+                  ✅ Resolved in 15m
+                </span>
+<span class="bg-[#27272a] text-[#71717a] text-[10px] px-1.5 py-0.5 rounded font-mono">#announcements</span>
+</div>
+<span class="text-[11px] font-mono text-emerald-500/80">Closed</span>
+</div>
+<div>
+<h3 class="font-normal text-sm text-[#d4d4d8]">Hạn nộp link GitHub Classroom repo</h3>
+<p class="text-xs text-[#71717a] mt-0.5">
+                Resolved by <span class="text-[#a1a1aa] font-mono">@TA_MinhHai</span> • <span class="font-mono">14:15</span> • Automated FAQ matching
+              </p>
+</div>
+</div>
+<!-- TICKET CARD 4: RESOLVED -->
+<div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3 space-y-1.5 opacity-75 hover:opacity-100 transition-opacity">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs text-[#a1a1aa] font-medium">TICKET #TICK-101</span>
+<span class="emerald text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded flex items-center gap-1">
+                  ✅ Resolved in 42m
+                </span>
+<span class="bg-[#27272a] text-[#71717a] text-[10px] px-1.5 py-0.5 rounded font-mono">#env-setup</span>
+</div>
+<span class="text-[11px] font-mono text-emerald-500/80">Closed</span>
+</div>
+<div>
+<h3 class="font-normal text-sm text-[#d4d4d8]">Cài đặt Conda virtual environment bị timeout khi tải PyTorch</h3>
+<p class="text-xs text-[#71717a] mt-0.5">
+                Resolved by <span class="text-[#a1a1aa] font-mono">@TA_MinhHai</span> • <span class="font-mono">10:05</span>
+</p>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: 22:00 CLEAN DAILY DIGEST & METRICS -->
+<div class="col-span-12 xl:col-span-4 space-y-4">
+<!-- 22:00 Clean Daily Digest Card -->
+<div class="bg-[#18181b] border border-[#27272a] rounded-lg p-4 space-y-3.5 shadow-sm relative overflow-hidden">
+<!-- Subtle accent top hairline -->
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#06b6d4] via-[#22d3ee] to-transparent"></div>
+<!-- Card Header -->
+<div class="flex items-start justify-between">
+<div>
+<h2 class="text-sm font-semibold text-white flex items-center gap-1.5">
+<span>📋 22:00 Clean Daily Digest</span>
+</h2>
+<span class="text-[11px] text-[#a1a1aa] mt-0.5 block">
+                  Verified Vietnamese typography · Zero "nguồn tham chiếu" bugs
+                </span>
+</div>
+<span class="text-[10px] font-mono bg-[#27272a] text-[#22d3ee] px-1.5 py-0.5 rounded border border-[#06b6d4]/30">Auto-Gen</span>
+</div>
+<!-- Stats Box -->
+<div class="bg-[#121215] border border-[#27272a] p-3 rounded text-xs space-y-1.5 font-mono">
+<div class="flex items-center justify-between text-[#d4d4d8]">
+<span>• Total Inquiries:</span>
+<span class="font-semibold text-white">33</span>
+</div>
+<div class="flex items-center justify-between text-emerald-400 font-medium">
+<span>• Resolved:</span>
+<span>31 (94%)</span>
+</div>
+<div class="flex items-center justify-between text-amber-400 font-medium">
+<span>• Backlog:</span>
+<span>2</span>
+</div>
+<div class="pt-1 border-t border-[#27272a] flex items-center justify-between text-[#71717a] text-[11px]">
+<span>• Avg Response Latency:</span>
+<span class="text-[#22d3ee]">18.4m</span>
+</div>
+</div>
+<!-- Top Confused Topics Section -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-mono text-[#71717a] uppercase tracking-wider font-semibold">Top Confused Topics</span>
+<span class="text-[10px] text-[#71717a] font-mono">Ranked by volume</span>
+</div>
+<!-- Topic 1 -->
+<div class="text-xs text-[#d4d4d8] bg-[#121215] p-2 rounded border border-[#27272a]/70 flex items-center justify-between hover:border-[#06b6d4]/40 transition-colors">
+<div class="flex items-center gap-2">
+<span class="w-4 text-center font-mono text-[11px] text-[#22d3ee]">1.</span>
+<span class="font-medium text-white truncate max-w-[200px]">Lab 1 Deadline Extension</span>
+</div>
+<span class="font-mono text-[11px] bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.2 rounded">14</span>
+</div>
+<!-- Topic 2 -->
+<div class="text-xs text-[#d4d4d8] bg-[#121215] p-2 rounded border border-[#27272a]/70 flex items-center justify-between hover:border-[#06b6d4]/40 transition-colors">
+<div class="flex items-center gap-2">
+<span class="w-4 text-center font-mono text-[11px] text-[#a1a1aa]">2.</span>
+<span class="font-medium text-white truncate max-w-[200px]">Attendance Makeup Policy</span>
+</div>
+<span class="font-mono text-[11px] bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.2 rounded">8</span>
+</div>
+<!-- Topic 3 -->
+<div class="text-xs text-[#d4d4d8] bg-[#121215] p-2 rounded border border-[#27272a]/70 flex items-center justify-between hover:border-[#06b6d4]/40 transition-colors">
+<div class="flex items-center gap-2">
+<span class="w-4 text-center font-mono text-[11px] text-[#a1a1aa]">3.</span>
+<span class="font-medium text-white truncate max-w-[200px]">Git Classroom Setup</span>
+</div>
+<span class="font-mono text-[11px] bg-[#27272a] text-[#a1a1aa] px-1.5 py-0.2 rounded">5</span>
+</div>
+</div>
+<!-- Broadcast CTA Button -->
+<button class="bg-[#06b6d4] text-[#09090b] font-semibold py-2 px-3 rounded-md text-xs w-full hover:bg-[#22d3ee] transition-colors text-center flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99]">
+<span class="material-symbols-outlined text-[15px]" data-icon="campaign">campaign</span>
+<span>📢 Broadcast to #ta-radar</span>
+</button>
+</div>
+<!-- Lab Coach Fast Tools Card -->
+<div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3.5 space-y-2.5">
+<div class="flex items-center justify-between text-xs text-[#a1a1aa]">
+<span class="font-medium text-white">Coach Quick Telemetry</span>
+<span class="text-[10px] font-mono text-[#06b6d4]">Cluster B: Live</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-xs">
+<div class="bg-[#121215] border border-[#27272a] p-2 rounded">
+<div class="text-[10px] text-[#71717a] font-mono">Active TAs Online</div>
+<div class="text-sm font-semibold text-white font-mono mt-0.5">4 Coach nodes</div>
+</div>
+<div class="bg-[#121215] border border-[#27272a] p-2 rounded">
+<div class="text-[10px] text-[#71717a] font-mono">SLA Adherence</div>
+<div class="text-sm font-semibold text-emerald-400 font-mono mt-0.5">93.8%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
