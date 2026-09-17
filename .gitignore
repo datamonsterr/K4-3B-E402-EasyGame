@@ -1,0 +1,10 @@
+# Environment and runtime
+.env
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+
+# Data security - AI Product Hackathon policy:
+# "Không commit data pack vào repo nộp bài (dữ liệu thật của khoá học)"
+data/discord-pack/k4_messages.csv
