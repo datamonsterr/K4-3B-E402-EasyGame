@@ -1,4 +1,4 @@
-﻿# AI SPEC — Trợ lý Logistics Xác Thực & Radar Cứu Kẹt Discord · Nhóm EasyGame · Lớp 3B · Phòng E402
+# AI SPEC — Trợ lý Logistics Xác Thực & Radar Cứu Kẹt Discord · Nhóm EasyGame · Lớp 3B · Phòng E402
 Hướng: [ ] A — VLearn  [x] B — Trợ lý Học viên  [ ] C — Làn mở  
 Loại: [x] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
@@ -126,14 +126,14 @@ guồn tham chiếuết thúc).
 - **Quality Bar (Chốt cứng tại CP4 — 21:00 17/9):**
   > **"Đạt khi $\ge 85\%$ số ca trong Golden Set vượt qua kiểm thử định lượng, và \%$ các ca không có căn cứ được từ chối an toàn kèm thông báo chuyển tiếp TA."**
 - **Kết quả các lượt chạy (Cập nhật liên tục từ CP3 đến CP6):**
-  - *Lượt 1 (Baseline CP3):* Đang chuẩn bị chạy thử nghiệm trên bộ Golden Set.
+  - *Lượt 1 (Baseline Golden Set):* Đạt **19/20 ca (95.0%)**, vượt ngưỡng Quality Bar $\ge 85\%$. 100% các ca ngoài phạm vi và không có nguồn được từ chối an toàn. Chi tiết báo cáo đo lường định lượng từng ca lưu tại [`eval/run_results.md`](eval/run_results.md).
 
 ---
 
 ## §8. Phân công & Kế hoạch
 - **Bảng phân công trách nhiệm chi tiết:**
   - **Phạm Thành Đạt:** Product Lead — Phụ trách định hình bài toán, viết hoàn thiện Spec (§1-§4), thiết kế khảo sát và nộp các mốc form CP1–CP6.
-  - **Đậu Quang Ý:** AI Engineer & Data Specialist — Phụ trách mining k4_messages.csv, xây dựng bộ Golden Set 20 case, thiết lập module gọi Gemini API có logging trace.
+  - **Đậu Quang Ý:** AI Engineer & Data Specialist — Phụ trách mining k4_messages.csv, xây dựng bộ Golden Set 20 case, thiết lập script kiểm thử định lượng và báo cáo đo lường eval.
   - **Thành viên 3:** Fullstack & Prototype Dev — Xây dựng giao diện web mô phỏng Discord Chat (CP2), tích hợp luồng tương tác 4 nhánh trải nghiệm.
   - **Thành viên 4:** UX Evaluator & Validation Lead — Phụ trách quay video thao tác 30s (CP3), thực hiện phỏng vấn Mom Test với 5 người dùng ngoài nhóm (R6 - CP5), biên soạn slide PDF 6 trang.
 - **Willing Users (≥2 người ngoài nhóm đã liên hệ và sẵn sàng test ở CP5):**
@@ -148,3 +148,5 @@ guồn tham chiếuết thúc).
 |---|---|---|
 | 17/09 - 18:30 | Khởi tạo Spec hoàn chỉnh theo template 8 phần chuẩn | Chốt đề tài Track B (Trợ lý Discord) dựa trên số liệu mining 1.092 tin nhắn |
 | 17/09 - 18:45 | Tích hợp 2 bộ câu hỏi khảo sát cho Học viên và Lab Coach | Chuẩn bị bằng chứng Chuẩn A theo hướng dẫn của ban tổ chức |
+| 17/09 - 20:50 | Hoàn thiện Golden Set 20 case & chạy đo lường kiểm thử Lượt 1 (95.0% Pass) | Hoàn thành toàn bộ nhiệm vụ AI Evaluation (Đậu Quang Ý) chuẩn bị cho CP3 |
+
