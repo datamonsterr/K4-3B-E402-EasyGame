@@ -8,3 +8,6 @@ node_modules/
 # Data security - AI Product Hackathon policy:
 # "Không commit data pack vào repo nộp bài (dữ liệu thật của khoá học)"
 data/discord-pack/k4_messages.csv
+
+# Agent configuration (contains secrets)
+.agents/mcp_config.json
