@@ -3124,8 +3124,10 @@ dataset = load_dataset("easygame/nlp_trackb_lab1.py", split="train")`
         return;
       }
 
-      const autoResolve = document.getElementById('qa-opt-resolve').checked;
-      const dispatchDiscord = document.getElementById('qa-opt-discord').checked;
+      const resolveCheck = document.getElementById('qa-opt-resolve');
+      const autoResolve = resolveCheck ? (resolveCheck.checked !== false) : true;
+      const discordCheck = document.getElementById('qa-opt-discord');
+      const dispatchDiscord = discordCheck ? (discordCheck.checked !== false) : true;
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       // Save answer to ticket
@@ -3919,13 +3921,12 @@ ${content}`
       }, 1200);
     }
 
-    function exportTableToCSV() {
-      let csv = "msg_id,created_at,channel,author,role,content,intent,confidence,status,latency
-";
+        function exportTableToCSV() {
+      const rows = ["msg_id,created_at,channel,author,role,content,intent,confidence,status,latency"];
       state.ingestedMessages.forEach(m => {
-        csv += `"${m.id}","${m.time}","${m.channel}","${m.author}","${m.role}","${m.content.replace(/"/g, '""')}","${m.intent}","${m.confidence}%","${m.status}","${m.latency}"
-`;
+        rows.push(`"${m.id}","${m.time}","${m.channel}","${m.author}","${m.role}","${m.content.replace(/"/g, '""')}","${m.intent}","${m.confidence}%","${m.status}","${m.latency}"`);
       });
+      const csv = rows.join(String.fromCharCode(10));
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
