@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 import uuid
@@ -8,11 +9,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from dotenv import load_dotenv
+
 from database import get_supabase_client
 from schemas import ChatResponse, Citation
 
 ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
+load_dotenv(ROOT.parent / ".env")
 NOTICES_FILE = ROOT / "data" / "official_notices.json"
+
 
 
 def normalize_text(text: str) -> str:
@@ -181,8 +187,17 @@ class LogisticsAgent:
     and proper citation tags conforming to schema.sql and UC-B1-01 specification.
     """
 
-    def __init__(self, notice_store: Optional[NoticeStore] = None):
+    def __init__(self, notice_store: Optional[NoticeStore] = None, use_gemini: bool = False):
         self.notice_store = notice_store or NoticeStore()
+        self.use_gemini = use_gemini
+        self._harness = None
+        if self.use_gemini and os.getenv("GEMINI_API_KEY"):
+            try:
+                from providers.gemini_provider import GeminiProvider
+                from agent import DiscordLogisticsAgentHarness
+                self._harness = DiscordLogisticsAgentHarness(provider=GeminiProvider(default_model="gemini-2.5-flash"))
+            except Exception as e:
+                print(f"Warning: GeminiProvider initialization failed: {e}")
 
     def process_query(self, user_text: str, conversation_id: str = "", channel: str = "#hoi-dap-logistics") -> ChatResponse:
         start_time = time.perf_counter()
@@ -190,6 +205,32 @@ class LogisticsAgent:
         conv_id = conversation_id or uuid.uuid4().hex
         created_at = datetime.now(timezone.utc).isoformat()
         bot_msg_id = f"BOT-{uuid.uuid4().hex[:8]}"
+
+        # Option: Gemini LLM Harness Mode
+        if self._harness is not None:
+            try:
+                run_res = self._harness.run([{"role": "user", "content": raw_text}])
+                reply_text = run_res.text or ""
+                if not reply_text and run_res.tool_results:
+                    # Collect reply from tool results
+                    reply_text = str(run_res.tool_results[0].get("result", ""))
+                latency = (time.perf_counter() - start_time) * 1000
+                return ChatResponse(
+                    conversation_id=conv_id,
+                    bot_msg_id=bot_msg_id,
+                    reply=reply_text or "Đã nhận câu hỏi và xử lý qua Gemini Agent.",
+                    intent="Gemini_LLM_Harness",
+                    citations=[],
+                    status="answered",
+                    awaiting_user=False,
+                    clarification_options=[],
+                    escalated_to_ta=False,
+                    latency_ms=round(latency, 2),
+                    created_at=created_at,
+                )
+            except Exception as e:
+                print(f"Gemini Harness execution error: {e}, falling back to deterministic grounding engine...")
+
 
         # 1. Guardrail: Prompt Injection Detection (PRD FR-105, Taxonomy Layer 3, GS06)
         if is_prompt_injection(raw_text):
