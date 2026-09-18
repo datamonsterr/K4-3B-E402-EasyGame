@@ -164,7 +164,7 @@ try {
   if (packIndex !== -1) {
     const path = process.argv[packIndex + 1];
     if (!path) throw new Error("--pack requires an explicit local CSV path");
-    const { parsePack } = await import("../src/backend/ingestion/index.ts");
+    const { parsePack } = await import("../app/backend/ingestion/index.ts");
     const pack = parsePack(readFileSync(path, "utf8"));
     const literal = (value) => "'" + value.replaceAll("'", "''") + "'";
     try {
@@ -210,7 +210,7 @@ try {
     if (generated.status !== 0)
       throw new Error(generated.stderr || "Supabase type generation failed");
     writeFileSync(
-      new URL("../src/backend/database/schema.types.ts", import.meta.url),
+      new URL("../app/backend/database/schema.types.ts", import.meta.url),
       generated.stdout,
     );
     console.log("Generated database schema types using Supabase CLI");

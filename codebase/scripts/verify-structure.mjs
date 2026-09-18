@@ -5,11 +5,11 @@ const root = new URL("../../", import.meta.url);
 const app = new URL("codebase/", root);
 const read = (base, name) => readFile(new URL(name, base), "utf8");
 const manifest = JSON.parse(
-  await read(app, "src/backend/artifacts/reference/starter_v0/PROVENANCE.json"),
+  await read(app, "app/backend/artifacts/reference/starter_v0/PROVENANCE.json"),
 );
 for (const [file, hash] of Object.entries(manifest.sha256)) {
   const bytes = await readFile(
-    new URL(`src/backend/artifacts/reference/starter_v0/${file}`, app),
+    new URL(`app/backend/artifacts/reference/starter_v0/${file}`, app),
   );
   assert.equal(
     createHash("sha256").update(bytes).digest("hex"),
@@ -26,11 +26,11 @@ assert.match(
   /data\/discord-pack\/k4_messages\.csv/,
 );
 for (const file of await readdir(
-  new URL("src/backend/artifacts/versions/v0/", app),
+  new URL("app/backend/artifacts/versions/v0/", app),
 )) {
   assert.equal(
-    await read(app, `src/backend/artifacts/versions/v0/${file}`),
-    await read(app, `src/backend/artifacts/${file}`),
+    await read(app, `app/backend/artifacts/versions/v0/${file}`),
+    await read(app, `app/backend/artifacts/${file}`),
   );
 }
 const html = await read(root, "index.html");

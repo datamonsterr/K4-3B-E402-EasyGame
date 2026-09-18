@@ -7,7 +7,7 @@ export default defineConfig([
   globalIgnores([
     ".next/**",
     "public/mock/**",
-    "src/backend/artifacts/reference/**",
+    "app/backend/artifacts/reference/**",
     "playwright-report/**",
     "test-results/**",
     "next-env.d.ts",

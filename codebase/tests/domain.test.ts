@@ -3,10 +3,10 @@ import {
   parsePack,
   importPack,
   MemoryPackStore,
-} from "../src/backend/ingestion";
-import { answerLogistics, type Notice } from "../src/backend/assistant";
-import { evaluateRadar } from "../src/backend/radar";
-import { requireActor } from "../src/backend/auth/authorize";
+} from "../app/backend/ingestion";
+import { answerLogistics, type Notice } from "../app/backend/assistant";
+import { evaluateRadar } from "../app/backend/radar";
+import { requireActor } from "../app/backend/auth/authorize";
 const header =
   "msg_id,guild,channel,author,is_bot,msg_type,created_at_vn,reply_to,mentions_bot,n_attachments,n_chars,content";
 const csv = [
