@@ -28,6 +28,6 @@ Form khảo sát mới được tạo tự động qua **Google Forms MCP** nh�
 
 ## 3. Tích Hợp Vào Ứng Dụng
 
-Form đã được nhúng trực tiếp vào Tab **Feedback & QR** của ứng dụng tại [`codebase/index.html`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/index.html) và [`index.html`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/index.html):
+Form đã được nhúng trực tiếp vào Tab **Feedback & QR** của mock chuẩn tại [`index.html`](../index.html). Bản dùng trong Next.js được tạo tại `codebase/public/mock/index.html` bằng `npm run sync:mock`:
 - **Chế độ 1 - Nhúng tương tác:** Cho phép người dùng trực tiếp đánh giá và bấm gửi Form ngay trên giao diện mà không cần rời khỏi ứng dụng.
 - **Chế độ 2 - Quét QR trên điện thoại:** Hiển thị mã QR Cyan kỹ thuật số (`screen5_qr.svg`) và nút sao chép link một chạm.
