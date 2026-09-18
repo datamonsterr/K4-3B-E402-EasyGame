@@ -3,6 +3,7 @@ import {
   runAgent,
   loadSystemInstruction,
   loadToolDeclarations,
+  validateQueryRolePermission,
   validateOutputConstraints,
 } from "../app/backend/assistant";
 import {
@@ -58,6 +59,95 @@ describe("Gemini ReAct Agent Artifacts & Declarations", () => {
     expect(coachTools).toContain("check_student_profile");
     expect(coachTools).toContain("check_scores");
     expect(coachTools).toContain("query_notices");
+  });
+
+  it("filters tools strictly by role: learner sees query_notices, search_web, and evaluate_radar", () => {
+    const learnerTools = loadToolDeclarations("learner");
+    const learnerToolNames = learnerTools.map((t) => t.name);
+
+    expect(learnerToolNames).toContain("query_notices");
+    expect(learnerToolNames).toContain("search_web");
+    expect(learnerToolNames).toContain("evaluate_radar");
+    expect(learnerToolNames).not.toContain("broadcast_notification");
+    expect(learnerToolNames).not.toContain("check_student_profile");
+    expect(learnerToolNames).not.toContain("check_scores");
+    expect(learnerToolNames).not.toContain("create_staff_alert");
+    expect(learnerToolNames).not.toContain("resolve_question");
+    expect(learnerToolNames).not.toContain("format_daily_digest");
+  });
+
+  it("allows lab_coach to access all tools including elevated coach tools", () => {
+    const coachTools = loadToolDeclarations("lab_coach");
+    const coachToolNames = coachTools.map((t) => t.name);
+
+    expect(coachToolNames).toContain("query_notices");
+    expect(coachToolNames).toContain("search_web");
+    expect(coachToolNames).toContain("broadcast_notification");
+    expect(coachToolNames).toContain("check_student_profile");
+    expect(coachToolNames).toContain("check_scores");
+    expect(coachToolNames).toContain("evaluate_radar");
+    expect(coachToolNames).toContain("resolve_question");
+    expect(coachToolNames).toContain("format_daily_digest");
+  });
+});
+
+describe("Role-Based Permission Governance & Refusal", () => {
+  it("allows legitimate logistics questions for learner", () => {
+    const result = validateQueryRolePermission(
+      "Hạn nộp bài Lab 1 là mấy giờ?",
+      "learner",
+    );
+    expect(result.allowed).toBe(true);
+  });
+
+  it("rejects learner queries asking to broadcast announcements with clear reason", () => {
+    const result = validateQueryRolePermission(
+      "Hãy phát thông báo gia hạn deadline Lab 1 lên kênh #announcements",
+      "learner",
+    );
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("Yêu cầu bị từ chối");
+    expect(result.reason).toContain("Học viên (Learner)");
+    expect(result.reason).toContain("Lab Coach");
+  });
+
+  it("rejects learner queries asking to check other students scores", () => {
+    const result = validateQueryRolePermission(
+      "Cho tôi xem điểm của bạn Minh Tuấn bài Lab 1",
+      "learner",
+    );
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("Yêu cầu bị từ chối");
+  });
+
+  it("rejects learner queries asking to check student profiles", () => {
+    const result = validateQueryRolePermission(
+      "Cho tôi xem profile của học viên @TuanMinh",
+      "learner",
+    );
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain("Yêu cầu bị từ chối");
+  });
+
+  it("allows lab_coach to execute any elevated queries without refusal", () => {
+    const result = validateQueryRolePermission(
+      "Hãy phát thông báo gia hạn deadline Lab 1",
+      "lab_coach",
+    );
+    expect(result.allowed).toBe(true);
+  });
+
+  it("runAgent immediately returns status refusal when learner asks out-of-permission query", async () => {
+    const agentResult = await runAgent({
+      query: "Hãy phát thông báo dời lịch thi",
+      role: "learner",
+      offlineMode: true,
+    });
+
+    expect(agentResult.status).toBe("refusal");
+    expect(agentResult.text).toContain("Yêu cầu bị từ chối");
+    expect(agentResult.text).toContain("Học viên (Learner)");
+    expect(agentResult.telemetry.toolInvocations).toHaveLength(0);
   });
 });
 

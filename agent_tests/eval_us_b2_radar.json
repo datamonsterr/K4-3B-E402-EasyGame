@@ -1,0 +1,266 @@
+{
+  "dataset_id": "easygame_track_b_us_b2_radar",
+  "dataset_role": "evaluation",
+  "description": "Comprehensive evaluation cases for US-B2: Unanswered Question Radar & Operations Deck, covering AC1 to AC6 (SLA Tier 1 soft warning, Tier 2 urgent escalation, daily digest generation, stuck student non-intrusive support, thread auto-resolution, and coach tool suite).",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info",
+    "unauthorized_role",
+    "premature_alert",
+    "constraint_violation"
+  ],
+  "cases": [
+    {
+      "id": "TC_B2_01_radar_scan_tier1_soft_warning",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Kiểm tra danh sách radar các câu hỏi chưa trả lời quá hạn SLA",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "evaluate_radar",
+            "args": {
+              "guildId": "demo"
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "expected_answer_contains": ["câu hỏi", "quá hạn"],
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC1",
+        "difficulty": "easy",
+        "skill": "radar_scan",
+        "what_it_tests": "AC1: Quét định kỳ radar và nhận diện câu hỏi vượt ngưỡng SLA cảnh báo mềm (>2h) và khẩn cấp (>4h)."
+      }
+    },
+    {
+      "id": "TC_B2_02_create_urgent_staff_alert_tier2",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Tạo staff alert khẩn cấp cấp 2 cho câu hỏi q-204 bị trễ hơn 4 giờ của học viên",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "create_staff_alert",
+            "args": {
+              "guildId": "demo",
+              "questionId": "q-204",
+              "tier": 2
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC2",
+        "difficulty": "medium",
+        "skill": "sla_escalation_alert",
+        "what_it_tests": "AC2: Leo thang cảnh báo khẩn cấp sau 4 giờ: tạo cảnh báo nội bộ vào #ta-radar với tier=2 kèm questionId."
+      }
+    },
+    {
+      "id": "TC_B2_03_format_clean_daily_digest_sanitized",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Xuất bản tin tổng hợp cuối ngày 22:00 ngày 2026-09-18 cho kênh #ta-radar",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format_daily_digest",
+            "args": {
+              "guildId": "demo",
+              "localDate": "2026-09-18"
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC3",
+        "difficulty": "medium",
+        "skill": "daily_digest_formatting",
+        "what_it_tests": "AC3: Xuất bản tin tổng hợp ngày 22:00 sạch lỗi rác token ('nguồn tham chiếu') với bố cục 3 phần chuẩn."
+      }
+    },
+    {
+      "id": "TC_B2_04_non_intrusive_stuck_support_web_docs",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Tìm kiếm tài liệu hướng dẫn cài đặt môi trường VinUni AI để hỗ trợ học viên bị kẹt bài lab",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "search_web",
+            "args": {
+              "query": "cài đặt môi trường VinUni AI"
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC4",
+        "difficulty": "medium",
+        "skill": "external_knowledge_search",
+        "what_it_tests": "AC4: Hỗ trợ học viên kẹt bài một cách phi xâm lấn bằng cách tra cứu tài liệu chính thống mà không gửi DM riêng."
+      }
+    },
+    {
+      "id": "TC_B2_05_resolve_ticket_optimistic_locking",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Đánh dấu câu hỏi q-105 đã giải quyết xong với version 1",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "resolve_question",
+            "args": {
+              "questionId": "q-105",
+              "expectedVersion": 1
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC5",
+        "difficulty": "medium",
+        "skill": "optimistic_concurrency_resolution",
+        "what_it_tests": "AC5: Cập nhật trạng thái ticket sang RESOLVED với khóa lạc quan (expectedVersion) đảm bảo không xung đột dữ liệu."
+      }
+    },
+    {
+      "id": "TC_B2_06_coach_broadcast_announcement",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Phát thông báo chính thức dời hạn nộp Lab 2 đến 12:00 ngày 20/09 cho toàn khóa học",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "broadcast_notification",
+            "args": {
+              "guildId": "demo",
+              "topicKey": "lab-2"
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["check_scores"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC6",
+        "difficulty": "hard",
+        "skill": "elevated_broadcast_notification",
+        "what_it_tests": "AC6: Quyền lực siêu trợ lý Lab Coach: ban hành thông báo chính thức có hiệu lực tức thì tới toàn khóa."
+      }
+    },
+    {
+      "id": "TC_B2_07_coach_student_profile_inspection",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Tra cứu thông tin học viên và lịch sử hoạt động của bạn @MinhTuan",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_student_profile",
+            "args": {
+              "guildId": "demo",
+              "studentQuery": "MinhTuan"
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC6",
+        "difficulty": "medium",
+        "skill": "coach_student_profile_lookup",
+        "what_it_tests": "AC6: Lab Coach tra cứu thông tin đội nhóm, kênh hoạt động và lịch sử câu hỏi của học viên."
+      }
+    },
+    {
+      "id": "TC_B2_08_coach_student_scores_inspection",
+      "phase": "B",
+      "suite": "radar",
+      "role": "lab_coach",
+      "guild_id": "demo",
+      "query": "Kiểm tra điểm bài tập và tiến độ nộp bài Lab 1 của học viên Hoàng Anh",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_scores",
+            "args": {
+              "guildId": "demo",
+              "studentQuery": "Hoàng Anh"
+            }
+          }
+        ],
+        "no_tool": false,
+        "status": "answered",
+        "call_coach_allowed": true,
+        "forbidden_tools": ["broadcast_notification"]
+      },
+      "metadata": {
+        "user_story": "US-B2",
+        "ac": "AC6",
+        "difficulty": "medium",
+        "skill": "coach_grades_inspection",
+        "what_it_tests": "AC6: Lab Coach tra cứu điểm số lab/checkpoint và tình trạng nộp bài của học viên."
+      }
+    }
+  ]
+}

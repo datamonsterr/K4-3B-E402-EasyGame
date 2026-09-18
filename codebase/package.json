@@ -16,6 +16,8 @@
     "test:live-agent": "vitest run tests/integration/live-agent.integration.test.ts",
     "test:watch": "vitest",
     "eval": "tsx eval/run_eval.ts",
+    "eval:agent": "tsx scripts/run_agent_eval.ts",
+    "eval:agent:offline": "tsx scripts/run_agent_eval.ts --offline",
     "test:e2e": "playwright test",
     "test:db": "node scripts/test-db.mjs",
     "format": "prettier --write .",

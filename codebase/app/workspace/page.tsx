@@ -16,6 +16,7 @@ export default async function WorkspacePage() {
 
   let userName = "@Member";
   let initialRole: "learner" | "lab_coach" = "learner";
+  let needsOnboarding = false;
 
   try {
     const supabase = await sessionClient();
@@ -25,30 +26,43 @@ export default async function WorkspacePage() {
     } = await supabase.auth.getUser();
     if (!user || userError) redirect("/sign-in?error=authentication_required");
 
-    const actorContext = await resolveActorContext({
-      async getAuthenticatedUserId() {
-        return user.id;
-      },
-      async listMemberships(userId) {
-        const { data, error } = await supabase
-          .from("memberships")
-          .select("guild_id,user_id,role")
-          .eq("user_id", userId)
-          .order("guild_id", { ascending: true })
-          .limit(2);
-        if (error) throw error;
-        return (data ?? []).map((membership) => ({
-          guildId: membership.guild_id,
-          userId: membership.user_id,
-          role: membership.role,
-        }));
-      },
-    });
-    if (actorContext.type !== "ready") {
-      redirect("/sign-in?error=membership_required");
+    // Fetch user memberships
+    const { data: rawMemberships, error: membershipError } = await supabase
+      .from("memberships")
+      .select("guild_id,user_id,role")
+      .eq("user_id", user.id)
+      .order("guild_id", { ascending: true })
+      .limit(2);
+
+    if (membershipError) throw membershipError;
+    const memberships = rawMemberships ?? [];
+
+    if (memberships.length === 0) {
+      // Authenticated user with no cohort membership yet:
+      // Open onboarding modal directly in workspace shell rather than bouncing to sign-in
+      needsOnboarding = true;
+      initialRole = "learner";
+    } else {
+      const actorContext = await resolveActorContext({
+        async getAuthenticatedUserId() {
+          return user.id;
+        },
+        async listMemberships() {
+          return memberships.map((m) => ({
+            guildId: m.guild_id,
+            userId: m.user_id,
+            role: m.role,
+          }));
+        },
+      });
+
+      if (actorContext.type !== "ready") {
+        redirect("/sign-in?error=membership_required");
+      }
+      initialRole = actorContext.actor.role;
     }
 
-    const metadata = user.user_metadata as Record<string, unknown>;
+    const metadata = (user.user_metadata || {}) as Record<string, unknown>;
     const metadataName = [
       metadata.global_name,
       metadata.full_name,
@@ -59,7 +73,6 @@ export default async function WorkspacePage() {
     );
     userName =
       metadataName ?? (user.email ? `@${user.email.split("@")[0]}` : "@Member");
-    initialRole = actorContext.actor.role;
   } catch (error) {
     if (error && typeof error === "object" && "digest" in error) throw error;
     redirect("/sign-in?error=authentication_unavailable");
@@ -70,6 +83,7 @@ export default async function WorkspacePage() {
       initialUser={userName}
       initialUserName={userName}
       initialRole={initialRole}
+      initialNeedsOnboarding={needsOnboarding}
     />
   );
 }

@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { sessionClient, configured } from "@/backend/database/client";
+import {
+  sessionClient,
+  jobClient,
+  configured,
+} from "@/backend/database/client";
 
 const roleSchema = z.object({
   role: z.enum(["learner", "lab_coach"]),
@@ -81,8 +85,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Upsert membership in database
-    const { error: upsertError } = await supabase.from("memberships").upsert(
+    // Upsert membership in database using privileged job client if available, or session client
+    let dbClient = supabase;
+    try {
+      dbClient = jobClient() as unknown as typeof supabase;
+    } catch {
+      // Job credentials might not be configured in preview, use session client
+    }
+
+    const { error: upsertError } = await dbClient.from("memberships").upsert(
       {
         guild_id: targetGuildId,
         user_id: user.id,

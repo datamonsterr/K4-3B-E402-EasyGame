@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { sessionClient, configured } from "@/backend/database/client";
-import { resolveActorContext } from "@/backend/auth/context";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -37,26 +36,16 @@ export async function GET(request: Request) {
           data: { user },
         } = await supabase.auth.getUser();
 
-        const actorContext = await resolveActorContext({
-          async getAuthenticatedUserId() {
-            return user?.id ?? null;
-          },
-          async listMemberships(userId) {
-            const { data, error: membershipError } = await supabase
-              .from("memberships")
-              .select("guild_id,user_id,role")
-              .eq("user_id", userId)
-              .order("guild_id", { ascending: true })
-              .limit(2);
-            if (membershipError) throw membershipError;
-            return (data ?? []).map((membership) => ({
-              guildId: membership.guild_id,
-              userId: membership.user_id,
-              role: membership.role,
-            }));
-          },
-        });
-        if (actorContext.type !== "ready") {
+        const { data: rawMemberships, error: membershipError } = await supabase
+          .from("memberships")
+          .select("guild_id,user_id,role")
+          .eq("user_id", user?.id ?? "")
+          .order("guild_id", { ascending: true })
+          .limit(2);
+        if (membershipError) throw membershipError;
+
+        const memberships = rawMemberships ?? [];
+        if (memberships.length > 1) {
           await supabase.auth.signOut();
           return NextResponse.redirect(
             `${baseUrl}/sign-in?error=membership_required`,

@@ -24,12 +24,14 @@ export interface WorkspaceShellProps {
   initialRole?: "learner" | "lab_coach";
   initialUserName?: string;
   initialUser?: string;
+  initialNeedsOnboarding?: boolean;
 }
 
 export function WorkspaceShell({
   initialRole = "learner",
   initialUserName,
   initialUser,
+  initialNeedsOnboarding = false,
 }: WorkspaceShellProps = {}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("chat");
@@ -57,7 +59,14 @@ export function WorkspaceShell({
     }
     return defaultUser;
   });
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(() => {
+    if (initialNeedsOnboarding) return true;
+    if (typeof window !== "undefined") {
+      const completed = localStorage.getItem("eg_onboarding_completed");
+      if (completed === "true") return false;
+    }
+    return false;
+  });
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   function handleRoleChanged(newRole: "learner" | "lab_coach") {

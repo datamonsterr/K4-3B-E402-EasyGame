@@ -84,7 +84,7 @@ test("routes reject invalid input and require configured auth", async ({
         data: { query: "When is Lab 1 due?" },
       })
     ).status(),
-  ).toBe(503);
+  ).toBe(401);
   expect(
     (
       await request.post("/api/demo/answer", {

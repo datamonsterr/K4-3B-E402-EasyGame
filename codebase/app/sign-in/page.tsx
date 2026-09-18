@@ -1,10 +1,22 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { configured, sessionClient } from "@/backend/database/client";
+import { resolveActorContext } from "@/backend/auth/context";
 import { SignInCard } from "@/frontend/sign-in-card";
 
-export default async function SignInPage() {
-  if (configured()) {
+interface SignInPageProps {
+  searchParams?: Promise<{
+    error?: string;
+    [key: string]: string | undefined;
+  }>;
+}
+
+export default async function SignInPage(props: SignInPageProps) {
+  const searchParams = (await props?.searchParams) || {};
+
+  // If error is present in query parameters (e.g. membership_required),
+  // do NOT redirect to /workspace. Display error on sign-in card to prevent redirect loops.
+  if (!searchParams.error && configured()) {
     let shouldRedirect = false;
     try {
       const supabase = await sessionClient();
@@ -12,10 +24,35 @@ export default async function SignInPage() {
         data: { user },
         error,
       } = await supabase.auth.getUser();
+
       if (user && !error) {
-        shouldRedirect = true;
+        // Only redirect if user has an active, ready membership
+        const actorContext = await resolveActorContext({
+          async getAuthenticatedUserId() {
+            return user.id;
+          },
+          async listMemberships(userId) {
+            const { data, error: membershipError } = await supabase
+              .from("memberships")
+              .select("guild_id,user_id,role")
+              .eq("user_id", userId)
+              .order("guild_id", { ascending: true })
+              .limit(2);
+            if (membershipError) throw membershipError;
+            return (data ?? []).map((membership) => ({
+              guildId: membership.guild_id,
+              userId: membership.user_id,
+              role: membership.role,
+            }));
+          },
+        });
+
+        if (actorContext.type === "ready") {
+          shouldRedirect = true;
+        }
       }
-    } catch {
+    } catch (e) {
+      if (e && typeof e === "object" && "digest" in e) throw e;
       // Session check failed or unauthenticated; render sign-in form
     }
     if (shouldRedirect) {

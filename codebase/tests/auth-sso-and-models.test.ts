@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { GET as oauthGet } from "../app/api/auth/oauth/route";
 import { GET as callbackGet } from "../app/auth/callback/route";
+import Home from "../app/page";
 import { getSupabaseBrowserClient } from "../app/frontend/supabase-browser";
 import { validateLlmConnection } from "../app/backend/assistant";
 import { POST as healthLlmPost } from "../app/api/health/llm/route";
@@ -110,6 +111,69 @@ describe("OAuth SSO & Model Customization Suite", () => {
       // Fails exchange -> redirects safely to sign-in
       expect(location).toContain("/sign-in?error=auth_callback_failed");
       expect(location).not.toContain("malicious.site");
+    });
+
+    it("parses multi-hop x-forwarded-host proxies correctly", async () => {
+      const req = new Request(
+        "http://internal:3000/auth/callback?error=server_error&error_description=Denied",
+        {
+          headers: {
+            "x-forwarded-host": "easygame.vercel.app, proxy2.internal",
+            "x-forwarded-proto": "https",
+          },
+        },
+      );
+      const res = await callbackGet(req);
+      const location = res.headers.get("location") || "";
+      expect(location).toContain(
+        "https://easygame.vercel.app/sign-in?error=Denied",
+      );
+    });
+  });
+
+  describe("Root Page OAuth Callback Interceptor (app/page)", () => {
+    it("intercepts ?code parameter and forwards to /auth/callback with next=/workspace", async () => {
+      try {
+        await Home({
+          searchParams: Promise.resolve({ code: "test-auth-code-123" }),
+        });
+        expect.unreachable("Should have redirected");
+      } catch (err: unknown) {
+        const errorString = String(err);
+        const digest = (err as { digest?: string }).digest || "";
+        expect(errorString + digest).toContain("/auth/callback");
+        expect(errorString + digest).toContain("code=test-auth-code-123");
+        expect(errorString + digest).toContain("next=%2Fworkspace");
+      }
+    });
+
+    it("intercepts OAuth error parameter on root and forwards to /auth/callback", async () => {
+      try {
+        await Home({
+          searchParams: Promise.resolve({
+            error: "access_denied",
+            error_description: "User+cancelled",
+          }),
+        });
+        expect.unreachable("Should have redirected");
+      } catch (err: unknown) {
+        const errorString = String(err);
+        const digest = (err as { digest?: string }).digest || "";
+        expect(errorString + digest).toContain("/auth/callback");
+        expect(errorString + digest).toContain("error=access_denied");
+      }
+    });
+
+    it("redirects unauthenticated visitors without params to /sign-in", async () => {
+      delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+      try {
+        await Home({});
+        expect.unreachable("Should have redirected");
+      } catch (err: unknown) {
+        const errorString = String(err);
+        const digest = (err as { digest?: string }).digest || "";
+        expect(errorString + digest).toContain("/sign-in");
+      }
     });
   });
 

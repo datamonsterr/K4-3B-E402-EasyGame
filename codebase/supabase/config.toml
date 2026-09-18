@@ -20,8 +20,18 @@ enabled = true
 port = 54323
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+site_url = "http://localhost:3000/workspace"
+additional_redirect_urls = [
+  "http://localhost:3000/**",
+  "http://localhost:3000/auth/callback",
+  "http://localhost:3000/workspace",
+  "http://127.0.0.1:3000/**",
+  "http://127.0.0.1:3000/auth/callback",
+  "http://127.0.0.1:3000/workspace",
+  "https://*.vercel.app/**",
+  "https://*.vercel.app/auth/callback",
+  "https://*.vercel.app/workspace"
+]
 jwt_expiry = 3600
 enable_signup = false
 [auth.email]

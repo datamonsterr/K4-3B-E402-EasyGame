@@ -31,3 +31,7 @@ codebase/supabase/.temp/
 codebase/supabase/.branches/
 coverage/
 .worktrees/
+.vercel
+.env*
+agent_test_runs/
+codebase/agent_test_runs/

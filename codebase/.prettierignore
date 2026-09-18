@@ -12,3 +12,4 @@ next-env.d.ts
 supabase/.temp
 supabase/.branches
 eval/eval_report.json
+agent_test_runs
