@@ -1,0 +1,7 @@
+{
+  "version": "v0",
+  "tools": [
+    { "name": "query_notices", "sideEffect": false },
+    { "name": "evaluate_radar", "sideEffect": false }
+  ]
+}

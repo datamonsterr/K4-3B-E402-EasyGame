@@ -10,7 +10,23 @@ node_modules/
 data/discord-pack/k4_messages.csv
 
 # Agent and IDE configuration (contains secrets)
-.agents/
+.agents/*
+!.agents/rules/
+.agents/rules/*
+!.agents/rules/easygame.md
 .cursor/
 .vscode/
 .mcp.json
+
+# Next.js and local development
+.env.*
+!.env.example
+.next/
+.vercel/
+*.tsbuildinfo
+codebase/public/mock/
+codebase/playwright-report/
+codebase/test-results/
+codebase/supabase/.temp/
+codebase/supabase/.branches/
+coverage/

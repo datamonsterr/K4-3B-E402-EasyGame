@@ -1,0 +1,12 @@
+min_version = "2026.9.1"
+redactions = ["*_TOKEN", "*_KEY", "*PASSWORD*", "CRON_SECRET"]
+
+[tools]
+node = "24"
+pnpm = "11.5.0"
+vercel = "50.44.0"
+supabase = "2.117.0"
+
+[env]
+# ADR: ../docs/adr/0006-mise-tooling-and-local-environment.md
+_.file = { path = ".env", redact = true }
