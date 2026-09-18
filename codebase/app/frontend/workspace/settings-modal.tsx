@@ -16,12 +16,53 @@ const PROVIDER_MODELS: Record<
   { id: string; label: string; tag?: string }[]
 > = {
   gemini: [
-    { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", tag: "Recommended" },
-    { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro", tag: "Deep Reasoning" },
-    { id: "gemini-1.5-flash", label: "Gemini 1.5 Flash", tag: "Fast" },
-    { id: "gemini-1.5-pro", label: "Gemini 1.5 Pro", tag: "Legacy" },
+    {
+      id: "gemini-3.5-flash-lite",
+      label: "Gemini 3.5 Flash-Lite",
+      tag: "Recommended",
+    },
+    {
+      id: "gemini-3.5-flash",
+      label: "Gemini 3.5 Flash",
+      tag: "Latest Flagship",
+    },
+    {
+      id: "gemini-3.5-pro",
+      label: "Gemini 3.5 Pro",
+      tag: "Deep Reasoning",
+    },
+    {
+      id: "gemini-2.5-flash",
+      label: "Gemini 2.5 Flash",
+      tag: "Balanced",
+    },
+    {
+      id: "gemini-2.5-pro",
+      label: "Gemini 2.5 Pro",
+      tag: "Reasoning",
+    },
+    {
+      id: "gemini-2.5-flash-lite",
+      label: "Gemini 2.5 Flash-Lite",
+      tag: "Lightweight",
+    },
+    {
+      id: "gemini-1.5-flash",
+      label: "Gemini 1.5 Flash",
+      tag: "Legacy Fast",
+    },
+    {
+      id: "gemini-1.5-pro",
+      label: "Gemini 1.5 Pro",
+      tag: "Legacy",
+    },
   ],
   openrouter: [
+    {
+      id: "google/gemini-3.5-flash-lite",
+      label: "Google: Gemini 3.5 Flash-Lite",
+      tag: "Ultra Fast",
+    },
     {
       id: "google/gemini-2.5-flash",
       label: "Google: Gemini 2.5 Flash",
@@ -42,11 +83,17 @@ const PROVIDER_MODELS: Record<
       label: "DeepSeek: V3 Chat",
       tag: "Cost Effective",
     },
+    {
+      id: "openai/gpt-4o",
+      label: "OpenAI: GPT-4o",
+      tag: "High Capacity",
+    },
   ],
   openai: [
     { id: "gpt-4o-mini", label: "GPT-4o Mini", tag: "Recommended" },
     { id: "gpt-4o", label: "GPT-4o Flagship", tag: "High Capacity" },
     { id: "gpt-4.1-turbo", label: "GPT-4.1 Turbo", tag: "Fast" },
+    { id: "o3-mini", label: "o3-mini", tag: "Reasoning" },
   ],
 };
 
@@ -101,9 +148,11 @@ function SettingsModalContent({
       if (storedModel) return storedModel;
       const storedProvider = (localStorage.getItem("eg_llm_provider") ||
         "gemini") as LLMProvider;
-      return PROVIDER_MODELS[storedProvider]?.[0]?.id || "gemini-2.5-flash";
+      return (
+        PROVIDER_MODELS[storedProvider]?.[0]?.id || "gemini-3.5-flash-lite"
+      );
     }
-    return "gemini-2.5-flash";
+    return "gemini-3.5-flash-lite";
   });
   const [selectedRole, setSelectedRole] = useState<"learner" | "lab_coach">(
     currentRole,
@@ -125,10 +174,18 @@ function SettingsModalContent({
   // When switching provider, set default model if current model doesn't belong to new provider
   function handleProviderChange(newProvider: LLMProvider) {
     setProvider(newProvider);
-    const availableModels = PROVIDER_MODELS[newProvider];
-    const match = availableModels.some((m) => m.id === model);
-    if (!match) {
-      setModel(availableModels[0].id);
+    if (newProvider === "gemini") {
+      const availableModels = PROVIDER_MODELS.gemini;
+      const match = availableModels.some((m) => m.id === model);
+      if (!match) {
+        setModel(availableModels[0].id);
+      }
+    } else {
+      const presets = PROVIDER_MODELS[newProvider];
+      const match = presets.some((m) => m.id === model);
+      if (!match && (!model || model.startsWith("gemini"))) {
+        setModel(presets[0].id);
+      }
     }
     setTestResult(null);
   }
@@ -139,6 +196,19 @@ function SettingsModalContent({
       const text = await navigator.clipboard.readText();
       if (text) {
         setApiKey(text.trim());
+      }
+    } catch {
+      // Ignore or let user paste manually
+    }
+  }
+
+  // Paste Model ID from clipboard
+  async function handlePasteModel() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        setModel(text.trim());
+        setTestResult(null);
       }
     } catch {
       // Ignore or let user paste manually
@@ -362,34 +432,141 @@ function SettingsModalContent({
             </p>
           </div>
 
-          {/* Section 3: Model Selector */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-mono uppercase tracking-wider text-[#a1a1aa] font-semibold flex items-center justify-between">
-              <span>3. Model Selection</span>
-              <span className="font-mono text-[10px] text-[#71717a]">
-                Provider-specific endpoints
-              </span>
-            </label>
-
-            <select
-              value={model}
-              onChange={(e) => {
-                setModel(e.target.value);
-                setTestResult(null);
-              }}
-              className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-cyan-500 transition"
-            >
-              {PROVIDER_MODELS[provider].map((m) => (
-                <option
-                  key={m.id}
-                  value={m.id}
-                  className="bg-[#18181b] text-white"
+          {/* Section 3: Model Configuration */}
+          {provider !== "gemini" ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                  <span>3. Model ID ({PROVIDER_INFO[provider].name})</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={handlePasteModel}
+                  className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1"
                 >
-                  {m.label} ({m.id}) {m.tag ? `[${m.tag}]` : ""}
+                  <span>📋 Paste model ID</span>
+                </button>
+              </div>
+
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  value={model}
+                  onChange={(e) => {
+                    setModel(e.target.value);
+                    setTestResult(null);
+                  }}
+                  placeholder={
+                    provider === "openrouter"
+                      ? "Paste or type model ID, e.g. anthropic/claude-3.5-sonnet, deepseek/deepseek-chat"
+                      : "Paste or type model ID, e.g. gpt-4o, gpt-4o-mini, o3-mini"
+                  }
+                  className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-[#52525b] focus:outline-none focus:border-cyan-500 pr-10 transition"
+                />
+                {model && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModel("");
+                      setTestResult(null);
+                    }}
+                    className="absolute right-2 px-1.5 py-0.5 text-[10px] text-[#71717a] hover:text-white font-mono"
+                    title="Clear"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Quick Presets */}
+              <div className="space-y-1 pt-0.5">
+                <span className="text-[10px] font-mono text-[#71717a]">
+                  Or click to apply a preset:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {PROVIDER_MODELS[provider].map((m) => {
+                    const isSelected = model === m.id;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          setModel(m.id);
+                          setTestResult(null);
+                        }}
+                        className={`px-2 py-1 rounded text-[11px] font-mono transition border ${
+                          isSelected
+                            ? "bg-cyan-950/80 border-cyan-500 text-cyan-300 shadow-sm"
+                            : "bg-[#202024] border-[#3f3f46] text-[#a1a1aa] hover:text-white hover:border-[#52525b]"
+                        }`}
+                      >
+                        {m.label} {m.tag ? `[${m.tag}]` : ""}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[#a1a1aa] font-semibold flex items-center gap-1.5">
+                  <span>3. Model Selection (Google Gemini)</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={handlePasteModel}
+                  className="text-[10px] font-mono text-cyan-400 hover:text-cyan-300 hover:underline flex items-center gap-1"
+                >
+                  <span>📋 Paste model ID</span>
+                </button>
+              </div>
+
+              <select
+                value={
+                  PROVIDER_MODELS.gemini.some((m) => m.id === model)
+                    ? model
+                    : "custom"
+                }
+                onChange={(e) => {
+                  if (e.target.value !== "custom") {
+                    setModel(e.target.value);
+                  }
+                  setTestResult(null);
+                }}
+                className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-cyan-500 transition"
+              >
+                {PROVIDER_MODELS.gemini.map((m) => (
+                  <option
+                    key={m.id}
+                    value={m.id}
+                    className="bg-[#18181b] text-white"
+                  >
+                    {m.label} ({m.id}) {m.tag ? `[${m.tag}]` : ""}
+                  </option>
+                ))}
+                <option value="custom" className="bg-[#18181b] text-white">
+                  Custom / Pasted Model ID: {model}
                 </option>
-              ))}
-            </select>
-          </div>
+              </select>
+
+              {(!PROVIDER_MODELS.gemini.some((m) => m.id === model) ||
+                model === "custom") && (
+                <div className="relative flex items-center pt-1">
+                  <input
+                    type="text"
+                    value={model === "custom" ? "" : model}
+                    onChange={(e) => {
+                      setModel(e.target.value);
+                      setTestResult(null);
+                    }}
+                    placeholder="Enter custom Gemini model ID (e.g. gemini-3.5-flash-lite)"
+                    className="w-full bg-[#18181b] border border-[#27272a] rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-[#52525b] focus:outline-none focus:border-cyan-500 transition"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Section 4: Test Connection */}
           <div className="p-3 bg-[#18181b] border border-[#27272a] rounded-lg space-y-2.5">

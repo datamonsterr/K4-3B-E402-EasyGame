@@ -24,6 +24,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(process.cwd(), "app"),
+      "server-only": resolve(
+        process.cwd(),
+        "node_modules/server-only/empty.js",
+      ),
     },
   },
   test: { include: ["tests/**/*.test.ts"] },

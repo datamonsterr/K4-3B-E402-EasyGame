@@ -10,20 +10,41 @@ export function configured() {
 }
 export async function sessionClient() {
   if (!configured()) throw new Error("Supabase is not configured");
-  const jar = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll: () => jar.getAll(),
-        setAll: (items) => {
-          for (const { name, value, options } of items)
-            jar.set(name, value, options);
+  try {
+    const jar = await cookies();
+    return createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      {
+        cookies: {
+          getAll: () => jar.getAll(),
+          setAll: (items) => {
+            for (const { name, value, options } of items)
+              jar.set(name, value, options);
+          },
         },
       },
-    },
-  );
+    );
+  } catch {
+    // Fallback for tests or executions outside Next.js request scope
+    const memory = new Map<string, string>();
+    return createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      {
+        cookies: {
+          getAll: () =>
+            Array.from(memory.entries()).map(([name, value]) => ({
+              name,
+              value,
+            })),
+          setAll: (items) => {
+            for (const { name, value } of items) memory.set(name, value);
+          },
+        },
+      },
+    );
+  }
 }
 export function jobClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
