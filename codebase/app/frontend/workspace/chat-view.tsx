@@ -31,7 +31,7 @@ function formatProviderLabel(provider?: string): string {
 
 function formatProviderModelLabel(provider?: string, model?: string): string {
   const prov = formatProviderLabel(provider);
-  const m = model ? model.split("/").pop() : "gemini-2.5-flash";
+  const m = model ? model.split("/").pop() : "gemini-3.5-flash-lite";
   return `${prov} (${m})`;
 }
 
@@ -54,7 +54,7 @@ const initialMessages: ChatMessage[] = [
       tool: "query_notices",
       groundedScore: 100,
       provider: "gemini",
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash-lite",
       steps: [
         {
           title: "Semantic Intent Classification",
@@ -250,7 +250,7 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
       const activeProvider =
         data.telemetry?.provider || storedProvider || "gemini";
       const activeModel =
-        data.telemetry?.model || storedModel || "gemini-2.5-flash";
+        data.telemetry?.model || storedModel || "gemini-3.5-flash-lite";
 
       const assistantMsg: ChatMessage = {
         id: assistantMsgId,
@@ -297,7 +297,7 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
           tool: "create_staff_alert",
           groundedScore: 100,
           provider: storedProvider || "gemini",
-          model: storedModel || "gemini-2.5-flash",
+          model: storedModel || "gemini-3.5-flash-lite",
           steps: [
             {
               title: "Know-What-You-Don't-Know Fallback",
@@ -432,7 +432,7 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
                           <span>
                             Model:{" "}
                             <span className="text-white font-semibold">
-                              {m.telemetry.model || "gemini-2.5-flash"}
+                              {m.telemetry.model || "gemini-3.5-flash-lite"}
                             </span>
                           </span>
                         </div>

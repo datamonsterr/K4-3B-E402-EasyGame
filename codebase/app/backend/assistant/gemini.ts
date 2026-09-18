@@ -1155,7 +1155,7 @@ export async function validateLlmConnection(
   let model = options.model?.trim();
   if (!model) {
     if (provider === "gemini") {
-      model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+      model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
     } else if (provider === "openrouter") {
       model = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
     } else if (provider === "openai") {
@@ -1316,7 +1316,7 @@ export async function runAgent(
   let model = options.model;
   if (!model) {
     if (provider === "gemini") {
-      model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+      model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
     } else if (provider === "openrouter") {
       model = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
     } else if (provider === "openai") {

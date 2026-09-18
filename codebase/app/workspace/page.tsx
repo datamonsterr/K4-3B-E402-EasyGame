@@ -31,8 +31,10 @@ export default async function WorkspacePage() {
 
       if (user && !error) {
         const resolvedName =
-          (user.user_metadata?.user_name as string | undefined) ||
+          (user.user_metadata?.global_name as string | undefined) ||
           (user.user_metadata?.full_name as string | undefined) ||
+          (user.user_metadata?.user_name as string | undefined) ||
+          (user.user_metadata?.name as string | undefined) ||
           (user.email ? `@${user.email.split("@")[0]}` : undefined);
         if (resolvedName) {
           initialUserName = resolvedName;

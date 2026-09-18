@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getSupabaseBrowserClient } from "./supabase-browser";
 
 export function SignInCard() {
   const router = useRouter();
@@ -95,10 +96,40 @@ export function SignInCard() {
 
   async function handleOAuth(provider: "discord" | "google") {
     setBusy(true);
+    setMessage("");
+
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      // Offline / preview / demo fallback when Supabase keys are absent
+      const targetName =
+        provider === "discord" ? "@DiscordLearner" : "@GoogleLearner";
+      setDemoCookiesAndStorage(role, targetName);
+      router.push("/workspace");
+      return;
+    }
+
     try {
-      router.push(`/auth/callback?provider=${provider}&next=/workspace`);
-    } catch {
-      setMessage(`${provider} SSO requires hosted OAuth provider setup.`);
+      const redirectTo = `${window.location.origin}/auth/callback?provider=${provider}&role=${role}&next=/workspace`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo,
+        },
+      });
+
+      if (error) {
+        setMessage(`OAuth error: ${error.message}`);
+        setBusy(false);
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "SSO authentication error";
+      setMessage(msg);
       setBusy(false);
     }
   }
