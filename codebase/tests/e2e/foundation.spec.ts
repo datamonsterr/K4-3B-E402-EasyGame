@@ -32,9 +32,12 @@ test("full flow: demo sign-in, workspace navigation, grounded agent answering, a
   await expect(page.locator("aside").getByText("Role: Learner")).toBeVisible();
   expect(await page.locator("select[name='persona-role']").count()).toBe(0);
 
-  // Test Chat View: initial grounded message and source card
-  await expect(page.getByText(/19\/09\/2026/)).toBeVisible();
-  await expect(page.getByText(/Thông báo gia hạn Lab 1/i)).toBeVisible();
+  // Test Chat View: initial welcome message without fabricated source links or grounded badges
+  await expect(page.getByText(/trợ lý hậu cần EasyGame/i)).toBeVisible();
+  expect(
+    await page.locator("a[href*='discord.com/channels/1234567890']").count(),
+  ).toBe(0);
+  expect(await page.getByText("100% Grounded").count()).toBe(0);
 
   // Test Navigation to Tickets & Radar View (B2)
   await page.getByRole("button", { name: /Tickets & Radar/i }).click();
@@ -68,6 +71,20 @@ test("routes reject invalid input and require configured auth", async ({
       await request.post("/api/demo/answer", { data: { topicKey: 123 } })
     ).status(),
   ).toBe(400);
+  expect(
+    (
+      await request.post("/api/demo/answer", {
+        data: { query: "When is Lab 1 due?", apiKey: "hack" },
+      })
+    ).status(),
+  ).toBe(400);
+  expect(
+    (
+      await request.post("/api/demo/answer", {
+        data: { query: "When is Lab 1 due?" },
+      })
+    ).status(),
+  ).toBe(503);
   expect(
     (
       await request.post("/api/demo/answer", {

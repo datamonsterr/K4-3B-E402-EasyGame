@@ -1,103 +1,31 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import {
+  toAssistantMessage,
+  type PublicAnswerResponse,
+} from "./public-answer";
 
 export interface ChatMessage {
   id: string;
   sender: "user" | "assistant";
   content: string;
   timestamp: string;
-  telemetry?: {
-    latencyMs: number;
-    tool: string;
-    groundedScore: number;
-    provider?: string;
-    model?: string;
-    steps: {
-      title: string;
-      detail: string;
-      status: "success" | "warning" | "info";
-    }[];
-  };
+  isGrounded?: boolean;
+  decisionSummary?: string;
   sources?: { label: string; href: string; icon: string }[];
-}
-
-function formatProviderLabel(provider?: string): string {
-  const p = (provider || "gemini").toLowerCase();
-  if (p.includes("openrouter")) return "OpenRouter";
-  if (p.includes("openai")) return "OpenAI";
-  return "Google Gemini";
-}
-
-function formatProviderModelLabel(provider?: string, model?: string): string {
-  const prov = formatProviderLabel(provider);
-  const m = model ? model.split("/").pop() : "gemini-3.5-flash-lite";
-  return `${prov} (${m})`;
 }
 
 const initialMessages: ChatMessage[] = [
   {
-    id: "m-1",
-    sender: "user",
-    content:
-      "@Assistant deadline Lab 1 mấy giờ vậy ạ? Mình thấy có 2 thông báo khác nhau trên Discord.",
-    timestamp: "14:22",
-  },
-  {
-    id: "m-2",
+    id: "m-welcome",
     sender: "assistant",
     content:
-      "Hạn chót nộp Lab 1 đã được gia hạn đến 12:00 trưa Thứ Bảy, 19/09/2026. Học viên nộp bài qua GitHub Classroom theo đúng định dạng quy định.",
-    timestamp: "14:22",
-    telemetry: {
-      latencyMs: 1140,
-      tool: "query_notices",
-      groundedScore: 100,
-      provider: "gemini",
-      model: "gemini-3.5-flash-lite",
-      steps: [
-        {
-          title: "Semantic Intent Classification",
-          detail:
-            "Classified as Logistics_Deadline (confidence: 0.98 >= 0.85 threshold).",
-          status: "success",
-        },
-        {
-          title: "Tool Invocation: query_notices",
-          detail: "Queried verified notices for topic 'lab-1' in cohort guild.",
-          status: "success",
-        },
-        {
-          title: "Multi-step Timestamp Resolution",
-          detail:
-            "Compared Notice #1 (12/09 03:00 UTC -> 17/09 deadline) vs Notice #2 (14/09 03:00 UTC -> 19/09 deadline). Notice #2 is the latest authoritative update.",
-          status: "success",
-        },
-        {
-          title: "Output Verification",
-          detail:
-            "Passed invariant: 139 Unicode code points (limit <= 300) and 2 sentences (limit <= 3). Grounded 100%.",
-          status: "success",
-        },
-      ],
-    },
-    sources: [
-      {
-        label: "Thông báo gia hạn Lab 1 (#announcements)",
-        href: "https://discord.com/channels/1234567890/1001/2002",
-        icon: "📌",
-      },
-      {
-        label: "Lab1_Specification.pdf",
-        href: "/sources/extension",
-        icon: "📄",
-      },
-      {
-        label: "GitHub Classroom Repo",
-        href: "https://github.com/classroom",
-        icon: "🔗",
-      },
-    ],
+      "Xin chào! Tôi là trợ lý hậu cần EasyGame. Bạn có thể hỏi tôi về các quy định, thời hạn bài tập và thông báo chính thức của khóa học.",
+    timestamp: "12:00",
+    isGrounded: false,
+    decisionSummary: "Initial welcome message",
+    sources: [],
   },
 ];
 
@@ -109,7 +37,7 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isThinking, setIsThinking] = useState(false);
-  const [expandedThought, setExpandedThought] = useState<string | null>("m-2");
+  const [expandedThought, setExpandedThought] = useState<string | null>(null);
   const scrollEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,153 +63,39 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
     if (!textToSend) setInput("");
     setIsThinking(true);
 
-    // Read active LLM configuration from localStorage
-    const storedProvider =
-      typeof window !== "undefined"
-        ? localStorage.getItem("eg_llm_provider") || "gemini"
-        : "gemini";
-    const storedApiKey =
-      typeof window !== "undefined"
-        ? localStorage.getItem("eg_llm_api_key") || undefined
-        : undefined;
-    const storedModel =
-      typeof window !== "undefined"
-        ? localStorage.getItem("eg_llm_model") || undefined
-        : undefined;
-
     try {
-      // Call demo answer endpoint or agent
       const res = await fetch("/api/demo/answer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(storedProvider ? { "x-llm-provider": storedProvider } : {}),
-          ...(storedApiKey ? { "x-llm-api-key": storedApiKey } : {}),
-          ...(storedModel ? { "x-llm-model": storedModel } : {}),
         },
-        body: JSON.stringify({
-          topicKey: query.toLowerCase().includes("lab 2")
-            ? "lab-2"
-            : query.toLowerCase().includes("attendance") ||
-                query.toLowerCase().includes("điểm danh")
-              ? "attendance"
-              : "lab-1",
-          query,
-          guildId: "demo",
-          confidence: 0.95,
-          provider: storedProvider,
-          apiKey: storedApiKey,
-          model: storedModel,
-        }),
+        body: JSON.stringify({ query }),
       });
 
-      const data = await res.json();
-      const assistantMsgId = `a-${Date.now()}`;
-
-      // Handle specific query scenarios
-      let replyContent =
-        data.text || "Thông tin đã được xác nhận từ thông báo chính thức.";
-      let toolName = "query_notices";
-      let steps: {
-        title: string;
-        detail: string;
-        status: "success" | "warning";
-      }[] = [
-        {
-          title: "Semantic Intent Classification",
-          detail: "Classified as Logistics query (confidence >= 0.85).",
-          status: "success",
-        },
-        {
-          title: "Tool Invocation",
-          detail: "Retrieved verified course notice for topic.",
-          status: "success" as const,
-        },
-        {
-          title: "Output Verification",
-          detail:
-            "Passed <=300 Unicode code points & <=3 sentences constraint.",
-          status: "success" as const,
-        },
-      ];
-
-      // Custom check for homework refusal test
-      if (
-        query.toLowerCase().includes("giải hộ") ||
-        query.toLowerCase().includes("bài tập") ||
-        query.toLowerCase().includes("code")
-      ) {
-        replyContent =
-          "Tôi được thiết kế để hỗ trợ thông tin quy chế, thời hạn và hậu cần khóa học. Để được hỗ trợ về bài tập lập trình, bạn vui lòng mô tả lỗi trên kênh thảo luận để Lab Coach và các bạn cùng hỗ trợ nhé!";
-        toolName = "scope_guardrail";
-        steps = [
-          {
-            title: "Scope Boundary Detection",
-            detail: "Detected Academic_Integrity / Code solution request.",
-            status: "warning" as const,
-          },
-          {
-            title: "Polite Refusal Triggered",
-            detail: "Preserved system scope boundary without code generation.",
-            status: "success" as const,
-          },
-        ];
-      } else if (
-        query.toLowerCase().includes("ignore") ||
-        query.toLowerCase().includes("dean")
-      ) {
-        replyContent =
-          "Tôi chỉ báo cáo thông tin đã được xác thực từ thông báo chính thức của Ban tổ chức. Hiện không có thông báo hủy nào được phát hành.";
-        toolName = "prompt_injection_guardrail";
-        steps = [
-          {
-            title: "Security Guardrail",
-            detail: "Intercepted adversarial override attempt.",
-            status: "warning" as const,
-          },
-          {
-            title: "Instruction Integrity Preserved",
-            detail: "Returned deterministic policy clarification.",
-            status: "success" as const,
-          },
-        ];
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        const fallbackMsg: ChatMessage = {
+          id: `err-${Date.now()}`,
+          sender: "assistant",
+          content:
+            errData?.error?.message ||
+            "Dịch vụ trợ lý tạm thời không khả dụng hoặc bạn chưa đăng nhập.",
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          isGrounded: false,
+          decisionSummary: errData?.error?.code || "REQUEST_FAILED",
+          sources: [],
+        };
+        setMessages((prev) => [...prev, fallbackMsg]);
+        return;
       }
 
-      const activeProvider =
-        data.telemetry?.provider || storedProvider || "gemini";
-      const activeModel =
-        data.telemetry?.model || storedModel || "gemini-3.5-flash-lite";
-
-      const assistantMsg: ChatMessage = {
-        id: assistantMsgId,
-        sender: "assistant",
-        content: replyContent,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        telemetry: {
-          latencyMs: data.latencyMs || 950,
-          tool: toolName,
-          groundedScore: 100,
-          provider: activeProvider,
-          model: activeModel,
-          steps,
-        },
-        sources: [
-          {
-            label:
-              data.source?.label || "Thông báo chính thức BTC (#announcements)",
-            href:
-              data.source?.href ||
-              "https://discord.com/channels/1234567890/1001/2002",
-            icon: "📌",
-          },
-        ],
-      };
-
+      const data: PublicAnswerResponse = await res.json();
+      const assistantMsg = toAssistantMessage(data);
       setMessages((prev) => [...prev, assistantMsg]);
-      setExpandedThought(assistantMsgId);
+      setExpandedThought(assistantMsg.id);
     } catch {
       const fallbackMsg: ChatMessage = {
         id: `fb-${Date.now()}`,
@@ -292,26 +106,9 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        telemetry: {
-          latencyMs: 420,
-          tool: "create_staff_alert",
-          groundedScore: 100,
-          provider: storedProvider || "gemini",
-          model: storedModel || "gemini-3.5-flash-lite",
-          steps: [
-            {
-              title: "Know-What-You-Don't-Know Fallback",
-              detail:
-                "No official notice found. Prevented ungrounded date fabrication.",
-              status: "warning",
-            },
-            {
-              title: "Staff Alert Queued",
-              detail: "Sent alert ticket into #ta-radar for coach triage.",
-              status: "info",
-            },
-          ],
-        },
+        isGrounded: false,
+        decisionSummary: "Network error or service unavailable",
+        sources: [],
       };
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
@@ -377,7 +174,7 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
               }`}
             >
               {/* Glass-box Inspector Accordion for Assistant */}
-              {m.telemetry && (
+              {m.decisionSummary && (
                 <div className="bg-[#18181b] border border-[#27272a] rounded-md overflow-hidden">
                   <button
                     type="button"
@@ -388,31 +185,16 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-cyan-400 font-mono text-[11px]">
-                        ✦ Thought Process
-                      </span>
-                      <span className="font-mono text-[10px] text-[#71717a]">
-                        · {(m.telemetry.latencyMs / 1000).toFixed(1)}s
+                        ✦ Decision Summary
                       </span>
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {(m.telemetry.provider || m.telemetry.model) && (
-                        <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#202025] text-cyan-300 border border-cyan-800/80 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                          <span>
-                            {formatProviderModelLabel(
-                              m.telemetry.provider,
-                              m.telemetry.model,
-                            )}
-                          </span>
+                      {m.isGrounded && (
+                        <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                          Verified Source
                         </span>
                       )}
-                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
-                        {m.telemetry.tool}
-                      </span>
-                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                        100% Grounded
-                      </span>
                       <span className="text-[#71717a] text-[10px]">
                         {expandedThought === m.id ? "▲" : "▼"}
                       </span>
@@ -420,45 +202,8 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
                   </button>
 
                   {expandedThought === m.id && (
-                    <div className="px-3 pb-3 pt-1 border-t border-[#27272a] space-y-2 text-[11px] font-mono">
-                      {(m.telemetry.provider || m.telemetry.model) && (
-                        <div className="flex items-center justify-between pb-1.5 border-b border-[#27272a]/60 text-[10px] text-[#71717a]">
-                          <span>
-                            Provider:{" "}
-                            <span className="text-cyan-400 font-semibold">
-                              {formatProviderLabel(m.telemetry.provider)}
-                            </span>
-                          </span>
-                          <span>
-                            Model:{" "}
-                            <span className="text-white font-semibold">
-                              {m.telemetry.model || "gemini-3.5-flash-lite"}
-                            </span>
-                          </span>
-                        </div>
-                      )}
-                      {m.telemetry.steps.map((step, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-2 text-[#a1a1aa]"
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${
-                              step.status === "success"
-                                ? "bg-cyan-400"
-                                : step.status === "warning"
-                                  ? "bg-amber-400"
-                                  : "bg-blue-400"
-                            }`}
-                          ></span>
-                          <div>
-                            <span className="text-white font-semibold">
-                              {step.title}:{" "}
-                            </span>
-                            <span>{step.detail}</span>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="px-3 pb-3 pt-1 border-t border-[#27272a] text-[11px] font-mono text-[#a1a1aa]">
+                      {m.decisionSummary}
                     </div>
                   )}
                 </div>
@@ -508,7 +253,7 @@ export function ChatView({ onGoToFeedback }: ChatViewProps) {
           </span>
           <button
             type="button"
-            onClick={() => handleSend("@Assistant deadline Lab 1 mấy giờ?")}
+            onClick={() => handleSend("Deadline Lab 1 mấy giờ?")}
             className="px-2.5 py-1 rounded bg-[#18181b] hover:bg-[#202024] border border-[#27272a] text-[#e4e4e7] whitespace-nowrap transition"
           >
             Deadline Lab 1 mấy giờ?
