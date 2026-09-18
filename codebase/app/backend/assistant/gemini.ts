@@ -148,16 +148,27 @@ export function loadSystemInstruction(): string {
   return readFileSync(filePath, "utf8");
 }
 
+export interface GeminiFunctionDeclaration {
+  name: string;
+  description: string;
+  roles?: ("learner" | "lab_coach")[];
+  parameters: Record<string, unknown>;
+}
+
 /**
  * Loads and converts tools.yaml into Gemini function_declarations.
+ * Optionally filters by role ('learner' | 'lab_coach').
  */
-export function loadToolDeclarations(): GeminiFunctionDeclaration[] {
+export function loadToolDeclarations(
+  role?: "learner" | "lab_coach",
+): GeminiFunctionDeclaration[] {
   const filePath = getArtifactPath("tools.yaml");
   const yamlContent = readFileSync(filePath, "utf8");
   const parsed = yamlLoad(yamlContent) as {
     tools: Array<{
       name: string;
       description: string;
+      roles?: ("learner" | "lab_coach")[];
       parameters: Record<string, unknown>;
     }>;
   };
@@ -166,9 +177,15 @@ export function loadToolDeclarations(): GeminiFunctionDeclaration[] {
     throw new Error("Invalid tools.yaml structure: missing 'tools' array");
   }
 
-  return parsed.tools.map((t) => ({
+  let tools = parsed.tools;
+  if (role) {
+    tools = tools.filter((t) => !t.roles || t.roles.includes(role));
+  }
+
+  return tools.map((t) => ({
     name: t.name,
     description: t.description,
+    roles: t.roles,
     parameters: t.parameters,
   }));
 }

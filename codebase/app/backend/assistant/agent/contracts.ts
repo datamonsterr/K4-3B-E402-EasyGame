@@ -45,6 +45,28 @@ export interface AgentOperations {
     localDate: string;
   }): Promise<unknown>;
   searchWeb(input: { guildId: string; query: string }): Promise<unknown>;
+  broadcastNotification?(input: {
+    guildId: string;
+    actorId: string;
+    actorRole: "lab_coach";
+    topicKey: string;
+    title: string;
+    content: string;
+    category?: string;
+  }): Promise<unknown>;
+  checkStudentProfile?(input: {
+    guildId: string;
+    actorId: string;
+    actorRole: "lab_coach";
+    studentQuery: string;
+  }): Promise<unknown>;
+  checkScores?(input: {
+    guildId: string;
+    actorId: string;
+    actorRole: "lab_coach";
+    studentQuery: string;
+    lab?: string;
+  }): Promise<unknown>;
 }
 
 export type CourseAgentDependencies = {

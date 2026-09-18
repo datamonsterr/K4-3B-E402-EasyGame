@@ -1,6 +1,9 @@
 tools:
   - name: query_notices
     description: "Query verified announcements, official notices, and deadlines for a given course topic or assignment within a guild."
+    roles:
+      - learner
+      - lab_coach
     parameters:
       type: object
       properties:
@@ -14,8 +17,25 @@ tools:
         - topicKey
         - guildId
 
+  - name: search_web
+    description: "Search external web sources or official course documentation repository (e.g. VinUni AI 20K materials)."
+    roles:
+      - learner
+      - lab_coach
+    parameters:
+      type: object
+      properties:
+        query:
+          type: string
+          description: "Search query string or keywords to find external documentation and resources."
+      required:
+        - query
+
   - name: evaluate_radar
     description: "Scan active questions and calculate SLA breach tiers (Tier 1 soft warning at 120 minutes, Tier 2 urgent escalation at 240 minutes)."
+    roles:
+      - lab_coach
+      - learner
     parameters:
       type: object
       properties:
@@ -30,6 +50,8 @@ tools:
 
   - name: create_staff_alert
     description: "Queue a private, staff-only alert into #ta-radar for dropped questions, ungrounded inquiries, or student roadblocks."
+    roles:
+      - lab_coach
     parameters:
       type: object
       properties:
@@ -54,6 +76,8 @@ tools:
 
   - name: resolve_question
     description: "Mark an open or answered ticket as resolved by an authorized Lab Coach with optimistic concurrency protection."
+    roles:
+      - lab_coach
     parameters:
       type: object
       properties:
@@ -69,6 +93,8 @@ tools:
 
   - name: format_daily_digest
     description: "Generate a consolidated 22:00 clean daily digest grouping top confused topics with zero token corruption."
+    roles:
+      - lab_coach
     parameters:
       type: object
       properties:
@@ -82,13 +108,67 @@ tools:
         - guildId
         - localDate
 
-  - name: search_web
-    description: "Search external web sources or official course documentation repository (e.g. VinUni AI 20K materials)."
+  - name: broadcast_notification
+    description: "Broadcast an official course announcement or deadline notice to all cohort members."
+    roles:
+      - lab_coach
     parameters:
       type: object
       properties:
-        query:
+        guildId:
           type: string
-          description: "Search query string or keywords to find external documentation and resources."
+          description: "Guild or cohort identifier."
+        topicKey:
+          type: string
+          description: "Topic identifier for the notice (e.g. lab-1, attendance, announcements)."
+        title:
+          type: string
+          description: "Title of the official announcement."
+        content:
+          type: string
+          description: "Full text content of the announcement."
+        category:
+          type: string
+          description: "Category of the notice (optional, e.g. urgent, general, logistics)."
       required:
-        - query
+        - guildId
+        - topicKey
+        - title
+        - content
+
+  - name: check_student_profile
+    description: "Inspect a student profile, assigned team, channel activity, and question history."
+    roles:
+      - lab_coach
+    parameters:
+      type: object
+      properties:
+        guildId:
+          type: string
+          description: "Guild or cohort identifier."
+        studentQuery:
+          type: string
+          description: "Student name, email, or user identifier to look up."
+      required:
+        - guildId
+        - studentQuery
+
+  - name: check_scores
+    description: "Query lab or checkpoint scores, submission status, and grading feedback for students."
+    roles:
+      - lab_coach
+    parameters:
+      type: object
+      properties:
+        guildId:
+          type: string
+          description: "Guild or cohort identifier."
+        studentQuery:
+          type: string
+          description: "Student name or identifier."
+        lab:
+          type: string
+          description: "Specific lab or assignment identifier (optional, e.g. lab-1, checkpoint-1)."
+      required:
+        - guildId
+        - studentQuery
