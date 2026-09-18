@@ -41,6 +41,8 @@ function hasAuthenticSource(notice: VerifiedNotice): boolean {
   return LOCAL_SOURCE_URL.test(notice.source.href);
 }
 
+const HONORIFICS = new Set(["dr", "mr", "mrs", "ms", "prof"]);
+
 function isMaskedDot(body: string, index: number): boolean {
   const previous = body[index - 1];
   const next = body[index + 1];
@@ -60,7 +62,30 @@ function isMaskedDot(body: string, index: number): boolean {
     .slice(tokenStart, tokenEnd + 1)
     .toLowerCase()
     .replace(/\.+$/, "");
-  return COMMON_ABBREVIATIONS.has(token);
+
+  if (!COMMON_ABBREVIATIONS.has(token)) {
+    return false;
+  }
+
+  if (index < tokenEnd) {
+    return true;
+  }
+
+  const remainder = body.slice(index + 1).trimStart();
+
+  if (token === "no") {
+    return /^\d/.test(remainder);
+  }
+
+  if (HONORIFICS.has(token)) {
+    return true;
+  }
+
+  if (remainder.length === 0 || /^\p{Lu}/u.test(remainder)) {
+    return false;
+  }
+
+  return true;
 }
 
 function sanitizeSentenceDots(body: string): string {

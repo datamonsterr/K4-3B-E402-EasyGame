@@ -128,6 +128,22 @@ describe("finalizeAnswer", () => {
     );
   });
 
+  it("fails closed when No. could be a sentence boundary", () => {
+    const answer =
+      "No. Lab 1 is due Friday. Submit by noon. Extensions need approval.";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
+  it("fails closed when a.m. could be a sentence boundary", () => {
+    const answer =
+      "The lab starts at 9 a.m. Bring a laptop. Submit by noon. Extensions need approval.";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
   it("accepts a valid local pack source", () => {
     const packNotice = {
       ...notice,
