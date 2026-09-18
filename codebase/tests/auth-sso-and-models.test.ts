@@ -57,7 +57,11 @@ describe("OAuth SSO & Model Customization Suite", () => {
       // When Supabase is configured, location redirects to Supabase authorize endpoint
       expect(location).toMatch(/auth\/v1\/authorize\?provider=discord/);
       expect(location).toContain("redirect_to=");
-      expect(location).toContain("role%3Dlab_coach");
+      const callback = new URL(
+        new URL(location).searchParams.get("redirect_to") ?? "",
+      );
+      expect(callback.searchParams.has("role")).toBe(false);
+      expect(callback.searchParams.get("next")).toBe("/workspace");
     });
 
     it("initiates Google OAuth flow and redirects to authorization URL when configured", async () => {
@@ -69,7 +73,11 @@ describe("OAuth SSO & Model Customization Suite", () => {
       const location = res.headers.get("location") || "";
       expect(location).toMatch(/auth\/v1\/authorize\?provider=google/);
       expect(location).toContain("redirect_to=");
-      expect(location).toContain("role%3Dlearner");
+      const callback = new URL(
+        new URL(location).searchParams.get("redirect_to") ?? "",
+      );
+      expect(callback.searchParams.has("role")).toBe(false);
+      expect(callback.searchParams.get("next")).toBe("/workspace");
     });
   });
 
@@ -225,22 +233,7 @@ describe("OAuth SSO & Model Customization Suite", () => {
       expect(sentBody.model).toBe("o3-mini");
     });
 
-    it("forwards pasted model ID through /api/health/llm endpoint", async () => {
-      let forwardedModel = "";
-
-      globalThis.fetch = vi.fn().mockImplementation(async (url, init) => {
-        const body = JSON.parse(String(init?.body));
-        forwardedModel = body.model;
-        return {
-          ok: true,
-          status: 200,
-          text: async () =>
-            JSON.stringify({
-              choices: [{ message: { content: "pong" } }],
-            }),
-        };
-      });
-
+    it("does not forward pasted credentials through /api/health/llm", async () => {
       const req = new Request("http://localhost:3000/api/health/llm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -252,11 +245,10 @@ describe("OAuth SSO & Model Customization Suite", () => {
       });
 
       const res = await healthLlmPost(req);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(401);
       const data = await res.json();
-      expect(data.ok).toBe(true);
-      expect(data.model).toBe("anthropic/claude-3.5-haiku");
-      expect(forwardedModel).toBe("anthropic/claude-3.5-haiku");
+      expect(data.ok).toBe(false);
+      expect(JSON.stringify(data)).not.toContain("sk-or-v1-pasted-key");
     });
   });
 });

@@ -4,16 +4,18 @@ import { configured, sessionClient } from "@/backend/database/client";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const provider = searchParams.get("provider");
-  const role =
-    searchParams.get("role") === "lab_coach" ? "lab_coach" : "learner";
-  const next = searchParams.get("next") ?? "/workspace";
+  const requestedNext = searchParams.get("next");
+  const next =
+    requestedNext && /^\/(?!\/)/.test(requestedNext)
+      ? requestedNext
+      : "/workspace";
 
   // Resolve base URL even behind reverse proxy / forwarded headers
   const forwardedHost = request.headers.get("x-forwarded-host");
   const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
   const isLocal = origin.includes("localhost") || origin.includes("127.0.0.1");
-  const baseUrl =
-    forwardedHost && !isLocal ? `${forwardedProto}://${forwardedHost}` : origin;
+  const host = forwardedHost?.split(",")[0]?.trim();
+  const baseUrl = host && !isLocal ? `${forwardedProto}://${host}` : origin;
 
   if (provider !== "discord" && provider !== "google") {
     return NextResponse.redirect(
@@ -33,7 +35,7 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await sessionClient();
-    const redirectTo = `${baseUrl}/auth/callback?provider=${provider}&role=${role}&next=${encodeURIComponent(
+    const redirectTo = `${baseUrl}/auth/callback?provider=${provider}&next=${encodeURIComponent(
       next,
     )}`;
 

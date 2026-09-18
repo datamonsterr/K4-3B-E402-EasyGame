@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { sessionClient, configured } from "@/backend/database/client";
+import { resolveActorContext } from "@/backend/auth/context";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/workspace";
-  const roleParam = searchParams.get("role");
+  const requestedNext = searchParams.get("next");
   const error = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
 
@@ -13,11 +13,14 @@ export async function GET(request: Request) {
   const forwardedHost = request.headers.get("x-forwarded-host");
   const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
   const isLocal = origin.includes("localhost") || origin.includes("127.0.0.1");
-  const baseUrl =
-    forwardedHost && !isLocal ? `${forwardedProto}://${forwardedHost}` : origin;
+  const host = forwardedHost?.split(",")[0]?.trim();
+  const baseUrl = host && !isLocal ? `${forwardedProto}://${host}` : origin;
 
   // Sanitized redirect destination to prevent open redirects
-  const safeNext = next.startsWith("/") ? next : "/workspace";
+  const safeNext =
+    requestedNext && /^\/(?!\/)/.test(requestedNext)
+      ? requestedNext
+      : "/workspace";
 
   if (error) {
     const message = encodeURIComponent(errorDescription || error);
@@ -34,58 +37,33 @@ export async function GET(request: Request) {
           data: { user },
         } = await supabase.auth.getUser();
 
-        const targetRole: "learner" | "lab_coach" =
-          roleParam === "lab_coach" ? "lab_coach" : "learner";
-
-        let displayName =
-          targetRole === "lab_coach" ? "@TA_MinhHai" : "@NguyenVanAn";
-
-        if (user) {
-          const meta = (user.user_metadata || {}) as Record<string, unknown>;
-          const extractedName =
-            (meta.global_name as string | undefined) ||
-            (meta.full_name as string | undefined) ||
-            (meta.user_name as string | undefined) ||
-            (meta.name as string | undefined) ||
-            (user.email ? `@${user.email.split("@")[0]}` : undefined);
-
-          if (extractedName) {
-            displayName = extractedName;
-          }
-
-          // Ensure membership exists in guild
-          const { data: existing } = await supabase
-            .from("memberships")
-            .select("role")
-            .eq("user_id", user.id);
-
-          if (!existing || existing.length === 0) {
-            const { data: guilds } = await supabase
-              .from("guilds")
-              .select("id")
-              .limit(1);
-            if (guilds && guilds.length > 0) {
-              await supabase.from("memberships").insert({
-                guild_id: guilds[0].id,
-                user_id: user.id,
-                role: targetRole,
-              });
-            }
-          }
+        const actorContext = await resolveActorContext({
+          async getAuthenticatedUserId() {
+            return user?.id ?? null;
+          },
+          async listMemberships(userId) {
+            const { data, error: membershipError } = await supabase
+              .from("memberships")
+              .select("guild_id,user_id,role")
+              .eq("user_id", userId)
+              .order("guild_id", { ascending: true })
+              .limit(2);
+            if (membershipError) throw membershipError;
+            return (data ?? []).map((membership) => ({
+              guildId: membership.guild_id,
+              userId: membership.user_id,
+              role: membership.role,
+            }));
+          },
+        });
+        if (actorContext.type !== "ready") {
+          await supabase.auth.signOut();
+          return NextResponse.redirect(
+            `${baseUrl}/sign-in?error=membership_required`,
+          );
         }
 
-        const response = NextResponse.redirect(`${baseUrl}${safeNext}`);
-        response.cookies.set("eg_demo_role", targetRole, {
-          path: "/",
-          maxAge: 86400,
-          sameSite: "lax",
-        });
-        response.cookies.set("eg_demo_name", encodeURIComponent(displayName), {
-          path: "/",
-          maxAge: 86400,
-          sameSite: "lax",
-        });
-        return response;
+        return NextResponse.redirect(`${baseUrl}${safeNext}`);
       }
     } catch {
       // Fall through to error redirect

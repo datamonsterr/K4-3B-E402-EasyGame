@@ -29,6 +29,12 @@ export type PublicAnswerResponse =
       body: string;
       source: null;
       decisionSummary: string;
+    }
+  | {
+      status: "completed";
+      body: string;
+      source: null;
+      decisionSummary: string;
     };
 
 export type PublicMessageSource = {

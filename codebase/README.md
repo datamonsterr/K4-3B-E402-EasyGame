@@ -4,8 +4,8 @@ One Next.js application serves the frontend and backend. The public preview uses
 
 ```bash
 mise install
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 Run commands from `codebase/`. Copy `.env.example` to the ignored `.env` when
@@ -13,11 +13,24 @@ using hosted Supabase; mise loads it automatically. Open http://localhost:3000.
 No cloud credentials are required for the synthetic preview.
 
 ```bash
-npm run check
-npm run build
-npx playwright install chromium
-npm run test:e2e
-npm run test:db # Docker required; creates and removes an isolated PostgreSQL container
+pnpm check
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
+pnpm test:db # Docker required; creates and removes an isolated PostgreSQL container
+```
+
+The optional AI SDK agent is selected entirely through server environment
+variables: `AI_PROVIDER=gemini` with `GEMINI_API_KEY`/`GEMINI_MODEL`, or
+`AI_PROVIDER=openrouter` with `OPENROUTER_API_KEY`/`OPENROUTER_MODEL`. The
+Gemini default is `gemini-3.5-flash-lite`. Browser requests cannot provide or
+persist provider keys, models, guilds, or roles.
+
+With local Supabase running and a real Gemini key loaded, the opt-in integration
+check exercises a real RLS-protected notice query and AI SDK tool loop:
+
+```bash
+RUN_LIVE_AGENT_TESTS=1 pnpm test:live-agent
 ```
 
 See the [schema](../docs/architecture/DATABASE_SCHEMA.md), [architecture](../docs/architecture/NEXTJS_FOUNDATION_DESIGN.md), and [use-case coverage review](../docs/usecases/IMPLEMENTATION_COVERAGE.md).

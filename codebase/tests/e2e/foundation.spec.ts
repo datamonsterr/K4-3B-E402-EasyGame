@@ -8,14 +8,14 @@ test("root page redirects to /sign-in and renders clean auth UI with no logo", a
   await expect(page.getByText("Track B")).toBeVisible();
   // Ensure strictly NO graphic logo
   expect(await page.locator("img[alt*='logo' i]").count()).toBe(0);
-  // Ensure SSO options and demo credentials exist
+  // Ensure SSO options and a non-privileged synthetic preview exist.
   await expect(page.getByRole("button", { name: /Discord/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /Google/i })).toBeVisible();
   await expect(
-    page.getByRole("button", { name: /@NguyenVanAn/i }),
+    page.getByRole("button", { name: /synthetic preview/i }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: /@TA_MinhHai/i }),
+    page.getByText(/operator-provisioned course membership/i),
   ).toBeVisible();
 });
 
@@ -23,12 +23,14 @@ test("full flow: demo sign-in, workspace navigation, grounded agent answering, a
   page,
 }) => {
   await page.goto("/sign-in");
-  // Sign in using demo learner button
-  await page.getByRole("button", { name: /@NguyenVanAn/i }).click();
+  // Open the synthetic learner-only preview when Supabase is not configured.
+  await page.getByRole("button", { name: /synthetic preview/i }).click();
   await expect(page).toHaveURL(/.*\/workspace/);
 
   // In workspace: verify role is displayed statically (no sidebar select switcher per ADR 0001)
-  await expect(page.locator("aside").getByText("@NguyenVanAn")).toBeVisible();
+  await expect(
+    page.locator("aside").getByText("@SyntheticPreview"),
+  ).toBeVisible();
   await expect(page.locator("aside").getByText("Role: Learner")).toBeVisible();
   expect(await page.locator("select[name='persona-role']").count()).toBe(0);
 
