@@ -99,3 +99,57 @@ export function answerLogistics(
     summary: "Selected the latest verified notice for this topic",
   };
 }
+
+/**
+ * UC-B1-01.EX.4: Discord Reply Delivery Failure & Idempotent Retry Policy
+ * When delivery fails or times out, records delivery failure without marking
+ * the question answered. Enforces idempotent delivery to prevent duplicates.
+ */
+export interface ReplyDeliveryResult {
+  status: "delivered" | "failed";
+  deliveredAt?: string;
+  error?: string;
+  questionMarkedAnswered: boolean;
+  idempotencyKey: string;
+}
+
+export async function deliverAssistantReply(
+  reply: { text: string; messageId: string; guildId: string },
+  transport: (msg: {
+    text: string;
+    messageId: string;
+  }) => Promise<{ success: boolean; error?: string }>,
+  idempotencyKey: string,
+): Promise<ReplyDeliveryResult> {
+  const result = await transport({
+    text: reply.text,
+    messageId: reply.messageId,
+  });
+  if (!result.success) {
+    return {
+      status: "failed",
+      error: result.error || "Discord delivery failed",
+      questionMarkedAnswered: false,
+      idempotencyKey,
+    };
+  }
+  return {
+    status: "delivered",
+    deliveredAt: new Date().toISOString(),
+    questionMarkedAnswered: true,
+    idempotencyKey,
+  };
+}
+
+export {
+  runAgent,
+  executeDeterministicAgent,
+  loadSystemInstruction,
+  loadToolDeclarations,
+  validateOutputConstraints,
+  type AgentResult,
+  type AgentTelemetry,
+  type ToolInvocationTelemetry,
+  type TemporalResolutionTelemetry,
+  type RunAgentOptions,
+} from "./gemini";

@@ -14,6 +14,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "eval": "tsx eval/run_eval.ts",
     "test:e2e": "playwright test",
     "test:db": "node scripts/test-db.mjs",
     "format": "prettier --write .",

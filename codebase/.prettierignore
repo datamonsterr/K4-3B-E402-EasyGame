@@ -10,3 +10,4 @@ test-results
 next-env.d.ts
 supabase/.temp
 supabase/.branches
+eval/eval_report.json

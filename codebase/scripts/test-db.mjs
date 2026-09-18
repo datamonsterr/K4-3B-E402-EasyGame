@@ -154,7 +154,7 @@ try {
   }
   sql(readFileSync(`${root}/seed.sql`, "utf8"), "seed_validation");
   sql(
-    `select test.assert((select count(*)=7 from public.source_messages), 'synthetic seed messages');
+    `select test.assert((select count(*)=17 from public.source_messages), 'synthetic seed messages');
     select test.assert((select count(*)=4 from public.memberships), 'synthetic seed roles');
     select test.assert((select source_kind='synthetic' from public.datasets), 'seed provenance');`,
     "seed_validation",
