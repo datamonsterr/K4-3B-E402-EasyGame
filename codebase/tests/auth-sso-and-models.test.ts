@@ -11,6 +11,9 @@ describe("OAuth SSO & Model Customization Suite", () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "http://127.0.0.1:54321";
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY =
+      "synthetic-anon-key-for-tests";
   });
 
   afterEach(() => {
@@ -28,6 +31,20 @@ describe("OAuth SSO & Model Customization Suite", () => {
       const location = res.headers.get("location") || "";
       expect(location).toContain("/sign-in?error=");
       expect(location).toContain("Unsupported");
+    });
+
+    it("redirects to sign-in with an error when Supabase credentials are not configured", async () => {
+      delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+      delete process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+      const req = new Request(
+        "http://localhost:3000/api/auth/oauth?provider=discord",
+      );
+      const res = await oauthGet(req);
+      expect(res.status).toBe(307);
+      const location = res.headers.get("location") || "";
+      expect(decodeURIComponent(location)).toContain(
+        "Discord SSO requires configured Supabase credentials.",
+      );
     });
 
     it("initiates Discord OAuth flow and redirects to authorization URL when configured", async () => {
