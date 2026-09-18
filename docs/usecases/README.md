@@ -24,6 +24,7 @@
 |---|---|---|:---:|:---:|
 | [**UC-B1-01**](UC-B1-01_verify-and-answer-logistics-query.md) | **Verify and Answer Logistics Query** | Learner | User-Goal (Sea level) | Track B1 (Assistant Optimization) |
 | [**UC-B2-01**](UC-B2-01_scan-and-generate-unanswered-radar.md) | **Scan and Generate Unanswered Question Radar** | On-duty Lab Coach (TA) | Mixed; split required | Track B2 (Staff Radar & Daily Digest) |
+| [**UC-B3-01**](UC-B3-01_run-authenticated-tool-agent.md) | **Run Authenticated Tool-Using Course Agent** | Learner / Lab Coach | User-Goal (Sea level) | Shared Auth, Assistant, and Radar orchestration |
 | [**Implementation coverage**](IMPLEMENTATION_COVERAGE.md) | **Trace Use Cases to Foundation** | BA / Engineering | Review artifact | Both tracks |
 
 ---

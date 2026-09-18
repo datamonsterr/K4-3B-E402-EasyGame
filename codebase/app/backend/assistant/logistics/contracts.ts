@@ -60,6 +60,12 @@ export type AnswerLogisticsResult =
       body: string;
       source: null;
       decisionSummary: string;
+    }
+  | {
+      status: "completed";
+      body: string;
+      source: null;
+      decisionSummary: string;
     };
 
 export interface NoticeEvidenceSource {

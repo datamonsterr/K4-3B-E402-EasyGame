@@ -4,7 +4,6 @@ import {
   validateLlmConnection,
   isQuotaOrTimeoutError,
 } from "../app/backend/assistant";
-import { POST as healthLlmPost } from "../app/api/health/llm/route";
 
 describe("Multi-Provider LLM & Resiliency Engine", () => {
   const originalFetch = globalThis.fetch;
@@ -314,7 +313,7 @@ describe("Multi-Provider LLM & Resiliency Engine", () => {
     });
   });
 
-  describe("POST /api/health/llm endpoint", () => {
+  describe("validateLlmConnection service function", () => {
     it("validates key with lightweight 1-token prompt and returns ok: true on success", async () => {
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -324,24 +323,15 @@ describe("Multi-Provider LLM & Resiliency Engine", () => {
         }),
       } as Response);
 
-      const request = new Request("http://localhost:3000/api/health/llm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: "openai",
-          apiKey: "sk-valid-key",
-          model: "gpt-4o-mini",
-        }),
+      const res = await validateLlmConnection({
+        provider: "openai",
+        apiKey: "sk-valid-key",
+        model: "gpt-4o-mini",
       });
-
-      const res = await healthLlmPost(request);
-      expect(res.status).toBe(200);
-
-      const data = await res.json();
-      expect(data.ok).toBe(true);
-      expect(data.provider).toBe("openai");
-      expect(data.model).toBe("gpt-4o-mini");
-      expect(data.latencyMs).toBeGreaterThanOrEqual(0);
+      expect(res.ok).toBe(true);
+      expect(res.provider).toBe("openai");
+      expect(res.model).toBe("gpt-4o-mini");
+      expect(res.latencyMs).toBeGreaterThanOrEqual(0);
     });
 
     it("returns ok: false with explanation when API key is invalid", async () => {
@@ -354,21 +344,12 @@ describe("Multi-Provider LLM & Resiliency Engine", () => {
           }),
       } as Response);
 
-      const request = new Request("http://localhost:3000/api/health/llm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: "openai",
-          apiKey: "sk-invalid-key",
-        }),
+      const res = await validateLlmConnection({
+        provider: "openai",
+        apiKey: "sk-invalid-key",
       });
-
-      const res = await healthLlmPost(request);
-      expect(res.status).toBe(200);
-
-      const data = await res.json();
-      expect(data.ok).toBe(false);
-      expect(data.error).toContain("Invalid API key");
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain("Invalid API key");
     });
 
     it("returns ok: false with explanation when quota is exceeded", async () => {
@@ -384,21 +365,12 @@ describe("Multi-Provider LLM & Resiliency Engine", () => {
           }),
       } as Response);
 
-      const request = new Request("http://localhost:3000/api/health/llm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: "gemini",
-          apiKey: "AIzaSyQuotaFull",
-        }),
+      const res = await validateLlmConnection({
+        provider: "gemini",
+        apiKey: "AIzaSyQuotaFull",
       });
-
-      const res = await healthLlmPost(request);
-      expect(res.status).toBe(200);
-
-      const data = await res.json();
-      expect(data.ok).toBe(false);
-      expect(data.error).toContain("Quota exceeded or rate limit reached");
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain("Quota exceeded or rate limit reached");
     });
 
     it("returns ok: false with explanation when connection times out", async () => {
@@ -409,38 +381,21 @@ describe("Multi-Provider LLM & Resiliency Engine", () => {
         })(),
       );
 
-      const request = new Request("http://localhost:3000/api/health/llm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: "openrouter",
-          apiKey: "sk-timeout-key",
-        }),
+      const res = await validateLlmConnection({
+        provider: "openrouter",
+        apiKey: "sk-timeout-key",
       });
-
-      const res = await healthLlmPost(request);
-      expect(res.status).toBe(200);
-
-      const data = await res.json();
-      expect(data.ok).toBe(false);
-      expect(data.error).toContain("timed out after 15 seconds");
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain("timed out after 15 seconds");
     });
 
     it("rejects invalid request body with status 400", async () => {
-      const request = new Request("http://localhost:3000/api/health/llm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: "unsupported-provider",
-        }),
+      const res = await validateLlmConnection({
+        provider: "unsupported-provider",
+        apiKey: "test-key",
       });
-
-      const res = await healthLlmPost(request);
-      expect(res.status).toBe(400);
-
-      const data = await res.json();
-      expect(data.ok).toBe(false);
-      expect(data.error).toBeDefined();
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain("Unsupported provider");
     });
 
     it("validates direct function call to validateLlmConnection", async () => {

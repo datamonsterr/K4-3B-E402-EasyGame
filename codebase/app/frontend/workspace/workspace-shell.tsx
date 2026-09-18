@@ -8,7 +8,6 @@ import { ChannelsView } from "./channels-view";
 import { NoticesView } from "./notices-view";
 import { DigestView } from "./digest-view";
 import { FeedbackView } from "./feedback-view";
-import { RoleModal } from "./role-modal";
 import { SettingsModal } from "./settings-modal";
 
 export type WorkspaceTab =
@@ -33,46 +32,14 @@ export function WorkspaceShell({
     initialUser ??
     (initialRole === "lab_coach" ? "@TA_MinhHai" : "@NguyenVanAn");
 
-  const [role, setRole] = useState<"learner" | "lab_coach">(() => {
-    if (typeof window !== "undefined") {
-      const storedRole = localStorage.getItem("eg_demo_role") as
-        "learner" | "lab_coach" | null;
-      if (storedRole) return storedRole;
-    }
-    return initialRole;
-  });
-  const [userName, setUserName] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const storedName = localStorage.getItem("eg_demo_name");
-      if (storedName) return storedName;
-    }
-    return defaultUser;
-  });
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const role = initialRole;
+  const userName = defaultUser;
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-
-  function handleRoleChanged(newRole: "learner" | "lab_coach") {
-    setRole(newRole);
-    const newName = newRole === "lab_coach" ? "@TA_MinhHai" : "@NguyenVanAn";
-    setUserName(newName);
-    localStorage.setItem("eg_demo_role", newRole);
-    localStorage.setItem("eg_demo_name", newName);
-    if (typeof document !== "undefined") {
-      document.cookie = `eg_demo_role=${newRole}; path=/; max-age=86400; SameSite=Lax`;
-      document.cookie = `eg_demo_name=${encodeURIComponent(newName)}; path=/; max-age=86400; SameSite=Lax`;
-    }
-  }
 
   async function handleSignOut() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
-    localStorage.removeItem("eg_demo_role");
-    localStorage.removeItem("eg_demo_name");
-    if (typeof document !== "undefined") {
-      document.cookie = "eg_demo_role=; path=/; max-age=0; SameSite=Lax";
-      document.cookie = "eg_demo_name=; path=/; max-age=0; SameSite=Lax";
-    }
     router.push("/sign-in");
   }
 
@@ -349,15 +316,6 @@ export function WorkspaceShell({
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         currentRole={role}
-        onRoleChanged={handleRoleChanged}
-      />
-
-      {/* Database Role Selection Modal */}
-      <RoleModal
-        currentRole={role}
-        isOpen={isRoleModalOpen}
-        onClose={() => setIsRoleModalOpen(false)}
-        onRoleChanged={handleRoleChanged}
       />
     </div>
   );
