@@ -1,31 +1,63 @@
 import { test, expect } from "@playwright/test";
-test("foundation renders, answers from synthetic evidence and links its source", async ({
+test("root page redirects to /sign-in and renders clean auth UI with no logo", async ({
   page,
 }) => {
   await page.goto("/");
+  await expect(page).toHaveURL(/.*\/sign-in/);
+  await expect(page.getByText("EasyGame")).toBeVisible();
+  await expect(page.getByText("Track B")).toBeVisible();
+  // Ensure strictly NO graphic logo
+  expect(await page.locator("img[alt*='logo' i]").count()).toBe(0);
+  // Ensure SSO options and demo credentials exist
+  await expect(page.getByRole("button", { name: /Discord/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Google/i })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Your cohort, in view." }),
+    page.getByRole("button", { name: /@NguyenVanAn/i }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Check notice" }).click();
   await expect(
-    page.getByText("Lab 1 is due at 12:00 on September 19, 2026.", {
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page.getByRole("link", { name: "Lab 1 extension (synthetic)" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Lab 1 extension (synthetic)" }),
+    page.getByRole("button", { name: /@TA_MinhHai/i }),
   ).toBeVisible();
 });
-test("unknown topics fall back without invented dates", async ({ page }) => {
-  await page.goto("/");
-  await page.getByLabel("Milestone").selectOption("lab-3");
-  await page.getByRole("button", { name: "Check notice" }).click();
+
+test("full flow: demo sign-in, workspace navigation, grounded agent answering, and radar triage", async ({
+  page,
+}) => {
+  await page.goto("/sign-in");
+  // Sign in using demo learner button
+  await page.getByRole("button", { name: /@NguyenVanAn/i }).click();
+  await expect(page).toHaveURL(/.*\/workspace/);
+
+  // In workspace: verify role is displayed statically (no sidebar select switcher per ADR 0001)
+  await expect(page.locator("aside").getByText("@NguyenVanAn")).toBeVisible();
+  await expect(page.locator("aside").getByText("Role: Learner")).toBeVisible();
+  expect(await page.locator("select[name='persona-role']").count()).toBe(0);
+
+  // Test Chat View: initial grounded message and source card
+  await expect(page.getByText(/19\/09\/2026/)).toBeVisible();
+  await expect(page.getByText(/Thông báo gia hạn Lab 1/i)).toBeVisible();
+
+  // Test Navigation to Tickets & Radar View (B2)
+  await page.getByRole("button", { name: /Tickets & Radar/i }).click();
+  await expect(page.getByText(/Urgent Breaches/i)).toBeVisible();
+  await expect(page.getByText(/SLA Breach Monitoring/i)).toBeVisible();
+
+  // Test Navigation to Official Notices View
+  await page.getByRole("button", { name: /Official Notices/i }).click();
+  await expect(page.getByText(/Lab 1 Submission/i)).toBeVisible();
+
+  // Test Navigation to Manage Channels View
+  await page.getByRole("button", { name: /Manage Channels/i }).click();
   await expect(
-    page.getByText(
-      "There is no verified notice for this question. Please ask a Lab Coach for confirmation.",
-    ),
+    page.getByRole("cell", { name: "#announcements" }),
   ).toBeVisible();
+
+  // Test Navigation to 22:00 Daily Digest View
+  await page.getByRole("button", { name: /22:00 Daily Digest/i }).click();
+  await expect(page.getByText(/Clean Daily Digest/i)).toBeVisible();
+
+  // Test Navigation to Feedback View
+  await page.getByRole("button", { name: /Feedback/i }).click();
+  await expect(page.getByRole("link", { name: /Google Forms/i })).toBeVisible();
 });
 test("routes reject invalid input and require configured auth", async ({
   request,

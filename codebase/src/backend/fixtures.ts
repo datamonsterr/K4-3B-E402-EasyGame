@@ -41,6 +41,20 @@ export const notices: Notice[] = [
       href: "/sources/lab-two",
     },
   },
+  {
+    id: "attendance-policy",
+    guildId: "demo",
+    topicKey: "attendance",
+    publishedAt: "2026-09-13T03:00:00Z",
+    verified: true,
+    answer:
+      "Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.",
+    source: {
+      kind: "synthetic",
+      label: "Attendance policy notice (synthetic)",
+      href: "/sources/attendance-policy",
+    },
+  },
 ];
 export const demoTime = new Date("2026-09-18T12:00:00Z");
 export const demoQuestions: (RadarQuestion & {
