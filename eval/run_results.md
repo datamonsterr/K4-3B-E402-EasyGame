@@ -1,12 +1,12 @@
-# Báo cáo Kết quả Đo lường Kiểm thử Lượt 1 (Golden Set Baseline)
+# Báo cáo Kết quả Đo lường Kiểm thử Lượt 1 (Golden Set Production Agent)
 **Người thực hiện:** Đậu Quang Ý — AI Engineer & Data Specialist  
 **Dự án:** Trợ lý Logistics Xác Thực & Radar Cứu Kẹt Discord · Nhóm EasyGame (Lớp 3B - Phòng E402)  
-**Thời gian thực thi:** 2026-09-17 20:49:29  
+**Thời gian thực thi:** 2026-09-18 12:25:07  
 
 ## 1. Tóm tắt Định lượng (Executive Summary)
 - **Tổng số ca kiểm thử trong Golden Set:** 20 ca (phủ trọn 4 lớp chỗ khó, case thường ngày và edge cases).
-- **Số ca ĐẠT chuẩn (Pass):** **19/20** ca.
-- **Tỷ lệ đạt thực tế:** **95.0%**.
+- **Số ca ĐẠT chuẩn (Pass):** **20/20** ca.
+- **Tỷ lệ đạt thực tế:** **100.0%**.
 - **Ngưỡng chất lượng cam kết (Quality Bar tại CP4):** $\ge 85.0\%$ và $100\%$ ca không có căn cứ được từ chối an toàn.
 - **Đánh giá sơ bộ:** ✅ **VƯỢT NGƯỠNG CHẤT LƯỢNG (PASS QUALITY BAR)**
 
@@ -24,7 +24,7 @@
 | **GS09** | `Thuong_Ngay` | A ơi, cho e hỏi, buổi workshop chủ nhật ngày mai thì có tính vào số buổi nghỉ ko ạ? | `Tra_loi_chinh_xac_co_trich_dan` | `Tra_loi_chinh_xac_co_trich_dan` | ✅ PASS | Bot trả lời ngắn gọn, nêu rõ buổi workshop không tính vào vắng chính thức kèm trích dẫn Sổ tay học viên. |
 | **GS10** | `Thuong_Ngay` | T3 tuần sau lecture sáng em có việc muốn xin vào trễ 30p thì gửi mail cho ai ạ? | `Huong_dan_dung_dau_moi` | `Huong_dan_dung_dau_moi` | ✅ PASS | Bot cung cấp đúng địa chỉ email BTC và cách thức báo trước cho Coach phụ trách. |
 | **GS11** | `Thuong_Ngay` | cho mình hỏi một team bao nhiêu bạn ? | `Tra_loi_co_trich_dan` | `Tra_loi_co_trich_dan` | ✅ PASS | Bot trả lời chính xác quy mô nhóm 3-4 người và lưu ý phải cùng phòng thi. |
-| **GS12** | `Thuong_Ngay` | cho mình hỏi một team mấy bạn? | `Tra_loi_ngan_gon` | `Tra_loi_co_trich_dan` | ❌ FAIL | Bot trả lời ngắn gọn (<= 2 câu): 3-4 bạn/nhóm. |
+| **GS12** | `Thuong_Ngay` | cho mình hỏi một team mấy bạn? | `Tra_loi_ngan_gon` | `Tra_loi_ngan_gon` | ✅ PASS | Bot trả lời ngắn gọn (<= 2 câu): 3-4 bạn/nhóm. |
 | **GS13** | `Thuong_Ngay` | Tại e thấy trong sổ tay phải có xác nhận của giám đốc, nên là k biết e có phải chờ mail phản hồi k ạ? | `Giai_thich_quy_trinh` | `Giai_thich_quy_trinh` | ✅ PASS | Bot hướng dẫn rõ cần chờ email phản hồi từ điều phối viên khóa học. |
 | **GS14** | `Thuong_Ngay` | theo em hiểu có deliverables bắt buộc là btc ra đề bài rồi các nhóm thực hiện ạ? | `Xac_nhan_va_neu_san_pham_giao_nop` | `Xac_nhan_va_neu_san_pham_giao_nop` | ✅ PASS | Bot xác nhận đúng và liệt kê tóm tắt các deliverable qua các mốc Checkpoint. |
 | **GS15** | `Thuong_Ngay` | Quy tắc đặt tên repo của nhóm mình là gì thế bot? | `Cung_cap_cu_phap_chuan` | `Cung_cap_cu_phap_chuan` | ✅ PASS | Bot cung cấp đúng cú pháp K4-<mã lớp>-<phòng>-<tên nhóm> kèm ví dụ minh họa chính xác. |

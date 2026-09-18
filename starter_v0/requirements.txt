@@ -1,0 +1,9 @@
+# Validated live provider + UI. All new runs use this Gemini SDK.
+google-genai==2.23.0
+PyYAML==6.0.3
+requests==2.34.2
+streamlit==1.63.0
+fastapi>=0.115.0
+uvicorn>=0.30.0
+supabase>=2.12.0
+python-dotenv>=1.0.0

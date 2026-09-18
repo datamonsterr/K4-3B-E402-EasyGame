@@ -1,0 +1,85 @@
+tools:
+  - name: lookup_official_notices
+    description: "Tra cứu thông báo chính thức từ BTC/Admin/TA được ghim trên kênh #announcements. Tự động áp dụng quy tắc thông báo có timestamp mới nhất sẽ ghi đè và loại trừ thông báo đã bị thay thế."
+    parameters:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: "Chủ đề tra cứu: 'lab_1', 'checkpoint', 'attendance', 'submission', 'team', 'workshop', 'security', 'vlearn', 'absence_permission'."
+        query:
+          type: string
+          description: "Từ khóa tra cứu ngữ nghĩa bổ sung nếu không rõ chủ đề."
+      required: []
+
+  - name: clarify_query
+    description: "Hỏi lại học viên để làm rõ ý định khi câu hỏi quá ngắn, mơ hồ hoặc thiếu thực thể xác định (ví dụ hỏi deadline nhưng không rõ bài nào)."
+    parameters:
+      type: object
+      properties:
+        question:
+          type: string
+          description: "Câu hỏi gợi ý làm rõ gửi tới học viên."
+        options:
+          type: array
+          items:
+            type: string
+          description: "Danh sách các lựa chọn nhanh (quick-reply options) cho học viên bấm chọn."
+      required:
+        - question
+        - options
+
+  - name: escalate_to_ta
+    description: "Chuyển tiếp câu hỏi tồn đọng, câu hỏi chưa có thông báo chính thức hoặc câu hỏi kỹ thuật code sang kênh radar của Trợ giảng (TA)."
+    parameters:
+      type: object
+      properties:
+        student_name:
+          type: string
+          description: "Tên hoặc Discord handle của học viên."
+        channel:
+          type: string
+          description: "Kênh Discord nơi học viên đặt câu hỏi."
+        issue_summary:
+          type: string
+          description: "Tóm tắt ngắn gọn 1 câu về nội dung cần hỗ trợ."
+        is_urgent:
+          type: boolean
+          description: "Đánh dấu khẩn cấp nếu câu hỏi liên quan đến nộp bài gấp hoặc chờ đợi quá 4h."
+      required:
+        - student_name
+        - issue_summary
+
+  - name: scan_unanswered_radar
+    description: "Quét toàn bộ các câu hỏi học viên chưa được trả lời trên Discord và phân loại theo các cấp độ cảnh báo SLA (SOFT_2H và URGENT_4H)."
+    parameters:
+      type: object
+      properties:
+        guild:
+          type: string
+          description: "Server Discord cần quét (mặc định 'easygame_k4')."
+      required: []
+
+  - name: generate_daily_digest
+    description: "Tạo bản tin tổng hợp cuối ngày cho đội ngũ Lab Coach và TA, gồm thống kê câu hỏi tồn, top chủ đề và deep link trực tiếp mà không bị lỗi chuỗi rác hay cắt cụt từ vựng."
+    parameters:
+      type: object
+      properties:
+        guild:
+          type: string
+          description: "Mã server Discord (mặc định 'easygame_k4')."
+      required: []
+
+  - name: resolve_question
+    description: "Đánh dấu câu hỏi tồn đọng trên radar đã được TA xử lý thành công."
+    parameters:
+      type: object
+      properties:
+        message_id:
+          type: string
+          description: "Mã tin nhắn gốc của câu hỏi."
+        resolver:
+          type: string
+          description: "Tên hoặc Discord tag của TA xử lý."
+      required:
+        - message_id

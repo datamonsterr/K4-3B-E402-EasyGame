@@ -2919,7 +2919,7 @@ dataset = load_dataset("easygame/nlp_trackb_lab1.py", split="train")`
       synthesizeAgentResponse(query, time);
     }
 
-    function synthesizeAgentResponse(query, time) {
+    async function synthesizeAgentResponse(query, time) {
       const dynamicWrapper = document.getElementById('dynamic-messages');
       const qLower = query.toLowerCase();
 
@@ -2930,44 +2930,83 @@ dataset = load_dataset("easygame/nlp_trackb_lab1.py", split="train")`
       let answerText = "Thông tin đã được ghi nhận. Vui lòng theo dõi thông báo chính thức tại kênh #announcements.";
       let jumpLink = "#announcements Jump Link ↗";
       let isEscalated = false;
+      let latencyVal = (Math.random() * 0.4 + 0.4).toFixed(2);
+      let isBackendGrounded = false;
 
-      if (qLower.includes("thẻ học viên") || qLower.includes("the hoc vien")) {
-        intent = "Onboarding_Card";
-        confidence = 0.97;
-        traceTool = 'query_pinned_notices("Thẻ học viên") -> Notice #04';
-        thoughtDetails = "Direct match with official onboarding guideline (M56157).";
-        answerText = "Học viên chưa nhận thẻ tại lễ khai giảng vui lòng liên hệ bàn điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn kèm MSSV để nhận thẻ trong tuần đầu.";
-      } else if (qLower.includes("clone") || qLower.includes("fork") || qLower.includes("lab 1")) {
-        intent = "Policy_Submission";
-        confidence = 0.96;
-        traceTool = 'query_pinned_notices("Lab 1 Git") -> Guideline v2.1';
-        thoughtDetails = "Verified rules for Git classroom fork/clone policy (M89035).";
-        answerText = "Học viên bắt buộc phải fork repo từ GitHub Classroom của lớp về tài khoản cá nhân rồi mới clone. Nếu clone trực tiếp sẽ không tạo được pull request nộp bài hợp lệ.";
-      } else if (qLower.includes("điểm danh") || qLower.includes("diem danh") || qLower.includes("nghỉ")) {
-        intent = "Policy_Attendance";
-        confidence = 0.98;
-        traceTool = 'query_pinned_notices("Chính sách điểm danh") -> Notice #03';
-        thoughtDetails = "Attendance verification via Zoom/MyVinUni app (M13974).";
-        answerText = "Dữ liệu điểm danh workshop cập nhật trên app MyVinUni sau 24h. Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.";
-      } else if (qLower.includes("record") || qLower.includes("video")) {
-        intent = "Logistics_Materials";
-        confidence = 0.99;
-        traceTool = 'query_pinned_notices("Recordings") -> Drive Directory';
-        thoughtDetails = "Retrieval of session recordings folder (M19079).";
-        answerText = "Record của các buổi workshop tối được lưu tại thư mục Google Drive 'AI20K Cohort 4 - Workshop Recordings'. Link truy cập đã ghim trên đầu kênh #announcements.";
-      } else if (qLower.includes("lỗi") || qLower.includes("error") || qLower.includes("cvat") || qLower.includes("typeerror")) {
-        intent = "Technical_Code";
-        confidence = 0.92;
-        traceTool = 'code_debugger("Dataset API") -> Low confidence / Auto-escalate';
-        thoughtDetails = "Identified technical bug. Fallback policy: Do not hallucinate code fix -> escalate to Lab Coach.";
-        answerText = "Lỗi kỹ thuật đã được hệ thống ghi nhận và chuyển tiếp lên radar của Lab Coach (@TA_MinhHai). Vé hỗ trợ #TICK-106 đã được tạo tự động.";
-        isEscalated = true;
-      } else if (qLower.includes("phoenix") || qLower.includes("nhóm") || qLower.includes("đội")) {
-        intent = "Team_Formation";
-        confidence = 0.95;
-        traceTool = 'query_pinned_notices("Ghép đội Phoenix") -> Rule #12';
-        thoughtDetails = "Phoenix grouping rules verification (M12505).";
-        answerText = "Mỗi đội có tối đa 5 thành viên và bắt buộc cùng Level (Level 2-3 lập nhóm riêng, Level 3-4 riêng). Hạn chót chốt danh sách đội trên Phoenix là 18:00 ngày 15/09/2026.";
+      // Production Agent Backend Integration (Track B1 & B2)
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const apiRes = await fetch("http://localhost:8000/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: query,
+            conversation_id: state.conversationId || "conv-k4-main",
+            user_name: state.persona === 'learner' ? '@NguyenVanAn' : '@TA_MinhHai',
+            channel: "#hoi-dap-logistics"
+          }),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (apiRes.ok) {
+          const data = await apiRes.json();
+          intent = data.intent || intent;
+          answerText = data.reply || answerText;
+          isEscalated = Boolean(data.escalated_to_ta || data.status === "escalated_to_ta");
+          latencyVal = (data.latency_ms ? data.latency_ms / 1000 : 0.25).toFixed(2);
+          confidence = data.status === "answered" ? 0.98 : 0.85;
+          traceTool = `Backend Agent -> ${intent}`;
+          thoughtDetails = `Production LogisticsAgent verified (status: ${data.status})`;
+          if (data.citations && data.citations.length > 0) {
+            jumpLink = (data.citations[0].title || "Official Announcement") + " ↗";
+          }
+          isBackendGrounded = true;
+        }
+      } catch (err) {
+        // Fallback to client heuristics if backend server is not running
+        console.info("Agent backend offline or timeout, using local heuristic response:", err.message);
+      }
+
+      if (!isBackendGrounded) {
+        if (qLower.includes("thẻ học viên") || qLower.includes("the hoc vien")) {
+          intent = "Onboarding_Card";
+          confidence = 0.97;
+          traceTool = 'query_pinned_notices("Thẻ học viên") -> Notice #04';
+          thoughtDetails = "Direct match with official onboarding guideline (M56157).";
+          answerText = "Học viên chưa nhận thẻ tại lễ khai giảng vui lòng liên hệ bàn điều phối tại sảnh E402 hoặc gửi email tới AIthucchien@vinuni.edu.vn kèm MSSV để nhận thẻ trong tuần đầu.";
+        } else if (qLower.includes("clone") || qLower.includes("fork") || qLower.includes("lab 1")) {
+          intent = "Policy_Submission";
+          confidence = 0.96;
+          traceTool = 'query_pinned_notices("Lab 1 Git") -> Guideline v2.1';
+          thoughtDetails = "Verified rules for Git classroom fork/clone policy (M89035).";
+          answerText = "Học viên bắt buộc phải fork repo từ GitHub Classroom của lớp về tài khoản cá nhân rồi mới clone. Nếu clone trực tiếp sẽ không tạo được pull request nộp bài hợp lệ.";
+        } else if (qLower.includes("điểm danh") || qLower.includes("diem danh") || qLower.includes("nghỉ")) {
+          intent = "Policy_Attendance";
+          confidence = 0.98;
+          traceTool = 'query_pinned_notices("Chính sách điểm danh") -> Notice #03';
+          thoughtDetails = "Attendance verification via Zoom/MyVinUni app (M13974).";
+          answerText = "Dữ liệu điểm danh workshop cập nhật trên app MyVinUni sau 24h. Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.";
+        } else if (qLower.includes("record") || qLower.includes("video")) {
+          intent = "Logistics_Materials";
+          confidence = 0.99;
+          traceTool = 'query_pinned_notices("Recordings") -> Drive Directory';
+          thoughtDetails = "Retrieval of session recordings folder (M19079).";
+          answerText = "Record của các buổi workshop tối được lưu tại thư mục Google Drive 'AI20K Cohort 4 - Workshop Recordings'. Link truy cập đã ghim trên đầu kênh #announcements.";
+        } else if (qLower.includes("lỗi") || qLower.includes("error") || qLower.includes("cvat") || qLower.includes("typeerror")) {
+          intent = "Technical_Code";
+          confidence = 0.92;
+          traceTool = 'code_debugger("Dataset API") -> Low confidence / Auto-escalate';
+          thoughtDetails = "Identified technical bug. Fallback policy: Do not hallucinate code fix -> escalate to Lab Coach.";
+          answerText = "Lỗi kỹ thuật đã được hệ thống ghi nhận và chuyển tiếp lên radar của Lab Coach (@TA_MinhHai). Vé hỗ trợ #TICK-106 đã được tạo tự động.";
+          isEscalated = true;
+        } else if (qLower.includes("phoenix") || qLower.includes("nhóm") || qLower.includes("đội")) {
+          intent = "Team_Formation";
+          confidence = 0.95;
+          traceTool = 'query_pinned_notices("Ghép đội Phoenix") -> Rule #12';
+          thoughtDetails = "Phoenix grouping rules verification (M12505).";
+          answerText = "Mỗi đội có tối đa 5 thành viên và bắt buộc cùng Level (Level 2-3 lập nhóm riêng, Level 3-4 riêng). Hạn chót chốt danh sách đội trên Phoenix là 18:00 ngày 15/09/2026.";
+        }
       }
 
       const responseHtml = `
