@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import {
-  toAssistantMessage,
-  type PublicAnswerResponse,
-} from "./public-answer";
+import { toAssistantMessage, type PublicAnswerResponse } from "./public-answer";
 
 export interface ChatMessage {
   id: string;

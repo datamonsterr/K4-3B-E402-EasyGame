@@ -113,7 +113,9 @@ describe("createAnswerHandler", () => {
           actor: { userId: "u", guildId: "g", role: "learner" },
           assistant: {
             answer: async () => {
-              throw new Error("Sensitive DB connection string or internal trace");
+              throw new Error(
+                "Sensitive DB connection string or internal trace",
+              );
             },
           },
         }) as never,
@@ -124,9 +126,12 @@ describe("createAnswerHandler", () => {
     expect(json).toEqual({
       error: {
         code: "ASSISTANT_UNAVAILABLE",
-        message: "The assistant is temporarily unavailable. Please try again later.",
+        message:
+          "The assistant is temporarily unavailable. Please try again later.",
       },
     });
-    expect(JSON.stringify(json)).not.toContain("Sensitive DB connection string");
+    expect(JSON.stringify(json)).not.toContain(
+      "Sensitive DB connection string",
+    );
   });
 });

@@ -15,7 +15,9 @@ const refusalText =
 const fallbackText =
   "There is no verified notice for this question. Please ask a Lab Coach for confirmation.";
 
-function classifyIntent(message: string):
+function classifyIntent(
+  message: string,
+):
   | { type: "refused"; reason: string }
   | { type: "clarify"; reason: string }
   | { type: "logistics"; topicKey: string } {

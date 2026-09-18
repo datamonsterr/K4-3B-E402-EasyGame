@@ -157,9 +157,9 @@ describe("finalizeAnswer", () => {
     "masks %s. only when it precedes a capitalized name",
     (title) => {
       const answer = `${title}. Smith approved it. Submit by noon. Extensions need approval.`;
-      expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
-        "answered",
-      );
+      expect(
+        finalizeAnswer(answer, { ...notice, answer }, guildId).status,
+      ).toBe("answered");
     },
   );
 
@@ -239,7 +239,10 @@ describe("createSupabaseNoticeEvidence", () => {
     };
     const source = createSupabaseNoticeEvidence({ from: () => query } as never);
     await expect(
-      source.findVerifiedNotices({ guildId: notice.guildId, topicKey: "lab-1" }),
+      source.findVerifiedNotices({
+        guildId: notice.guildId,
+        topicKey: "lab-1",
+      }),
     ).rejects.toThrow("Notice evidence unavailable");
   });
 });
@@ -264,9 +267,9 @@ describe("createLogisticsToolExecutor", () => {
     await expect(
       execute({ name: "query_notices", args: { topicKey: "lab-1" } }),
     ).resolves.toMatchObject({ matchedCount: 1 });
-    await expect(execute({ name: "resolve_question", args: {} })).rejects.toThrow(
-      "Tool is not allowed for logistics answers",
-    );
+    await expect(
+      execute({ name: "resolve_question", args: {} }),
+    ).rejects.toThrow("Tool is not allowed for logistics answers");
     await expect(
       execute({
         name: "query_notices",

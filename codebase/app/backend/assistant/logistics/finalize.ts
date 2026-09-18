@@ -36,7 +36,10 @@ function isMaskedDot(body: string, index: number): boolean {
     return true;
   }
 
-  const token = body.slice(0, index).match(/\p{L}+$/u)?.[0].toLowerCase();
+  const token = body
+    .slice(0, index)
+    .match(/\p{L}+$/u)?.[0]
+    .toLowerCase();
   const remainder = body.slice(index + 1);
 
   if (token === "no") {
