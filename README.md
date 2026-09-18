@@ -12,10 +12,10 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| *(Điền tên Đội trưởng)* | *(Mã HV)* | **Product Lead** | Định hình bài toán, JTBD, viết Spec (§1-§4), điều phối các mốc CP1–CP6 |
-| *(Thành viên 2)* | *(Mã HV)* | **Data & Evidence Specialist** | Khai thác `discord-pack`, thống kê định lượng, phỏng vấn/khảo sát người dùng, xây dựng Golden Set |
-| *(Thành viên 3)* | *(Mã HV)* | **AI & Prompt Engineer** | Thiết kế Prompt/RAG từ nguồn chính thức, xử lý 4 lớp chỗ khó, kiểm thử độ chính xác |
-| *(Thành viên 4)* | *(Mã HV)* | **Prototype & Validation Lead** | Dựng luồng mock/prototype (CP2, CP3), quay video thao tác, thực hiện user validation R6 (CP5) |
+| Phạm Thành Đạt | 2A202602721 *(Trưởng nhóm)* | **Product Lead** | Định hình bài toán, JTBD, viết Spec (§1-§4), điều phối các mốc CP1–CP6 |
+| Đậu Quang Ý | 2A202602661 | **Data & Evidence Specialist** | Khai thác `discord-pack`, thống kê định lượng, phỏng vấn/khảo sát người dùng, xây dựng Golden Set |
+| Trần Mạnh Hùng | 2A202602708 | **AI & Prompt Engineer** | Thiết kế Prompt/RAG từ nguồn chính thức, xử lý 4 lớp chỗ khó, kiểm thử độ chính xác |
+| Nguyễn Tiến Đạt | 2A202602970 | **Prototype & Validation Lead** | Dựng luồng mock/prototype (CP2, CP3), quay video thao tác, thực hiện user validation R6 (CP5) |
 
 > ⚠️ **Lưu ý quan trọng:** Cả 5 checkpoint (CP1 → CP5) phải nộp bằng **cùng một mã học viên của đội trưởng**.
 

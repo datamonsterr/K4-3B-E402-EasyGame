@@ -1,7 +1,7 @@
 # Bài Thu Hoạch Cá Nhân (Individual Reflection) — Hackathon AI Batch 04
 
 - **Họ và Tên:** Đậu Quang Ý  
-- **Mã học viên:** [Điền MSSV của bạn]  
+- **Mã học viên:** 2A202602661  
 - **Lớp:** 3B · **Phòng thi:** E402  
 - **Nhóm:** EasyGame · **Track:** B — Trợ lý Học viên (Discord)  
 - **Vai trò chính:** AI Engineer & Data Specialist  
