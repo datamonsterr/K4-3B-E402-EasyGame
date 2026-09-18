@@ -1,7 +1,6 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-// @ts-expect-error js-yaml does not provide types in current dependency tree
-import yaml from "js-yaml";
+import { load as yamlLoad } from "js-yaml";
 import type { Source, Notice } from "./index";
 import {
   executeTool,
@@ -155,7 +154,7 @@ export function loadSystemInstruction(): string {
 export function loadToolDeclarations(): GeminiFunctionDeclaration[] {
   const filePath = getArtifactPath("tools.yaml");
   const yamlContent = readFileSync(filePath, "utf8");
-  const parsed = yaml.load(yamlContent) as {
+  const parsed = yamlLoad(yamlContent) as {
     tools: Array<{
       name: string;
       description: string;
