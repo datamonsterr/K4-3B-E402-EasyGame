@@ -30,17 +30,20 @@ jobs:
       DEPLOY_TARGET: ${{ github.event_name == 'push' && 'production' || inputs.target }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: codebase/package-lock.json
+          cache: pnpm
+          cache-dependency-path: codebase/pnpm-lock.yaml
       - name: Check deployment credentials
         run: |
           test -n "$VERCEL_TOKEN" || { echo 'Set VERCEL_TOKEN in the selected GitHub environment.'; exit 1; }
           test -n "$VERCEL_ORG_ID" || { echo 'Set VERCEL_ORG_ID in the selected GitHub environment.'; exit 1; }
           test -n "$VERCEL_PROJECT_ID" || { echo 'Set VERCEL_PROJECT_ID in the selected GitHub environment.'; exit 1; }
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
         working-directory: codebase
       # Run Vercel from the Git root. The linked Vercel project's Root Directory is codebase.
       - name: Pull project configuration

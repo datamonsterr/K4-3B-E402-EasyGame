@@ -31,17 +31,20 @@ jobs:
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: codebase/package-lock.json
-      - run: npm ci
+          cache: pnpm
+          cache-dependency-path: codebase/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
       - name: Validate migration environment
         run: |
           test -n "$SUPABASE_ACCESS_TOKEN" || { echo 'Set SUPABASE_ACCESS_TOKEN.'; exit 1; }
           test -n "$SUPABASE_PROJECT_REF" || { echo 'Set SUPABASE_PROJECT_REF.'; exit 1; }
           test -n "$SUPABASE_DB_PASSWORD" || { echo 'Set SUPABASE_DB_PASSWORD.'; exit 1; }
-      - run: npx supabase link --project-ref "$SUPABASE_PROJECT_REF"
-      - run: npx supabase db push --dry-run
-      - run: npx supabase db push --yes
+      - run: pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      - run: pnpm exec supabase db push --dry-run
+      - run: pnpm exec supabase db push --yes
