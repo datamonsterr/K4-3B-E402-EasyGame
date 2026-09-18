@@ -132,10 +132,10 @@ guồn tham chiếuết thúc).
 
 ## §8. Phân công & Kế hoạch
 - **Bảng phân công trách nhiệm chi tiết:**
-  - **Phạm Thành Đạt:** Product Lead — Phụ trách định hình bài toán, viết hoàn thiện Spec (§1-§4), thiết kế khảo sát và nộp các mốc form CP1–CP6.
-  - **Đậu Quang Ý:** AI Engineer & Data Specialist — Phụ trách mining k4_messages.csv, xây dựng bộ Golden Set 20 case, thiết lập script kiểm thử định lượng và báo cáo đo lường eval.
-  - **Thành viên 3:** Fullstack & Prototype Dev — Xây dựng giao diện web mô phỏng Discord Chat (CP2), tích hợp luồng tương tác 4 nhánh trải nghiệm.
-  - **Thành viên 4:** UX Evaluator & Validation Lead — Phụ trách quay video thao tác 30s (CP3), thực hiện phỏng vấn Mom Test với 5 người dùng ngoài nhóm (R6 - CP5), biên soạn slide PDF 6 trang.
+  - **Phạm Thành Đạt (2A202602721):** Product Lead — Phụ trách định hình bài toán, viết hoàn thiện Spec (§1-§4), thiết kế khảo sát và nộp các mốc form CP1–CP6.
+  - **Đậu Quang Ý (2A202602661):** AI Engineer & Data Specialist — Phụ trách mining k4_messages.csv, xây dựng bộ Golden Set 20 case, thiết lập script kiểm thử định lượng và báo cáo đo lường eval.
+  - **Trần Mạnh Hùng (2A202602708):** Fullstack & Prompt Dev — Thiết kế prompt RAG từ thông báo chính thức, xử lý 4 lớp chỗ khó, UI Mock.
+  - **Nguyễn Tiến Đạt (2A202602970):** Prototype & Validation Lead — Xây dựng mock/prototype, quay video thao tác, thực hiện user validation R6 (CP5).
 - **Willing Users (≥2 người ngoài nhóm đã liên hệ và sẵn sàng test ở CP5):**
   1. *Nguyễn Văn A (Học viên Lớp 3B - Nhóm khác)* — Xác nhận tham gia thử nghiệm luồng hỏi đáp deadline.
   2. *Trần Thị B (Học viên Lớp 3B - Nhóm khác)* — Xác nhận tham gia thử nghiệm tính năng phát hiện trôi tin.
