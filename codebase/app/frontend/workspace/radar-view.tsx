@@ -62,7 +62,11 @@ const initialTickets: RadarTicket[] = [
   },
 ];
 
-export function RadarView() {
+export interface RadarViewProps {
+  onSelectMessage?: (messageId: string) => void;
+}
+
+export function RadarView({ onSelectMessage }: RadarViewProps = {}) {
   const [tickets, setTickets] = useState<RadarTicket[]>(initialTickets);
   const [filter, setFilter] = useState<
     "all" | "urgent" | "warning" | "resolved"
@@ -325,13 +329,34 @@ export function RadarView() {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {onSelectMessage ? (
+                      <button
+                        type="button"
+                        onClick={() => onSelectMessage(t.id)}
+                        className="px-2.5 py-1 rounded bg-cyan-950 hover:bg-cyan-900 text-cyan-400 text-[11px] font-mono border border-cyan-800 transition flex items-center gap-1"
+                        title="Mở tin nhắn trong giao diện Messages để trả lời trực tiếp vào CSDL"
+                      >
+                        <span>Xem tin nhắn</span>
+                        <span>💬</span>
+                      </button>
+                    ) : (
+                      <a
+                        href="https://discord.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 rounded bg-[#202024] hover:bg-[#27272a] text-[#e4e4e7] text-[11px] font-mono border border-[#3f3f46] transition"
+                      >
+                        Xem tin nhắn 💬
+                      </a>
+                    )}
                     <a
                       href="https://discord.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2.5 py-1 rounded bg-[#202024] hover:bg-[#27272a] text-[#e4e4e7] text-[11px] font-mono border border-[#3f3f46] transition"
+                      className="px-2 py-1 rounded bg-[#202024] hover:bg-[#27272a] text-[#a1a1aa] hover:text-white text-[10px] font-mono border border-[#27272a] transition"
+                      title="Mở trên Discord thật trong tab mới"
                     >
-                      Nhảy tới Discord ↗
+                      Discord ↗
                     </a>
                     {t.status !== "resolved" && (
                       <>

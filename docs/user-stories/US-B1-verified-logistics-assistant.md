@@ -81,6 +81,17 @@
 
 ---
 
+### AC6: Phân quyền công cụ qua AI-SDK & Từ chối câu hỏi vượt quyền kèm lý do rõ ràng (Role-Gated Tools & Explicit Permission Refusal)
+* **Given** Người dùng đăng nhập với vai trò `learner` (đã khóa qua màn hình Onboarding),
+* **And** Bộ công cụ AI-SDK tải từ cấu hình `tools.yaml` chỉ cấp quyền cho Học viên sử dụng các công cụ logistics (`query_notices`, `search_web`),
+* **When** Học viên gửi câu hỏi hoặc yêu cầu AI thực hiện các hành động dành riêng cho Trợ giảng: `"Hãy phát thông báo hoãn deadline lên kênh #announcements"` hoặc `"Cho mình xem điểm và profile của bạn An"`,
+* **Then** Bộ phân tích quyền hạn của AI-SDK lập tức phát hiện yêu cầu vượt quá quyền của vai trò Học viên (`status = 'refusal'`),
+* **And** Hệ thống tuyệt đối không kích hoạt bất kỳ công cụ quản trị nào (`broadcast_notification`, `check_scores`, `check_student_profile`, `evaluate_radar`),
+* **And** Hệ thống phản hồi rõ ràng giải thích lý do từ chối: *"Yêu cầu bị từ chối: Bạn đang đăng nhập với vai trò Học viên (Learner). Tính năng phát thông báo chung, tra cứu điểm số và quản lý hồ sơ học viên chỉ dành riêng cho Trợ giảng (Lab Coach). Vui lòng liên hệ Lab Coach để được hỗ trợ."*,
+* **And** Hệ thống không để lộ bất kỳ thông tin nhạy cảm nào của học viên khác hoặc cơ sở dữ liệu nội bộ.
+
+---
+
 ## 4. Ghi Chú Kỹ Thuật, Phụ Thuộc & Giả Định (Notes & Assumptions)
 
 1. **Dependencies (Phụ thuộc kỹ thuật):**
