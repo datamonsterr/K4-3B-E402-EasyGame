@@ -158,3 +158,9 @@ export {
   type ValidateLlmOptions,
   type ValidateLlmResult,
 } from "./gemini";
+
+export * from "./logistics/contracts";
+export { finalizeAnswer } from "./logistics/finalize";
+export { createSupabaseNoticeEvidence } from "./logistics/supabase-evidence";
+export { createLogisticsToolExecutor } from "./logistics/tools";
+export { createLogisticsAssistant } from "./logistics/assistant";

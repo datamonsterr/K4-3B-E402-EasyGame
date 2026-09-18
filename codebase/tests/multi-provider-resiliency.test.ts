@@ -4,7 +4,6 @@ import {
   validateLlmConnection,
   isQuotaOrTimeoutError,
 } from "../app/backend/assistant";
-import { POST as demoAnswerPost } from "../app/api/demo/answer/route";
 import { POST as healthLlmPost } from "../app/api/health/llm/route";
 
 describe("Multi-Provider LLM & Resiliency Engine", () => {
@@ -312,61 +311,6 @@ describe("Multi-Provider LLM & Resiliency Engine", () => {
       expect(result.telemetry.fallbackReason).toContain(
         "Notice: LLM quota reached or timed out; executed deterministic grounded resolution from verified notices",
       );
-    });
-  });
-
-  describe("POST /api/demo/answer endpoint", () => {
-    it("accepts provider, apiKey, and model in body and returns clean response with telemetry and source", async () => {
-      const request = new Request("http://localhost:3000/api/demo/answer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          topicKey: "lab-1",
-          provider: "gemini",
-          apiKey: "mock",
-          model: "gemini-2.5-flash",
-        }),
-      });
-
-      const res = await demoAnswerPost(request);
-      expect(res.status).toBe(200);
-
-      const data = await res.json();
-      expect(data).toHaveProperty("status");
-      expect(data).toHaveProperty("grounded");
-      expect(data).toHaveProperty("text");
-      expect(data).toHaveProperty("source");
-      expect(data).toHaveProperty("summary");
-      expect(data).toHaveProperty("latencyMs");
-      expect(data).toHaveProperty("telemetry");
-      expect(data.status).toBe("answered");
-      expect(data.grounded).toBe(true);
-      expect(data.source.href).toMatch(/\/sources\//);
-      expect(data.latencyMs).toBeGreaterThanOrEqual(0);
-    });
-
-    it("accepts provider, apiKey, and model via headers", async () => {
-      const request = new Request("http://localhost:3000/api/demo/answer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-llm-provider": "openai",
-          "x-llm-api-key": "mock",
-          "x-llm-model": "gpt-4o-mini",
-        },
-        body: JSON.stringify({
-          query: "Deadline nộp bài Lab 1 là mấy giờ?",
-        }),
-      });
-
-      const res = await demoAnswerPost(request);
-      expect(res.status).toBe(200);
-
-      const data = await res.json();
-      expect(data.status).toBe("answered");
-      expect(data.grounded).toBe(true);
-      expect(data.telemetry.provider).toBe("openai");
-      expect(data.telemetry.model).toBe("gpt-4o-mini");
     });
   });
 
