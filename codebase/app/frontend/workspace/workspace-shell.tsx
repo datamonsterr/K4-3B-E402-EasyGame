@@ -4,29 +4,40 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChatView } from "./chat-view";
 import { RadarView } from "./radar-view";
-import { ChannelsView } from "./channels-view";
+import { MessagesView } from "./messages-view";
 import { NoticesView } from "./notices-view";
 import { DigestView } from "./digest-view";
 import { FeedbackView } from "./feedback-view";
-import { RoleModal } from "./role-modal";
+import { OnboardingModal } from "./onboarding-modal";
 import { SettingsModal } from "./settings-modal";
 
 export type WorkspaceTab =
-  "chat" | "radar" | "channels" | "notices" | "digest" | "feedback";
+  | "chat"
+  | "radar"
+  | "channels"
+  | "messages"
+  | "notices"
+  | "digest"
+  | "feedback";
 
 export interface WorkspaceShellProps {
   initialRole?: "learner" | "lab_coach";
   initialUserName?: string;
   initialUser?: string;
+  initialNeedsOnboarding?: boolean;
 }
 
 export function WorkspaceShell({
   initialRole = "learner",
   initialUserName,
   initialUser,
+  initialNeedsOnboarding = false,
 }: WorkspaceShellProps = {}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("chat");
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+    null,
+  );
 
   const defaultUser =
     initialUserName ??
@@ -48,7 +59,14 @@ export function WorkspaceShell({
     }
     return defaultUser;
   });
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(() => {
+    if (initialNeedsOnboarding) return true;
+    if (typeof window !== "undefined") {
+      const completed = localStorage.getItem("eg_onboarding_completed");
+      if (completed === "true") return false;
+    }
+    return false;
+  });
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   function handleRoleChanged(newRole: "learner" | "lab_coach") {
@@ -168,18 +186,18 @@ export function WorkspaceShell({
               </div>
             </button>
 
-            {/* Tab 3: Manage Channels */}
+            {/* Tab 3: Messages */}
             <button
-              onClick={() => setActiveTab("channels")}
+              onClick={() => setActiveTab("messages")}
               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md transition text-left group ${
-                activeTab === "channels"
+                activeTab === "messages" || activeTab === "channels"
                   ? "bg-[#18181b] text-cyan-400 border-l-2 border-cyan-400"
                   : "text-[#a1a1aa] hover:bg-[#18181b] hover:text-white"
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm">📡</span>
-                <span className="text-xs font-medium">Manage Channels</span>
+                <span className="text-sm">📨</span>
+                <span className="text-xs font-medium">Messages</span>
               </div>
               <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-[#27272a] text-[#a1a1aa] border border-[#3f3f46]">
                 4
@@ -301,7 +319,8 @@ export function WorkspaceShell({
                       role === "lab_coach" ? "text-amber-400" : "text-cyan-400"
                     }`}
                   >
-                    Role: {role === "lab_coach" ? "Lab Coach" : "Learner"}
+                    Role: {role === "lab_coach" ? "Lab Coach" : "Learner"}{" "}
+                    (Locked)
                   </span>
                 </div>
               </div>
@@ -335,8 +354,20 @@ export function WorkspaceShell({
         {activeTab === "chat" && (
           <ChatView onGoToFeedback={() => setActiveTab("feedback")} />
         )}
-        {activeTab === "radar" && <RadarView />}
-        {activeTab === "channels" && <ChannelsView />}
+        {activeTab === "radar" && (
+          <RadarView
+            onSelectMessage={(msgId) => {
+              setSelectedMessageId(msgId);
+              setActiveTab("messages");
+            }}
+          />
+        )}
+        {(activeTab === "messages" || activeTab === "channels") && (
+          <MessagesView
+            initialSelectedId={selectedMessageId}
+            onClearSelected={() => setSelectedMessageId(null)}
+          />
+        )}
         {activeTab === "notices" && <NoticesView />}
         {activeTab === "digest" && <DigestView />}
         {activeTab === "feedback" && (
@@ -352,12 +383,14 @@ export function WorkspaceShell({
         onRoleChanged={handleRoleChanged}
       />
 
-      {/* Database Role Selection Modal */}
-      <RoleModal
-        currentRole={role}
-        isOpen={isRoleModalOpen}
-        onClose={() => setIsRoleModalOpen(false)}
-        onRoleChanged={handleRoleChanged}
+      {/* First Sign-in Onboarding Role Selection Modal */}
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        onRoleConfirmed={(confirmedRole) => {
+          handleRoleChanged(confirmedRole);
+          localStorage.setItem("eg_onboarding_completed", "true");
+          setIsOnboardingOpen(false);
+        }}
       />
     </div>
   );

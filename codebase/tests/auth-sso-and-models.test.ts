@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { GET as oauthGet } from "../app/api/auth/oauth/route";
 import { GET as callbackGet } from "../app/auth/callback/route";
+import Home from "../app/page";
 import { getSupabaseBrowserClient } from "../app/frontend/supabase-browser";
 import { validateLlmConnection } from "../app/backend/assistant";
 import { POST as healthLlmPost } from "../app/api/health/llm/route";
@@ -57,7 +58,11 @@ describe("OAuth SSO & Model Customization Suite", () => {
       // When Supabase is configured, location redirects to Supabase authorize endpoint
       expect(location).toMatch(/auth\/v1\/authorize\?provider=discord/);
       expect(location).toContain("redirect_to=");
-      expect(location).toContain("role%3Dlab_coach");
+      const callback = new URL(
+        new URL(location).searchParams.get("redirect_to") ?? "",
+      );
+      expect(callback.searchParams.has("role")).toBe(false);
+      expect(callback.searchParams.get("next")).toBe("/workspace");
     });
 
     it("initiates Google OAuth flow and redirects to authorization URL when configured", async () => {
@@ -69,7 +74,11 @@ describe("OAuth SSO & Model Customization Suite", () => {
       const location = res.headers.get("location") || "";
       expect(location).toMatch(/auth\/v1\/authorize\?provider=google/);
       expect(location).toContain("redirect_to=");
-      expect(location).toContain("role%3Dlearner");
+      const callback = new URL(
+        new URL(location).searchParams.get("redirect_to") ?? "",
+      );
+      expect(callback.searchParams.has("role")).toBe(false);
+      expect(callback.searchParams.get("next")).toBe("/workspace");
     });
   });
 
@@ -102,6 +111,69 @@ describe("OAuth SSO & Model Customization Suite", () => {
       // Fails exchange -> redirects safely to sign-in
       expect(location).toContain("/sign-in?error=auth_callback_failed");
       expect(location).not.toContain("malicious.site");
+    });
+
+    it("parses multi-hop x-forwarded-host proxies correctly", async () => {
+      const req = new Request(
+        "http://internal:3000/auth/callback?error=server_error&error_description=Denied",
+        {
+          headers: {
+            "x-forwarded-host": "easygame.vercel.app, proxy2.internal",
+            "x-forwarded-proto": "https",
+          },
+        },
+      );
+      const res = await callbackGet(req);
+      const location = res.headers.get("location") || "";
+      expect(location).toContain(
+        "https://easygame.vercel.app/sign-in?error=Denied",
+      );
+    });
+  });
+
+  describe("Root Page OAuth Callback Interceptor (app/page)", () => {
+    it("intercepts ?code parameter and forwards to /auth/callback with next=/workspace", async () => {
+      try {
+        await Home({
+          searchParams: Promise.resolve({ code: "test-auth-code-123" }),
+        });
+        expect.unreachable("Should have redirected");
+      } catch (err: unknown) {
+        const errorString = String(err);
+        const digest = (err as { digest?: string }).digest || "";
+        expect(errorString + digest).toContain("/auth/callback");
+        expect(errorString + digest).toContain("code=test-auth-code-123");
+        expect(errorString + digest).toContain("next=%2Fworkspace");
+      }
+    });
+
+    it("intercepts OAuth error parameter on root and forwards to /auth/callback", async () => {
+      try {
+        await Home({
+          searchParams: Promise.resolve({
+            error: "access_denied",
+            error_description: "User+cancelled",
+          }),
+        });
+        expect.unreachable("Should have redirected");
+      } catch (err: unknown) {
+        const errorString = String(err);
+        const digest = (err as { digest?: string }).digest || "";
+        expect(errorString + digest).toContain("/auth/callback");
+        expect(errorString + digest).toContain("error=access_denied");
+      }
+    });
+
+    it("redirects unauthenticated visitors without params to /sign-in", async () => {
+      delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+      try {
+        await Home({});
+        expect.unreachable("Should have redirected");
+      } catch (err: unknown) {
+        const errorString = String(err);
+        const digest = (err as { digest?: string }).digest || "";
+        expect(errorString + digest).toContain("/sign-in");
+      }
     });
   });
 
@@ -225,22 +297,7 @@ describe("OAuth SSO & Model Customization Suite", () => {
       expect(sentBody.model).toBe("o3-mini");
     });
 
-    it("forwards pasted model ID through /api/health/llm endpoint", async () => {
-      let forwardedModel = "";
-
-      globalThis.fetch = vi.fn().mockImplementation(async (url, init) => {
-        const body = JSON.parse(String(init?.body));
-        forwardedModel = body.model;
-        return {
-          ok: true,
-          status: 200,
-          text: async () =>
-            JSON.stringify({
-              choices: [{ message: { content: "pong" } }],
-            }),
-        };
-      });
-
+    it("does not forward pasted credentials through /api/health/llm", async () => {
       const req = new Request("http://localhost:3000/api/health/llm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -252,11 +309,10 @@ describe("OAuth SSO & Model Customization Suite", () => {
       });
 
       const res = await healthLlmPost(req);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(401);
       const data = await res.json();
-      expect(data.ok).toBe(true);
-      expect(data.model).toBe("anthropic/claude-3.5-haiku");
-      expect(forwardedModel).toBe("anthropic/claude-3.5-haiku");
+      expect(data.ok).toBe(false);
+      expect(JSON.stringify(data)).not.toContain("sk-or-v1-pasted-key");
     });
   });
 });

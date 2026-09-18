@@ -9,6 +9,8 @@ import {
   executeCreateStaffAlert,
   executeSearchWeb,
 } from "../tools";
+import { validateQueryRolePermission } from "./agent/tool-registry";
+export { validateQueryRolePermission };
 
 export type LLMProvider = "gemini" | "openrouter" | "openai";
 
@@ -53,6 +55,8 @@ export interface RunAgentOptions {
   provider?: LLMProvider | string;
   apiKey?: string;
   model?: string;
+  role?: "learner" | "lab_coach";
+  messages?: Array<{ role: string; content: string }>;
 }
 
 export interface GeminiFunctionDeclaration {
@@ -148,16 +152,27 @@ export function loadSystemInstruction(): string {
   return readFileSync(filePath, "utf8");
 }
 
+export interface GeminiFunctionDeclaration {
+  name: string;
+  description: string;
+  roles?: ("learner" | "lab_coach")[];
+  parameters: Record<string, unknown>;
+}
+
 /**
  * Loads and converts tools.yaml into Gemini function_declarations.
+ * Optionally filters by role ('learner' | 'lab_coach').
  */
-export function loadToolDeclarations(): GeminiFunctionDeclaration[] {
+export function loadToolDeclarations(
+  role?: "learner" | "lab_coach",
+): GeminiFunctionDeclaration[] {
   const filePath = getArtifactPath("tools.yaml");
   const yamlContent = readFileSync(filePath, "utf8");
   const parsed = yamlLoad(yamlContent) as {
     tools: Array<{
       name: string;
       description: string;
+      roles?: ("learner" | "lab_coach")[];
       parameters: Record<string, unknown>;
     }>;
   };
@@ -166,9 +181,15 @@ export function loadToolDeclarations(): GeminiFunctionDeclaration[] {
     throw new Error("Invalid tools.yaml structure: missing 'tools' array");
   }
 
-  return parsed.tools.map((t) => ({
+  let tools = parsed.tools;
+  if (role) {
+    tools = tools.filter((t) => !t.roles || t.roles.includes(role));
+  }
+
+  return tools.map((t) => ({
     name: t.name,
     description: t.description,
+    roles: t.roles,
     parameters: t.parameters,
   }));
 }
@@ -611,6 +632,26 @@ export async function executeDeterministicAgent(
 /**
  * Executes Gemini ReAct function calling loop with 15s timeout and quota fallback.
  */
+function cleanGeminiFunctionDeclarations(
+  declarations: GeminiFunctionDeclaration[],
+): Array<{ name: string; description: string; parameters: Record<string, unknown> }> {
+  return declarations.map((d) => {
+    const cleanParams = JSON.parse(JSON.stringify(d.parameters)) as Record<string, unknown>;
+    if (cleanParams.properties && typeof cleanParams.properties === "object") {
+      for (const prop of Object.values(cleanParams.properties) as Record<string, unknown>[]) {
+        if (Array.isArray(prop.enum)) {
+          delete prop.enum;
+        }
+      }
+    }
+    return {
+      name: d.name,
+      description: d.description,
+      parameters: cleanParams,
+    };
+  });
+}
+
 async function runGeminiReAct(
   options: RunAgentOptions,
   apiKey: string,
@@ -618,7 +659,8 @@ async function runGeminiReAct(
   startTime: number,
 ): Promise<AgentResult> {
   const systemInstruction = loadSystemInstruction();
-  const toolDeclarations = loadToolDeclarations();
+  const toolDeclarations = loadToolDeclarations(options.role);
+  const geminiFunctions = cleanGeminiFunctionDeclarations(toolDeclarations);
   const thoughtProcess: string[] = [
     `Initialized Gemini ReAct session with model ${model}.`,
   ];
@@ -630,12 +672,18 @@ async function runGeminiReAct(
   const contentsHistory: Array<{
     role: string;
     parts: Array<Record<string, unknown>>;
-  }> = [
-    {
-      role: "user",
-      parts: [{ text: options.query }],
-    },
-  ];
+  }> =
+    options.messages && options.messages.length > 0
+      ? options.messages.map((m) => ({
+          role: m.role === "assistant" ? "model" : m.role,
+          parts: [{ text: m.content }],
+        }))
+      : [
+          {
+            role: "user",
+            parts: [{ text: options.query }],
+          },
+        ];
 
   const maxTurns = 6;
   let turn = 0;
@@ -653,7 +701,7 @@ async function runGeminiReAct(
       contents: contentsHistory,
       tools: [
         {
-          function_declarations: toolDeclarations,
+          function_declarations: geminiFunctions,
         },
       ],
       generation_config: {
@@ -775,7 +823,7 @@ async function runGeminiReAct(
         }
 
         contentsHistory.push({
-          role: "function",
+          role: "user",
           parts: [
             {
               functionResponse: {
@@ -895,6 +943,17 @@ async function runOpenAICompatibleReAct(
     },
   }));
 
+  const initialMessages: Array<{
+    role: "system" | "user" | "assistant" | "tool";
+    content?: string | null;
+  }> =
+    options.messages && options.messages.length > 0
+      ? options.messages.map((m) => ({
+          role: m.role as "system" | "user" | "assistant" | "tool",
+          content: m.content,
+        }))
+      : [{ role: "user" as const, content: options.query }];
+
   const messages: Array<{
     role: "system" | "user" | "assistant" | "tool";
     content?: string | null;
@@ -907,10 +966,7 @@ async function runOpenAICompatibleReAct(
       };
     }>;
     tool_call_id?: string;
-  }> = [
-    { role: "system", content: systemInstruction },
-    { role: "user", content: options.query },
-  ];
+  }> = [{ role: "system", content: systemInstruction }, ...initialMessages];
 
   const maxTurns = 6;
   let turn = 0;
@@ -1286,6 +1342,33 @@ export async function runAgent(
     typeof optionsOrQuery === "string"
       ? { query: optionsOrQuery }
       : optionsOrQuery;
+
+  // 0. Role permission check (US-B1 AC6, US-B3 AC4)
+  if (options.role) {
+    const roleValidation = validateQueryRolePermission(
+      options.query,
+      options.role,
+    );
+    if (!roleValidation.allowed) {
+      return {
+        text:
+          roleValidation.reason || "Yêu cầu bị từ chối: Quyền hạn không đủ.",
+        status: "refusal",
+        summary: "Role-based permission violation refused",
+        telemetry: {
+          latencyMs: Date.now() - startTime,
+          thoughtProcess: [
+            `Role permission rejected: ${options.role} requested ${roleValidation.tool || "prohibited action"}`,
+          ],
+          toolInvocations: [],
+          factualityScore: 1.0,
+          confidence: 1.0,
+          provider: options.provider || "gemini",
+          model: options.model,
+        },
+      };
+    }
+  }
 
   // 1. Resolve provider ('gemini' | 'openrouter' | 'openai')
   let provider: LLMProvider = "gemini";

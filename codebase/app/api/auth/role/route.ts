@@ -1,21 +1,32 @@
 import { z } from "zod";
-import { sessionClient, configured } from "@/backend/database/client";
+import {
+  sessionClient,
+  jobClient,
+  configured,
+} from "@/backend/database/client";
 
-const roleSchema = z
-  .object({
-    role: z.enum(["learner", "lab_coach"]),
-    guildId: z.string().optional(),
-  })
-  .strict();
+const roleSchema = z.object({
+  role: z.enum(["learner", "lab_coach"]),
+  guildId: z.string().optional(),
+});
 
 export async function POST(request: Request) {
   if (!configured()) {
     return Response.json({ error: "Database not configured" }, { status: 503 });
   }
-
   try {
     const raw = await request.text();
-    const input = roleSchema.safeParse(JSON.parse(raw));
+    let body: unknown;
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return Response.json(
+        { error: "Invalid role specified" },
+        { status: 400 },
+      );
+    }
+
+    const input = roleSchema.safeParse(body);
     if (!input.success) {
       return Response.json(
         { error: "Invalid role specified" },
@@ -49,8 +60,40 @@ export async function POST(request: Request) {
       }
     }
 
-    // Upsert membership in database
-    const { error: upsertError } = await supabase.from("memberships").upsert(
+    // Check if membership already exists with a role (role immutability)
+    const { data: existingMembership, error: fetchError } = await supabase
+      .from("memberships")
+      .select("role")
+      .eq("guild_id", targetGuildId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      return Response.json(
+        { error: `Database check failed: ${fetchError.message}` },
+        { status: 502 },
+      );
+    }
+
+    if (existingMembership && existingMembership.role) {
+      return Response.json(
+        {
+          error:
+            "Role is permanently locked after onboarding and cannot be changed",
+        },
+        { status: 403 },
+      );
+    }
+
+    // Upsert membership in database using privileged job client if available, or session client
+    let dbClient = supabase;
+    try {
+      dbClient = jobClient() as unknown as typeof supabase;
+    } catch {
+      // Job credentials might not be configured in preview, use session client
+    }
+
+    const { error: upsertError } = await dbClient.from("memberships").upsert(
       {
         guild_id: targetGuildId,
         user_id: user.id,
@@ -73,8 +116,8 @@ export async function POST(request: Request) {
     });
   } catch {
     return Response.json(
-      { error: "Failed to update role in database" },
-      { status: 400 },
+      { error: "Authentication unavailable" },
+      { status: 503 },
     );
   }
 }

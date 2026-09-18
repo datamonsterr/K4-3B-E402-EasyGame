@@ -19,8 +19,8 @@
 |---|---|
 | **Actor:** | **Primary Actor:** Learner<br>**Secondary Actors:** Official Notice Grounding Engine, Discord Messaging Platform, On-duty Lab Coach |
 | **Description:** | A Learner submits a question concerning logistics, lab deadlines, or course regulations in a public Discord channel. The system verifies the inquiry against authenticated announcements and returns a concise Grounded Response with an exact source link so that the Learner does not receive misleading dates or policies. |
-| **Preconditions:** | 1. The Learner has access to the course Discord server and may post in an eligible public channel.<br>2. The Official Notice Grounding Engine has synchronized active notices from an Official Notice Authority.<br>3. The Assistant integration is available to receive the message. |
-| **Postconditions:** | 1. A concise Grounded Response and authentic source card are published in the thread.<br>2. The query is marked as `answered`; a bot reply does not mark it `resolved`.<br>3. No ungrounded date or policy statement is presented to the Learner. |
+| **Preconditions:** | 1. The Learner has access to the course Discord server/workspace and holds an immutable `learner` role established via Onboarding ([UC-B3-01](UC-B3-01_select-and-lock-cohort-role-onboarding.md)).<br>2. The Official Notice Grounding Engine has synchronized active notices from an Official Notice Authority.<br>3. The Assistant integration is available to receive the message. |
+| **Postconditions:** | 1. A concise Grounded Response and authentic source card are published in the thread.<br>2. The query is marked as `answered`; a bot reply does not mark it `resolved`.<br>3. No ungrounded date or policy statement is presented to the Learner.<br>4. The query executes strictly within the Learner tool authorization set via TypeScript AI-SDK ([UC-B1-02](UC-B1-02_execute-role-gated-assistant-tool.md)). |
 | **Priority:** | High |
 | **Frequency of Use:** | 30–60 times per day across the active cohort (~200 students). |
 
@@ -32,10 +32,10 @@
 
 | Step | Initiator | Action |
 |:---:|:---:|---|
-| 1 | **Learner** | Posts a message in an eligible public Discord channel tagging `@Assistant` and asking about a specific lab deadline. |
+| 1 | **Learner** | Posts a message in an eligible public Discord channel or workspace tagging `@Assistant` and asking about a specific lab deadline. |
 | 2 | **Discord Messaging Platform** | Emits a `MessageCreate` gateway event containing message content, sender metadata, channel ID, and timestamp to the Assistant backend. |
 | 3 | **Assistant System** | Analyzes the semantic intent of the message and classifies it as `Logistics_Deadline` with a confidence score exceeding the operational threshold (≥0.85). |
-| 4 | **Assistant System** | Dispatches a grounded retrieval query to the **Official Notice Grounding Engine** for Lab 1 deadline notices. |
+| 4 | **Assistant System** | Validates caller role permissions via the **TypeScript AI-SDK Engine** and dispatches the authorized `query_notices` tool to the **Official Notice Grounding Engine** for Lab 1 deadline notices. |
 | 5 | **Official Notice Grounding Engine** | Retrieves the corresponding official pinned announcement post containing the exact deadline (`21:00, September 17, 2026`) and its message jump link. |
 | 6 | **Assistant System** | Formulates a concise response (≤3 sentences) stating the verified deadline and formats an official citation bracket: `[Source: Announcement #CP1 - #announcements]`. |
 | 7 | **Assistant System** | Publishes the verified response as an inline reply to the Learner's original message. |

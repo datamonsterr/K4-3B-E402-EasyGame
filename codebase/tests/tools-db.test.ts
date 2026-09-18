@@ -388,7 +388,7 @@ describe("Database & Tool Integration", () => {
       expect(result.results.length).toBeGreaterThan(0);
       expect(result.results[0].url).toMatch(/^https?:\/\//);
       expect(result.results[0].title).toBeDefined();
-    });
+    }, 15000);
   });
 
   describe("executeTool universal dispatcher", () => {

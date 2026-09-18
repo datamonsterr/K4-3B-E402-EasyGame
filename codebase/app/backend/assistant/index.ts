@@ -148,6 +148,7 @@ export {
   isQuotaOrTimeoutError,
   loadSystemInstruction,
   loadToolDeclarations,
+  validateQueryRolePermission,
   validateOutputConstraints,
   type AgentResult,
   type AgentTelemetry,
