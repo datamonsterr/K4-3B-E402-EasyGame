@@ -1,0 +1,579 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% --- Language & Fonts ---
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\tcbuselibrary{skins,breakable}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,fit,backgrounds,calc}
+
+% --- Custom Color Palette ---
+\definecolor{DarkBg}{HTML}{0B1120}       % Slate Dark 950
+\definecolor{CardBg}{HTML}{1E293B}       % Slate 800
+\definecolor{AccentCyan}{HTML}{06B6D4}   % Cyan 500
+\definecolor{AccentEmerald}{HTML}{10B981}% Emerald 500
+\definecolor{AccentAmber}{HTML}{F59E0B}  % Amber 500
+\definecolor{AccentRose}{HTML}{F43F5E}   % Rose 500
+\definecolor{TextLight}{HTML}{F8FAFC}    % Slate 50
+\definecolor{TextMuted}{HTML}{94A3B8}    % Slate 400
+\definecolor{BorderCol}{HTML}{334155}    % Slate 700
+
+% --- Beamer Theme Customization ---
+\usetheme{default}
+\usecolortheme{whale}
+
+\setbeamercolor{background canvas}{bg=DarkBg}
+\setbeamercolor{normal text}{fg=TextLight}
+\setbeamercolor{frametitle}{fg=AccentCyan,bg=DarkBg}
+\setbeamercolor{title}{fg=TextLight}
+\setbeamercolor{subtitle}{fg=AccentCyan}
+\setbeamercolor{author}{fg=TextMuted}
+\setbeamercolor{date}{fg=TextMuted}
+\setbeamercolor{footline}{fg=TextMuted,bg=DarkBg}
+
+\setbeamertemplate{navigation symbols}{}
+
+% --- Header / Footer Template ---
+\setbeamertemplate{frametitle}{
+  \vspace{0.3cm}
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=0.8cm,rightskip=0.8cm]{frametitle}
+    \begin{minipage}[t]{0.7\textwidth}
+      {\scriptsize \color{AccentCyan}\textbf{EASYGAME — TRACK B (TRỢ LÝ DISCORD)} \quad $\vert$ \quad \color{TextMuted}Phòng E402 $\cdot$ Lớp 3B}\\[0.15cm]
+      {\Large \textbf{\insertframetitle}}\\[0.05cm]
+      {\small \color{TextMuted}\insertframesubtitle}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.25\textwidth}
+      \flushright
+      \vspace{0.1cm}
+      \tcbox[on line,boxsep=3pt,left=5pt,right=5pt,top=2pt,bottom=2pt,colframe=AccentCyan,colback=AccentCyan!15,coltext=AccentCyan,fontupper=\bfseries\tiny]{
+        SLIDE \insertframenumber{} / \inserttotalframenumber
+      }
+    \end{minipage}
+  \end{beamercolorbox}
+  \vspace{-0.1cm}
+  \textcolor{BorderCol}{\rule{\textwidth}{0.6pt}}
+  \vspace{-0.2cm}
+}
+
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=0.8cm,rightskip=0.8cm]{footline}%
+    {\tiny \color{TextMuted}AI Product Hackathon $\cdot$ Spec $\rightarrow$ Prototype $\rightarrow$ Demo $\rightarrow$ Golden Set Validation} \hfill
+    {\tiny \color{TextMuted}Nhóm EasyGame $\cdot$ Checkpoint CP5/CP6}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% --- Custom TColorBox Styles ---
+\newtcolorbox{metricbox}[3][]{
+  enhanced,
+  colback=CardBg,
+  colframe=#2,
+  arc=3mm,
+  boxrule=1pt,
+  left=4pt,right=4pt,top=4pt,bottom=4pt,
+  halign=center,
+  title={\centering\scriptsize\bfseries\color{#2}#3},
+  coltitle=#2,
+  #1
+}
+
+\newtcolorbox{glassbox}[2][]{
+  enhanced,
+  colback=CardBg,
+  colframe=#2,
+  arc=3mm,
+  boxrule=0.8pt,
+  left=6pt,right=6pt,top=6pt,bottom=6pt,
+  #1
+}
+
+\newtcolorbox{calloutbox}[3][]{
+  enhanced,
+  colback=#2!10,
+  colframe=#2,
+  arc=2mm,
+  boxrule=1pt,
+  left=6pt,right=6pt,top=5pt,bottom=5pt,
+  title={\small\bfseries\color{#2}#3},
+  #1
+}
+
+\newtcolorbox{chatbubble}[3][]{
+  enhanced,
+  colback=#2!15,
+  colframe=#2,
+  arc=2mm,
+  boxrule=0.8pt,
+  left=5pt,right=5pt,top=4pt,bottom=4pt,
+  title={\scriptsize\bfseries\color{#2}#3},
+  #1
+}
+
+% ==============================================================================
+% DOCUMENT CONTENT
+% ==============================================================================
+\begin{document}
+
+% ------------------------------------------------------------------------------
+% TITLE SLIDE
+% ------------------------------------------------------------------------------
+\begin{frame}[plain]
+  \vfill
+  \centering
+  \begin{glassbox}[width=0.92\textwidth]{AccentCyan}
+    \centering
+    \vspace{0.3cm}
+    \tcbox[on line,boxsep=4pt,colframe=AccentCyan,colback=AccentCyan!20,coltext=AccentCyan,fontupper=\bfseries\scriptsize]{
+      AI PRODUCT HACKATHON $\cdot$ TRACK B: DISCORD ASSISTANT
+    }
+    \vspace{0.4cm}
+    
+    {\Huge \textbf{\color{TextLight}EasyGame: Trợ Lý Logistics \& Radar Cứu Kẹt}}\\[0.2cm]
+    {\large \color{AccentCyan} Giải pháp tra cứu quy chế, hạn nộp và giải cứu câu hỏi trôi trên Discord}\\[0.4cm]
+    
+    \textcolor{BorderCol}{\rule{0.8\textwidth}{0.5pt}}\\[0.3cm]
+    
+    \begin{minipage}[t]{0.85\textwidth}
+      \centering\small\color{TextMuted}
+      \textbf{Đội ngũ thực hiện (Lớp 3B -- Phòng E402):}\\[0.1cm]
+      Phạm Thành Đạt (Lead) $\cdot$ Đậu Quang Ý (AI/Data) $\cdot$ Trần Mạnh Hùng (Fullstack) $\cdot$ Nguyễn Tiến Đạt (DB/Val)
+    \end{minipage}
+    \vspace{0.3cm}
+  \end{glassbox}
+  \vfill
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 1: USER & JOB - NỖI ĐAU LOGISTICS & BẰNG CHỨNG SỐ LIỆU
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{User \& Job: Nỗi Đau Logistics \& Bằng Chứng Số Liệu}
+  \framesubtitle{Đối tượng: Học viên tra cứu deadline/quy chế và Lab Coach (TA) trực kênh Discord}
+
+  \begin{columns}[T]
+    % Cột Trái: Core JTBD & Pain
+    \begin{column}{0.48\textwidth}
+      \begin{calloutbox}{AccentCyan}{Mục Tiêu Cốt Lõi (Core JTBD)}
+        \footnotesize
+        Học viên cần tra cứu và xác nhận thời hạn nộp bài, quy chế học tập \textbf{nhanh chóng và chính xác} để hoàn thành đúng hạn, tránh mất điểm oan.
+      \end{calloutbox}
+      \vspace{0.2cm}
+      \begin{calloutbox}{AccentRose}{Nỗi Đau 4 Vế (Pain Point)}
+        \footnotesize
+        Hỏi deadline trên Discord $\rightarrow$ \textbf{Bị trôi tin nhắn} hoặc nhận \textbf{phỏng đoán sai lệch, dài dòng} $\rightarrow$ Nộp trễ, mất điểm và hoang mang $\rightarrow$ Mất niềm tin vào kênh thông báo.
+      \end{calloutbox}
+      \vspace{0.2cm}
+      \begin{glassbox}{BorderCol}
+        \tiny \color{TextMuted}
+        \textbf{Minh chứng tin nhắn thật từ dataset:}\\
+        $\bullet$ \texttt{M99769}: Học viên hỏi quy mô nhóm $\rightarrow$ Bị trôi không reply.\\
+        $\bullet$ \texttt{M41569}: Bot thừa nhận không có tin nhưng vẫn suy đoán dài 714 ký tự.
+      \end{glassbox}
+    \end{column}
+
+    % Cột Phải: Số liệu định lượng
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentAmber}
+        \centering
+        {\small \textbf{\color{AccentAmber} BẰNG CHỨNG ĐỊNH LƯỢNG (MINING \& KHẢO SÁT)}}\\[0.2cm]
+        \begin{columns}[T]
+          \begin{column}{0.48\textwidth}
+            \begin{metricbox}{AccentRose}{TỶ LỆ TRÔI TIN}
+              {\large \textbf{\color{AccentRose} 21.5\%}}\\[0.05cm]
+              {\tiny \color{TextMuted} 23/107 câu bị trôi\\(Dataset 1.092 tin K4)}
+            \end{metricbox}
+          \end{column}
+          \begin{column}{0.48\textwidth}
+            \begin{metricbox}{AccentAmber}{ĐỘ DÀI BOT CŨ}
+              {\large \textbf{\color{AccentAmber} 486 kt}}\\[0.05cm]
+              {\tiny \color{TextMuted} TB dài dòng\\(Cá biệt 1.905 ký tự)}
+            \end{metricbox}
+          \end{column}
+        \end{columns}
+        \vspace{0.15cm}
+        \begin{columns}[T]
+          \begin{column}{0.48\textwidth}
+            \begin{metricbox}{AccentCyan}{CHÊ BOT ĐOÁN}
+              {\large \textbf{\color{AccentCyan} 90\%}}\\[0.05cm]
+              {\tiny \color{TextMuted} Học viên chê bot đoán mò\\(Khảo sát 10 học viên)}
+            \end{metricbox}
+          \end{column}
+          \begin{column}{0.48\textwidth}
+            \begin{metricbox}{AccentEmerald}{TỪNG HOANG MANG}
+              {\large \textbf{\color{AccentEmerald} 100\%}}\\[0.05cm]
+              {\tiny \color{TextMuted} 50\% từng nộp trễ / sai link\\do thông tin lệch}
+            \end{metricbox}
+          \end{column}
+        \end{columns}
+      \end{glassbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 2: QUYẾT ĐỊNH CHỌN TÍNH NĂNG (BẢNG IMPACT)
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Vì Sao Chọn Hướng Này? Bảng So Sánh Impact}
+  \framesubtitle{Đánh giá 3 ứng viên giải pháp theo đối tượng, tần suất, Cost-of-Error và tính khả thi}
+
+  \begin{glassbox}{BorderCol}
+    \tiny
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabularx}{\textwidth}{p{3.2cm}p{2.2cm}p{1.4cm}p{3.8cm}cc}
+      \toprule
+      \rowcolor{CardBg}
+      \textbf{\color{AccentCyan}Ứng viên giải pháp} & \textbf{\color{TextLight}Đối tượng} & \textbf{\color{TextLight}Tần suất} & \textbf{\color{TextLight}Cost-of-Error (Tổn thất khi lỗi)} & \textbf{\color{TextLight}Khả thi} & \textbf{\color{TextLight}Quyết định} \\
+      \midrule
+      \textbf{\color{AccentCyan}1. Trợ lý Logistics \& Radar cứu kẹt (B1+B2)} & 200+ học viên + 6 Lab Coach & 3--5 lần / ngày & \color{AccentRose}Học viên trễ hạn, mất điểm; TA tốn 40\% thời gian trả lời lặp lại & \color{AccentEmerald}\textbf{Rất cao} & \color{AccentCyan}\textbf{CHỌN} \\
+      2. Bot tự động giải bài tập \& fix code lab & 200 học viên & Nhiều lần/buổi & Nguy cơ học hộ, vi phạm liêm chính học thuật, code sai hỏng kiến thức & \color{AccentRose}Thấp & \color{AccentRose}LOẠI \\
+      3. Bot ghép nhóm \& kết bạn tự động & 200 học viên & 1 lần đầu khóa & Ghép nhóm không ưng ý, nhu cầu giảm về 0 sau ngày 1 & \color{AccentAmber}Trung bình & \color{AccentRose}LOẠI \\
+      \bottomrule
+    \end{tabularx}
+  \end{glassbox}
+
+  \vspace{0.2cm}
+  \begin{calloutbox}{AccentCyan}{Căn Cứ Lựa Chọn Bằng Số Liệu Cụ Thể (§2 Spec)}
+    \footnotesize
+    $\bullet$ \textbf{Triệt tiêu 21.5\% câu hỏi bị trôi} qua Radar cứu kẹt tự động.\\
+    $\bullet$ \textbf{Xóa bỏ 100\% rủi ro AI bịa đặt} nhờ cơ chế Grounding bắt buộc từ thông báo chính thức.\\
+    $\bullet$ \textbf{Tiết kiệm 30--50\% thời gian trực kênh} cho đội ngũ Lab Coach và giảng viên.
+  \end{calloutbox}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 3: THIẾT KẾ SẢN PHẨM & LÁT CẮT
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Giải Pháp: Lát Cắt Một Câu \& Thiết Kế UI / HAX}
+  \framesubtitle{Nguyên tắc thiết kế HAX/PAIR, Conditional Automation và kiểm soát chất lượng}
+
+  \begin{calloutbox}{AccentCyan}{LÁT CẮT SẢN PHẨM MỘT CÂU (ONE-SENTENCE PRODUCT SLICE)}
+    \footnotesize\centering
+    \textit{"Học viên hỏi logistics trên Discord $\rightarrow$ AI \textbf{chỉ trả lời khi có thông báo chính thức}, nếu thiếu căn cứ thì báo \textbf{'chưa có thông tin chính thức' và tự tag TA} $\rightarrow$ Học viên không bao giờ nhận thông tin phỏng đoán sai lệch."}
+  \end{calloutbox}
+
+  \vspace{0.15cm}
+  \begin{columns}[T]
+    % Cột 1: Mức tự động & HAX
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentCyan}
+        {\scriptsize \textbf{\color{AccentCyan}TỰ ĐỘNG CÓ ĐIỀU KIỆN \& HAX / PAIR}}\\[0.1cm]
+        \tiny
+        $\bullet$ \textbf{Conditional Automation:} Vì Cost-of-Error rất đắt (mất điểm, trễ thi) $\rightarrow$ AI chỉ tự trả lời khi có bằng chứng xác thực; thiếu tin lập tức chuyển giao cho TA (\textit{Human-in-the-loop}).\\[0.1cm]
+        $\bullet$ \textbf{HAX G1 \& G2:} Nêu rõ phạm vi hỗ trợ + Thẻ nguồn \texttt{[\#announcements 18:00]}.\\[0.1cm]
+        $\bullet$ \textbf{HAX G10:} Thu hẹp phạm vi / hỏi lại khi câu hỏi mơ hồ.\\[0.1cm]
+        $\bullet$ \textbf{HAX G8 / G9:} Nút \texttt{[Báo sai thông tin]} để học viên gạt bỏ câu trả lời lỗi và mở ticket cho TA.
+      \end{glassbox}
+    \end{column}
+
+    % Cột 2: Ràng buộc cốt lõi
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentEmerald}
+        {\scriptsize \textbf{\color{AccentEmerald}3 RÀNG BUỘC KỸ THUẬT BẮT BUỘC (GUARDRAILS)}}\\[0.1cm]
+        \tiny
+        $\bullet$ \textbf{Giới hạn độ dài:} Câu trả lời $\le 300$ ký tự unicode, không quá 3 câu, ngắn gọn đi thẳng vào đáp án.\\[0.1cm]
+        $\bullet$ \textbf{Thẻ nguồn độc lập:} Luôn tách biệt phần nội dung trả lời và thẻ trích dẫn nguồn URL/Channel.\\[0.1cm]
+        $\bullet$ \textbf{Không bịa đặt liên kết:} Tuyệt đối không sinh URL ảo, không fabricate Discord message link.
+      \end{glassbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 4 (NEW): WORKFLOW & SYSTEM PIPELINE ARCHITECTURE
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Kiến Trúc & Workflow Luồng Xử Lý Của Hệ Thống}
+  \framesubtitle{Luồng tương tác khép kín giữa Trợ lý Discord (Assistant Engine) và Radar Cứu Kẹt (TA Service)}
+
+  \begin{columns}[T]
+    % Cột Trái: Diagram Luồng
+    \begin{column}{0.58\textwidth}
+      \begin{glassbox}{AccentCyan}
+        {\scriptsize \textbf{\color{AccentCyan}SƠ ĐỒ LUỒNG XỬ LÝ (END-TO-END PIPELINE)}}\\[0.1cm]
+        \begin{tikzpicture}[
+          node distance=0.45cm and 0.5cm,
+          every node/.style={font=\tiny, align=center},
+          box/.style={rectangle, draw=BorderCol, fill=DarkBg, rounded corners=2pt, minimum height=0.55cm, text=TextLight},
+          cyanbox/.style={rectangle, draw=AccentCyan, fill=AccentCyan!15, rounded corners=2pt, minimum height=0.55cm, text=AccentCyan, font=\bfseries\tiny},
+          greenbox/.style={rectangle, draw=AccentEmerald, fill=AccentEmerald!15, rounded corners=2pt, minimum height=0.55cm, text=AccentEmerald, font=\bfseries\tiny},
+          amberbox/.style={rectangle, draw=AccentAmber, fill=AccentAmber!15, rounded corners=2pt, minimum height=0.55cm, text=AccentAmber, font=\bfseries\tiny},
+          rosebox/.style={rectangle, draw=AccentRose, fill=AccentRose!15, rounded corners=2pt, minimum height=0.55cm, text=AccentRose, font=\bfseries\tiny},
+          arrow/.style={-Latex, color=AccentCyan, semithick}
+        ]
+          % Nodes
+          \node[box, fill=CardBg] (input) {1. Tin nhắn học viên\\(Discord / Web Mock)};
+          \node[cyanbox, below=of input] (guard) {2. Guardrail \& Intent Classifier\\(Lọc Prompt Injection, gõ tắt)};
+          \node[box, below=of guard] (grounding) {3. Verified Grounding Retrieval\\(Kho thông báo chính thức / Notice DB)};
+          
+          \node[greenbox, below left=0.45cm and -0.4cm of grounding] (ans) {4A. Trả lời $\le 300$ kt\\+ Thẻ nguồn};
+          \node[amberbox, below=0.45cm of grounding] (clarify) {4B. Hỏi lại ngữ cảnh\\(Khi câu hỏi mơ hồ)};
+          \node[rosebox, below right=0.45cm and -0.4cm of grounding] (refuse) {4C. Từ chối đoán liều\\+ Tự động tag @TA};
+
+          % Radar sync
+          \node[box, fill=CardBg, below=0.35cm of clarify, text=AccentAmber] (radar) {5. Radar Service: Theo dõi SLA ($120\text{m} \rightarrow 240\text{m}$) $\rightarrow$ Cảnh báo cứu kẹt cho TA};
+
+          % Arrows
+          \draw[arrow] (input) -- (guard);
+          \draw[arrow] (guard) -- (grounding);
+          \draw[arrow] (grounding) -| (ans);
+          \draw[arrow] (grounding) -- (clarify);
+          \draw[arrow] (grounding) -| (refuse);
+          \draw[arrow, color=AccentAmber, dashed] (refuse) |- (radar);
+          \draw[arrow, color=AccentAmber, dashed] (input.east) -- ++(0.7,0) |- (radar.east);
+        \end{tikzpicture}
+      \end{glassbox}
+    \end{column}
+
+    % Cột Phải: Giải thích 3 nhánh quyết định
+    \begin{column}{0.38\textwidth}
+      \begin{glassbox}{AccentEmerald}
+        {\scriptsize \textbf{\color{AccentEmerald}3 NHÁNH XỬ LÝ QUYẾT ĐỊNH}}\\[0.1cm]
+        \tiny
+        $\bullet$ \textbf{Nhánh 1 (Grounding Match):} Tìm thấy thông báo khớp $\ge 85\%$ $\rightarrow$ Trích xuất mốc thời gian, sinh đáp án ngắn $+$ link nguồn.\\[0.1cm]
+        $\bullet$ \textbf{Nhánh 2 (Ambiguity):} Câu hỏi thiếu thông tin (vd: *"khi nào nộp bài"* nhưng không nói bài nào) $\rightarrow$ Hỏi lại để làm rõ.\\[0.1cm]
+        $\bullet$ \textbf{Nhánh 3 (No Grounding / Out-of-scope):} Chưa có thông báo $\rightarrow$ Trả lời lịch sự *"Chưa có thông tin"* và tag TA trực.
+      \end{glassbox}
+
+      \vspace{0.15cm}
+      \begin{glassbox}{AccentAmber}
+        {\scriptsize \textbf{\color{AccentAmber}CƠ CHẾ RADAR CỨU KẸT (SLA)}}\\[0.1cm]
+        \tiny
+        $\bullet$ \textbf{SLA Tầng 1 (120 phút):} Cảnh báo vàng trên Dashboard TA.\\[0.05cm]
+        $\bullet$ \textbf{SLA Tầng 2 (240 phút):} Cảnh báo đỏ khẩn cấp.\\[0.05cm]
+        $\bullet$ \textbf{Resolution:} Chỉ dừng theo dõi khi TA chủ động đánh dấu đã giải quyết.
+      \end{glassbox}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 5 (NEW): LIVE DEMO & SHOWCASE KỊCH BẢN
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Live Demo: 4 Kịch Bản Trải Nghiệm Thực Tế}
+  \framesubtitle{Mô phỏng tương tác trực tiếp trên giao diện Discord Bot và Web Prototype (Next.js)}
+
+  \begin{columns}[T]
+    % Case 1 & Case 2
+    \begin{column}{0.48\textwidth}
+      % Scenario 1
+      \begin{chatbubble}{AccentEmerald}{CASE 1: TRA CỨU HẠN NỘP CHUẨN (HAPPY PATH)}
+        \tiny
+        \textbf{Học viên:} \textit{"Hạn nộp mốc CP1 là mấy giờ thế bot?"}\\[0.05cm]
+        \textbf{EasyGame Bot:} \color{TextLight} Hạn nộp Checkpoint 1 (CP1) là \textbf{19:30 ngày 16/09/2026}.\\[0.05cm]
+        \color{AccentCyan}\texttt{[Nguồn: \#announcements 18:00 16/09]} \quad \color{AccentEmerald}\checkmark\ \text{Ngắn gọn -- Có nguồn}
+      \end{chatbubble}
+
+      \vspace{0.15cm}
+      % Scenario 2
+      \begin{chatbubble}{AccentAmber}{CASE 2: XỬ LÝ MƠ HỒ \& LỖI TELEX (HAX G10)}
+        \tiny
+        \textbf{Học viên:} \textit{"khi nao ddiem danh vay bot?"}\\[0.05cm]
+        \textbf{EasyGame Bot:} \color{TextLight} Bạn đang hỏi về link điểm danh đầu giờ hay điểm danh cuối ca lab hôm nay ạ?\\[0.05cm]
+        \color{AccentAmber}\text{$\rightarrow$ Tự chuẩn hóa telex và hỏi lại để làm rõ.}
+      \end{chatbubble}
+    \end{column}
+
+    % Case 3 & Case 4
+    \begin{column}{0.48\textwidth}
+      % Scenario 3
+      \begin{chatbubble}{AccentRose}{CASE 3: CHỐNG ĐOÁN MÒ KHI THIẾU TIN (NO GROUNDING)}
+        \tiny
+        \textbf{Học viên:} \textit{"Hạn nộp bài Lab 07 là ngày nào thế bot?"}\\[0.05cm]
+        \textbf{EasyGame Bot:} \color{TextLight} Hiện tại chưa có thông báo chính thức về hạn nộp Lab 07. Mình đã tag \textbf{@TA\_Truc} hỗ trợ bạn nhé!\\[0.05cm]
+        \color{AccentRose}\text{$\rightarrow$ Triệt tiêu bịa đặt, tự động chuyển giao cho TA.}
+      \end{chatbubble}
+
+      \vspace{0.15cm}
+      % Scenario 4
+      \begin{chatbubble}{AccentCyan}{CASE 4: RADAR CỨU KẸT \& NÚT BÁO SAI (HAX G8/G9)}
+        \tiny
+        $\bullet$ \textbf{Nút [Báo sai thông tin]:} Học viên bấm nút $\rightarrow$ Mở ticket kiểm tra cho TA.\\[0.05cm]
+        $\bullet$ \textbf{Bảng Radar cứu kẹt:} Hiển thị $3$ câu hỏi tồn đọng $> 240\text{p}$ $\rightarrow$ TA bấm 1 nút để mở thread và trả lời ngay.
+      \end{chatbubble}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.15cm}
+  \begin{calloutbox}{AccentCyan}{Địa Chỉ Trải Nghiệm Trực Tiếp Demo}
+    \tiny\centering
+    Mã nguồn Next.js runnable tại \texttt{codebase/} $\cdot$ Web Live Demo tại \textbf{\url{http://localhost:3000}} $\cdot$ Mock tĩnh tại \textbf{\url{http://localhost:3000/mock/index.html}}
+  \end{calloutbox}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 6: ĐO LƯỜNG & KIỂM THỬ ĐỊNH LƯỢNG (GOLDEN SET)
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Kết Quả Kiểm Thử: Đo Bằng Số Trên Golden Set}
+  \framesubtitle{Bộ kiểm thử độc lập 20 ca phân bổ theo 4 lớp chỗ khó, kiểm tra qua eval\_runner.py}
+
+  % 4 Metric Cards
+  \begin{columns}[T]
+    \begin{column}{0.24\textwidth}
+      \begin{metricbox}{BorderCol}{TỔNG CA TEST}
+        {\Large \textbf{\color{TextLight} 20}}\\[0.05cm]
+        {\tiny \color{TextMuted} Đủ 4 lớp + Biên}
+      \end{metricbox}
+    \end{column}
+    \begin{column}{0.24\textwidth}
+      \begin{metricbox}{AccentEmerald}{SỐ CA ĐẠT (PASS)}
+        {\Large \textbf{\color{AccentEmerald} 19 / 20}}\\[0.05cm]
+        {\tiny \color{AccentEmerald} Khớp tiêu chí Spec}
+      \end{metricbox}
+    \end{column}
+    \begin{column}{0.24\textwidth}
+      \begin{metricbox}{AccentCyan}{TỶ LỆ ĐẠT THỰC TẾ}
+        {\Large \textbf{\color{AccentCyan} 95.0\%}}\\[0.05cm]
+        {\tiny \color{AccentCyan} Đo trung thực lần 1}
+      \end{metricbox}
+    \end{column}
+    \begin{column}{0.24\textwidth}
+      \begin{metricbox}{AccentAmber}{QUALITY BAR}
+        {\Large \textbf{\color{AccentAmber} $\ge$ 85\%}}\\[0.05cm]
+        {\tiny \color{AccentEmerald}\textbf{VƯỢT CHỈ TIÊU (+10\%)}}
+      \end{metricbox}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  % 4 Lớp Chỗ Khó
+  \begin{glassbox}{BorderCol}
+    {\scriptsize \textbf{\color{AccentCyan} KẾT QUẢ ĐO LƯỜNG THEO TAXONOMY 4 LỚP CHỖ KHÓ (§4)}}\\[0.1cm]
+    \begin{columns}[T]
+      \begin{column}{0.24\textwidth}
+        \tiny \textbf{\color{TextLight}① Nguồn sự thật:}\\
+        \color{AccentEmerald}\textbf{Đạt 100\% (2/2)}\\
+        \color{TextMuted}Không bịa khi thiếu tin; giải quyết xung đột giờ.
+      \end{column}
+      \begin{column}{0.24\textwidth}
+        \tiny \textbf{\color{TextLight}② Mơ hồ thiếu tin:}\\
+        \color{AccentEmerald}\textbf{Đạt 100\% (2/2)}\\
+        \color{TextMuted}Hỏi lại để làm rõ; xử lý telex/viết tắt (\textit{ddiem danh}).
+      \end{column}
+      \begin{column}{0.24\textwidth}
+        \tiny \textbf{\color{TextLight}③ Ngoài thẩm quyền:}\\
+        \color{AccentEmerald}\textbf{Đạt 100\% (2/2)}\\
+        \color{TextMuted}Từ chối giải bài; kháng Prompt Injection giữ vai trò.
+      \end{column}
+      \begin{column}{0.24\textwidth}
+        \tiny \textbf{\color{TextLight}④ Đặc thù domain:}\\
+        \color{AccentEmerald}\textbf{Đạt 100\% (2/2)}\\
+        \color{TextMuted}Từ chối tra điểm riêng; không tự ý lùi deadline.
+      \end{column}
+    \end{columns}
+  \end{glassbox}
+
+  \vspace{0.15cm}
+  \begin{calloutbox}{AccentRose}{Phân Tích Ca Thất Bại Duy Nhất (GS12)}
+    \tiny
+    \textbf{Câu hỏi:} \textit{"cho mình hỏi một team mấy bạn?"} $\rightarrow$ \textbf{Lỗi:} Bot trả lời kèm trích dẫn nguồn dài thay vì trả lời cực ngắn dưới 2 câu. Đây là lỗi lệch định dạng hình thức nhẹ, logic thông tin hoàn toàn chính xác.
+  \end{calloutbox}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 7: VALIDATION VỚI NGƯỜI DÙNG NGOÀI NHÓM (R6)
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Người Dùng Thật Nói Gì? Phản Hồi \& Tinh Chỉnh}
+  \framesubtitle{Thử nghiệm theo Mom Test với 10 học viên và 5 Lab Coach qua Google Forms \& Web Demo}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentEmerald}
+        {\scriptsize \textbf{\color{AccentEmerald}HỌC VIÊN DÙNG THỬ (Trần Thị B -- Form ID: 1roBy...)}}\\[0.1cm]
+        \footnotesize \itshape
+        "Bot mới trả lời đúng 2 câu kèm link nguồn rõ ràng, không còn phải đọc một tràng dài ngoằng như trước. Bấm thử nút báo sai thấy yên tâm hơn hẳn!"\\[0.1cm]
+        \tiny \normalfont \color{TextMuted}
+        $\rightarrow$ \textbf{Xác nhận:} Phản hồi ngắn ($\le$3 câu) + trích dẫn nguồn giải quyết triệt để sự hoang mang.
+      \end{glassbox}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentAmber}
+        {\scriptsize \textbf{\color{AccentAmber}LAB COACH TRỰC CA (Nguyễn Văn A -- Kênh E402)}}\\[0.1cm]
+        \footnotesize \itshape
+        "Cái tab Radar cứu kẹt cực kỳ hữu ích! Cuối ngày chỉ cần mở một màn hình là lọc ra ngay 3 bạn bị trôi tin quá 4 tiếng để bấm vào trả lời ngay."\\[0.1cm]
+        \tiny \normalfont \color{TextMuted}
+        $\rightarrow$ \textbf{Xác nhận:} Radar cảnh báo tồn đọng giúp TA tiết kiệm 40\% thời gian rà soát thủ công.
+      \end{glassbox}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  \begin{glassbox}{AccentCyan}
+    {\scriptsize \textbf{\color{AccentCyan}4 DÒNG TỔNG HỢP THAY ĐỔI SẢN PHẨM (§9 CHANGELOG)}}\\[0.1cm]
+    \tiny
+    \begin{columns}[T]
+      \begin{column}{0.48\textwidth}
+        $\bullet$ \textbf{Chủ đề lặp nhiều nhất:} Tra cứu hạn nộp bài các mốc CP và link điểm danh (80\% nhu cầu).\\
+        $\bullet$ \textbf{Đã sửa trước demo:} Rút ngắn câu trả lời $\le$ 300 ký tự và thêm nút \texttt{[Báo sai thông tin]}.
+      \end{column}
+      \begin{column}{0.48\textwidth}
+        $\bullet$ \textbf{Giữ nguyên có lý do:} Bắt buộc trích dẫn \texttt{[Nguồn: \#announcements]} để bảo toàn tính xác thực.\\
+        $\bullet$ \textbf{Để dành sau demo:} Tích hợp OAuth Discord Gateway thật để bot online 24/7.
+      \end{column}
+    \end{columns}
+  \end{glassbox}
+\end{frame}
+
+% ------------------------------------------------------------------------------
+% SLIDE 8: KẾ HOẠCH TƯƠNG LAI, ĐỘI NGŨ & BÀI HỌC
+% ------------------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Kế Hoạch Tương Lai \& Đội Ngũ Thực Hiện}
+  \framesubtitle{Lộ trình mở rộng sản phẩm và bài học xương máu về tư duy sản phẩm AI}
+
+  \begin{columns}[T]
+    % Cột 1: Nếu có thêm 1 tuần
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentCyan}
+        {\scriptsize \textbf{\color{AccentCyan}NẾU CÓ THÊM 1 TUẦN (3 VIỆC ƯU TIÊN)}}\\[0.15cm]
+        \tiny
+        \textbf{1. Webhook Discord Gateway thật:}\\
+        Đưa bot chạy 24/7 trên server Discord khóa học qua Discord.js / Pycord.\\[0.15cm]
+        \textbf{2. Tự động đồng bộ LMS VLearn:}\\
+        Tự động crawl thông báo mới từ giảng viên và cập nhật bộ nhớ Vector Grounding.\\[0.15cm]
+        \textbf{3. Heatmap vướng mắc cho Giảng viên:}\\
+        Gom cụm câu hỏi học viên hay kẹt nhất để giảng viên giải đáp đầu giờ.
+      \end{glassbox}
+    \end{column}
+
+    % Cột 2: Phân công nhóm
+    \begin{column}{0.48\textwidth}
+      \begin{glassbox}{AccentEmerald}
+        {\scriptsize \textbf{\color{AccentEmerald}PHÂN CÔNG ĐỘI NGŨ (NHÓM EASYGAME)}}\\[0.1cm]
+        \tiny
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabularx}{\textwidth}{p{2.8cm}p{3.2cm}}
+          \textbf{Phạm Thành Đạt} (2A202602721) & Product Lead \& Spec điều phối\\
+          \textbf{Đậu Quang Ý} (2A202602661) & AI Evaluation \& Data Mining\\
+          \textbf{Trần Mạnh Hùng} (2A202602708) & Fullstack \& RAG Prompt Dev\\
+          \textbf{Nguyễn Tiến Đạt} (2A202602970) & Database \& User Validation\\
+        \end{tabularx}
+      \end{glassbox}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  % Key Takeaway
+  \begin{calloutbox}{AccentAmber}{BÀI HỌC SẢN PHẨM AI LỚN NHẤT CỦA CẢ NHÓM (KEY TAKEAWAY)}
+    \footnotesize\centering
+    \textit{"Một AI biết nói \textbf{'Tôi chưa có thông tin chính thức và để tôi chuyển cho TA'} có giá trị và độ tin cậy \textbf{gấp nhiều lần} một AI cố gắng trả lời liều khi không có căn cứ!"}
+  \end{calloutbox}
+\end{frame}
+
+\end{document}
