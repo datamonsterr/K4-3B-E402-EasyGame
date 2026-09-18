@@ -158,3 +158,59 @@ describe("finalizeAnswer", () => {
     );
   });
 });
+
+import { createSupabaseNoticeEvidence } from "../app/backend/assistant/logistics/supabase-evidence";
+
+describe("createSupabaseNoticeEvidence", () => {
+  it("queries the authorized guild and topic in PostgreSQL", async () => {
+    const filters: Array<[string, string]> = [];
+    const query = {
+      select: () => query,
+      eq: (column: string, value: string) => {
+        filters.push([column, value]);
+        return query;
+      },
+      order: () =>
+        Promise.resolve({
+          data: [
+            {
+              id: notice.id,
+              guild_id: notice.guildId,
+              topic_key: notice.topicKey,
+              published_at: notice.publishedAt,
+              answer_excerpt: notice.answer,
+              source_message: {
+                source_label: notice.source.label,
+                discord_jump_url: notice.source.href,
+              },
+            },
+          ],
+          error: null,
+        }),
+    };
+    const source = createSupabaseNoticeEvidence({ from: () => query } as never);
+    expect(
+      await source.findVerifiedNotices({
+        guildId: notice.guildId,
+        topicKey: "lab-1",
+      }),
+    ).toHaveLength(1);
+    expect(filters).toEqual([
+      ["guild_id", notice.guildId],
+      ["topic_key", "lab-1"],
+    ]);
+  });
+
+  it("throws on database error instead of returning fixtures", async () => {
+    const query = {
+      select: () => query,
+      eq: () => query,
+      order: () =>
+        Promise.resolve({ data: null, error: { message: "RLS failure" } }),
+    };
+    const source = createSupabaseNoticeEvidence({ from: () => query } as never);
+    await expect(
+      source.findVerifiedNotices({ guildId: notice.guildId, topicKey: "lab-1" }),
+    ).rejects.toThrow("Notice evidence unavailable");
+  });
+});
