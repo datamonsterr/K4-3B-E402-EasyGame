@@ -29,6 +29,19 @@ insert into public.memberships(guild_id,user_id,role)
 select id, '00000000-0000-0000-0000-000000000003', 'lab_coach' from public.guilds where source_label='A';
 insert into public.memberships(guild_id,user_id,role)
 select id, '00000000-0000-0000-0000-000000000004', 'learner' from public.guilds where source_label='B';
+insert into auth.users(id) values ('00000000-0000-0000-0000-000000000005');
+insert into public.memberships(guild_id,user_id,role)
+select id, '00000000-0000-0000-0000-000000000005', 'lab_coach'
+from public.guilds where source_label='B';
+
+set role service_role;
+insert into public.notices(guild_id,message_id,topic_key,verified_by,published_at,answer_excerpt)
+select guild_id,id,'shared-topic','00000000-0000-0000-0000-000000000002',sent_at,'Guild A synthetic notice'
+from public.source_messages where record_ordinal=1;
+insert into public.notices(guild_id,message_id,topic_key,verified_by,published_at,answer_excerpt)
+select guild_id,id,'shared-topic','00000000-0000-0000-0000-000000000005',sent_at,'Guild B synthetic notice'
+from public.source_messages where record_ordinal=6;
+reset role;
 insert into public.questions(id,guild_id,message_id,intent)
 select '10000000-0000-0000-0000-000000000001',guild_id,id,'synthetic' from public.source_messages where record_ordinal=1;
 insert into public.assistant_runs(id,guild_id,actor_id,status,artifact_version,latency_ms,decision_summary)
@@ -52,12 +65,19 @@ select test.assert((select count(*)=2 from public.authors), 'authors scoped thro
 select test.assert((select count(*)=0 from public.questions), 'learner cannot see radar');
 select test.assert((select count(*)=1 from public.assistant_runs), 'learner only own runs');
 select test.assert((select count(*)=1 from public.run_events), 'events inherit run visibility');
+select test.assert((select count(*) = 1 from public.notices where topic_key = 'shared-topic'), 'learner sees only own-guild notice for a shared topic');
+select test.assert((select answer_excerpt = 'Guild A synthetic notice' from public.notices where topic_key = 'shared-topic'), 'learner cannot read the other guild notice body');
 do $$ begin
  begin update public.memberships set role='lab_coach'; raise exception 'self promotion unexpectedly allowed'; exception when insufficient_privilege then null; end;
  begin perform public.claim_question('10000000-0000-0000-0000-000000000001',0); raise exception 'learner claim unexpectedly allowed'; exception when insufficient_privilege then null; end;
  begin perform public.import_pack(repeat('b',64),'unauthorized','[]'); raise exception 'learner import unexpectedly allowed'; exception when insufficient_privilege then null; end;
  begin perform public.enqueue_radar('2026-09-18T05:00:00Z'); raise exception 'learner scheduler unexpectedly allowed'; exception when insufficient_privilege then null; end;
 end $$;
+reset role;
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000004',false);
+set role authenticated;
+select test.assert((select count(*) = 1 from public.notices where topic_key = 'shared-topic'), 'learner B sees only own-guild notice for a shared topic');
+select test.assert((select answer_excerpt = 'Guild B synthetic notice' from public.notices where topic_key = 'shared-topic'), 'learner B sees guild B notice body');
 reset role;
 select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-000000000002',false);
 set role authenticated;
