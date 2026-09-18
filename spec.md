@@ -149,4 +149,5 @@ guồn tham chiếuết thúc).
 | 17/09 - 18:30 | Khởi tạo Spec hoàn chỉnh theo template 8 phần chuẩn | Chốt đề tài Track B (Trợ lý Discord) dựa trên số liệu mining 1.092 tin nhắn |
 | 17/09 - 18:45 | Tích hợp 2 bộ câu hỏi khảo sát cho Học viên và Lab Coach | Chuẩn bị bằng chứng Chuẩn A theo hướng dẫn của ban tổ chức |
 | 17/09 - 20:50 | Hoàn thiện Golden Set 20 case & chạy đo lường kiểm thử Lượt 1 (95.0% Pass) | Hoàn thành toàn bộ nhiệm vụ AI Evaluation (Đậu Quang Ý) chuẩn bị cho CP3 |
+| 18/09 - 12:40 | Cập nhật kết quả thử nghiệm người dùng (Khối R6) & xuất bản demo-slides.pdf 6 trang | Hoàn thiện toàn bộ hồ sơ nghiệm thu CP5 |
 
