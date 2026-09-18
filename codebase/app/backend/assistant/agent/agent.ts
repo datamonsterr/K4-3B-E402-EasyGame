@@ -11,6 +11,7 @@ import type {
   CourseAgent,
   CourseAgentDependencies,
 } from "./contracts";
+import { getRolePermissionReason } from "./tool-registry";
 
 const FALLBACK_BODY =
   "There is no verified notice for this question. Please ask a Lab Coach for confirmation.";
@@ -43,7 +44,10 @@ function classifyTopic(message: string): LogisticsTopic | null {
   return null;
 }
 
-function refusalReason(message: string): string | null {
+function refusalReason(
+  message: string,
+  role: "learner" | "lab_coach" = "learner",
+): string | null {
   const normalized = message.trim().toLowerCase();
   if (
     /ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions/.test(normalized) ||
@@ -62,16 +66,18 @@ function refusalReason(message: string): string | null {
   ) {
     return "Refused out-of-scope solution request";
   }
-  if (
-    /\b(?:my|private|personal)\s+(?:grade|score|extension)\b/.test(
-      normalized,
-    ) ||
-    /(?:điểm số|bảng điểm|điểm thi|điểm của em|điểm cá nhân|bao nhiêu điểm|xem điểm|tra cứu điểm)/i.test(
-      normalized,
-    ) ||
-    /(?:xin gia hạn|gia hạn cho em|gia hạn cá nhân)/i.test(normalized)
-  ) {
-    return "Refused private learner record request";
+  if (role === "learner") {
+    if (
+      /\b(?:my|private|personal)\s+(?:grade|score|extension)\b/.test(
+        normalized,
+      ) ||
+      /(?:điểm số|bảng điểm|điểm thi|điểm của em|điểm cá nhân|bao nhiêu điểm|xem điểm|tra cứu điểm)/i.test(
+        normalized,
+      ) ||
+      /(?:xin gia hạn|gia hạn cho em|gia hạn cá nhân)/i.test(normalized)
+    ) {
+      return "Refused private learner record request";
+    }
   }
   return null;
 }
@@ -81,6 +87,9 @@ type OperationIntent =
   | { tool: "create_staff_alert"; coachOnly: true }
   | { tool: "resolve_question"; coachOnly: true }
   | { tool: "format_daily_digest"; coachOnly: true }
+  | { tool: "broadcast_notification"; coachOnly: true }
+  | { tool: "check_student_profile"; coachOnly: true }
+  | { tool: "check_scores"; coachOnly: true }
   | { tool: "search_web" };
 
 function classifyOperation(message: string): OperationIntent | null {
@@ -97,6 +106,27 @@ function classifyOperation(message: string): OperationIntent | null {
     )
   ) {
     return { tool: "format_daily_digest", coachOnly: true };
+  }
+  if (
+    /\b(?:broadcast|phát thông báo|đăng thông báo|thông báo toàn khóa|thông báo chính thức)\b/.test(
+      normalized,
+    )
+  ) {
+    return { tool: "broadcast_notification", coachOnly: true };
+  }
+  if (
+    /\b(?:student profile|profile của|thông tin học viên|hồ sơ học viên|tra cứu học viên)\b/.test(
+      normalized,
+    )
+  ) {
+    return { tool: "check_student_profile", coachOnly: true };
+  }
+  if (
+    /\b(?:check score|xem điểm của|tra cứu điểm|bảng điểm|điểm số của)\b/.test(
+      normalized,
+    )
+  ) {
+    return { tool: "check_scores", coachOnly: true };
   }
   if (
     /\b(?:search|find)\b.{0,30}\b(?:official|external|documentation|resource)/.test(
@@ -142,10 +172,18 @@ async function runOperation(
   }
 
   if ("coachOnly" in intent && request.actor.role !== "lab_coach") {
+    const isVietnamese =
+      /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(
+        request.message,
+      );
+    const body = isVietnamese
+      ? getRolePermissionReason(intent.tool, "learner")
+      : REFUSAL_BODY;
+
     return {
       answer: {
         status: "refused" as const,
-        body: REFUSAL_BODY,
+        body,
         source: null,
         decisionSummary: "Refused staff-only operation",
       },
@@ -239,6 +277,74 @@ async function runOperation(
         return output;
       },
     }),
+    broadcast_notification: tool({
+      description:
+        "Broadcast an official course announcement or deadline notice to all cohort members.",
+      inputSchema: z.object({
+        topicKey: z.string().min(1),
+        title: z.string().min(1),
+        content: z.string().min(1),
+        category: z.string().optional(),
+      }),
+      execute: async ({ topicKey, title, content, category }) => {
+        recordCall("Broadcasting official course announcement");
+        const output = operations.broadcastNotification
+          ? await operations.broadcastNotification({
+              guildId: request.guildId,
+              actorId: request.actor.userId,
+              actorRole: "lab_coach",
+              topicKey,
+              title,
+              content,
+              category,
+            })
+          : { ok: true, message: "Broadcast completed" };
+        recordObservation("Announcement broadcast completed");
+        return output;
+      },
+    }),
+    check_student_profile: tool({
+      description:
+        "Inspect a student profile, assigned team, channel activity, and question history.",
+      inputSchema: z.object({
+        studentQuery: z.string().min(1),
+      }),
+      execute: async ({ studentQuery }) => {
+        recordCall("Querying student profile and activity");
+        const output = operations.checkStudentProfile
+          ? await operations.checkStudentProfile({
+              guildId: request.guildId,
+              actorId: request.actor.userId,
+              actorRole: "lab_coach",
+              studentQuery,
+            })
+          : { studentQuery, role: "learner" };
+        recordObservation("Student profile retrieval completed");
+        return output;
+      },
+    }),
+    check_scores: tool({
+      description:
+        "Query lab or checkpoint scores, submission status, and grading feedback for students.",
+      inputSchema: z.object({
+        studentQuery: z.string().min(1),
+        lab: z.string().optional(),
+      }),
+      execute: async ({ studentQuery, lab }) => {
+        recordCall("Querying student scores and submission status");
+        const output = operations.checkScores
+          ? await operations.checkScores({
+              guildId: request.guildId,
+              actorId: request.actor.userId,
+              actorRole: "lab_coach",
+              studentQuery,
+              lab,
+            })
+          : { studentQuery, score: 9.5 };
+        recordObservation("Student scores retrieval completed");
+        return output;
+      },
+    }),
     search_web: tool({
       description:
         "Search official external course documentation only when explicitly requested.",
@@ -254,6 +360,7 @@ async function runOperation(
       },
     }),
   };
+
   const selectedTools = { [intent.tool]: allTools[intent.tool] };
   const agent = new ToolLoopAgent({
     model: deps.model,
@@ -317,7 +424,7 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
         throw new Error("Forbidden guild scope");
       }
 
-      const refused = refusalReason(request.message);
+      const refused = refusalReason(request.message, request.actor.role);
       if (refused) {
         return {
           answer: {

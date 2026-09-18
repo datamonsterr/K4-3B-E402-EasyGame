@@ -1,7 +1,42 @@
 {
   "version": "v0",
   "tools": [
-    { "name": "query_notices", "sideEffect": false },
-    { "name": "evaluate_radar", "sideEffect": false }
+    {
+      "name": "query_notices",
+      "sideEffect": false,
+      "roles": ["learner", "lab_coach"]
+    },
+    {
+      "name": "search_web",
+      "sideEffect": false,
+      "roles": ["learner", "lab_coach"]
+    },
+    {
+      "name": "evaluate_radar",
+      "sideEffect": false,
+      "roles": ["lab_coach", "learner"]
+    },
+    {
+      "name": "create_staff_alert",
+      "sideEffect": true,
+      "roles": ["lab_coach"]
+    },
+    { "name": "resolve_question", "sideEffect": true, "roles": ["lab_coach"] },
+    {
+      "name": "format_daily_digest",
+      "sideEffect": true,
+      "roles": ["lab_coach"]
+    },
+    {
+      "name": "broadcast_notification",
+      "sideEffect": true,
+      "roles": ["lab_coach"]
+    },
+    {
+      "name": "check_student_profile",
+      "sideEffect": false,
+      "roles": ["lab_coach"]
+    },
+    { "name": "check_scores", "sideEffect": false, "roles": ["lab_coach"] }
   ]
 }

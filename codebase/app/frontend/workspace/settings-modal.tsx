@@ -76,7 +76,9 @@ export function SettingsModal({
           {/* Active Role notice */}
           <div className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-white">Cohort Role</span>
+              <span className="text-xs font-medium text-white">
+                Cohort Role
+              </span>
               <span
                 className={`font-mono text-[10px] px-2 py-0.5 rounded border ${
                   currentRole === "lab_coach"
@@ -88,7 +90,8 @@ export function SettingsModal({
               </span>
             </div>
             <p className="text-[11px] text-[#71717a]">
-              Your role was configured during first sign-in onboarding and cannot be changed from settings.
+              Your role was configured during first sign-in onboarding and
+              cannot be changed from settings.
             </p>
           </div>
 

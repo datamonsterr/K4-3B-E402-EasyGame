@@ -39,6 +39,25 @@ describe("Gemini ReAct Agent Artifacts & Declarations", () => {
       expect(tool.parameters).toHaveProperty("type");
       expect(tool.parameters).toHaveProperty("properties");
     }
+
+    expect(names).toContain("broadcast_notification");
+    expect(names).toContain("check_student_profile");
+    expect(names).toContain("check_scores");
+  });
+
+  it("filters declarations by role when loading tools.yaml", () => {
+    const learnerTools = loadToolDeclarations("learner").map((t) => t.name);
+    const coachTools = loadToolDeclarations("lab_coach").map((t) => t.name);
+
+    expect(learnerTools).toContain("query_notices");
+    expect(learnerTools).toContain("search_web");
+    expect(learnerTools).not.toContain("broadcast_notification");
+    expect(learnerTools).not.toContain("check_student_profile");
+
+    expect(coachTools).toContain("broadcast_notification");
+    expect(coachTools).toContain("check_student_profile");
+    expect(coachTools).toContain("check_scores");
+    expect(coachTools).toContain("query_notices");
   });
 });
 

@@ -8,10 +8,7 @@ import { MessagesView } from "./messages-view";
 import { NoticesView } from "./notices-view";
 import { DigestView } from "./digest-view";
 import { FeedbackView } from "./feedback-view";
-<<<<<<< HEAD
-=======
 import { OnboardingModal } from "./onboarding-modal";
->>>>>>> 9ff0cf6 (feat(workspace): add first sign-in onboarding role lock and in-app messages triage with direct db reply)
 import { SettingsModal } from "./settings-modal";
 
 export type WorkspaceTab =
@@ -45,10 +42,6 @@ export function WorkspaceShell({
     initialUser ??
     (initialRole === "lab_coach" ? "@TA_MinhHai" : "@NguyenVanAn");
 
-<<<<<<< HEAD
-  const role = initialRole;
-  const userName = defaultUser;
-=======
   const [role, setRole] = useState<"learner" | "lab_coach">(() => {
     if (typeof window !== "undefined") {
       const storedRole = localStorage.getItem("eg_demo_role") as
@@ -65,13 +58,30 @@ export function WorkspaceShell({
     return defaultUser;
   });
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
->>>>>>> 9ff0cf6 (feat(workspace): add first sign-in onboarding role lock and in-app messages triage with direct db reply)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  function handleRoleChanged(newRole: "learner" | "lab_coach") {
+    setRole(newRole);
+    const newName = newRole === "lab_coach" ? "@TA_MinhHai" : "@NguyenVanAn";
+    setUserName(newName);
+    localStorage.setItem("eg_demo_role", newRole);
+    localStorage.setItem("eg_demo_name", newName);
+    if (typeof document !== "undefined") {
+      document.cookie = `eg_demo_role=${newRole}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `eg_demo_name=${encodeURIComponent(newName)}; path=/; max-age=86400; SameSite=Lax`;
+    }
+  }
 
   async function handleSignOut() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
+    localStorage.removeItem("eg_demo_role");
+    localStorage.removeItem("eg_demo_name");
+    if (typeof document !== "undefined") {
+      document.cookie = "eg_demo_role=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "eg_demo_name=; path=/; max-age=0; SameSite=Lax";
+    }
     router.push("/sign-in");
   }
 

@@ -50,11 +50,9 @@ test("full flow: demo sign-in, workspace navigation, grounded agent answering, a
   await page.getByRole("button", { name: /Official Notices/i }).click();
   await expect(page.getByText(/Lab 1 Submission/i)).toBeVisible();
 
-  // Test Navigation to Manage Channels View
-  await page.getByRole("button", { name: /Manage Channels/i }).click();
-  await expect(
-    page.getByRole("cell", { name: "#announcements" }),
-  ).toBeVisible();
+  // Test Navigation to Messages View
+  await page.getByRole("button", { name: /Messages/i }).click();
+  await expect(page.getByText(/Messages & Triage/i)).toBeVisible();
 
   // Test Navigation to 22:00 Daily Digest View
   await page.getByRole("button", { name: /22:00 Daily Digest/i }).click();
