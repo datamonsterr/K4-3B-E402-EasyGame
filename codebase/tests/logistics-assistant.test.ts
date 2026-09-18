@@ -66,4 +66,62 @@ describe("finalizeAnswer", () => {
       decisionSummary: "Candidate failed verified-evidence output gate",
     });
   });
+
+  it("allows exactly three lowercase-start sentences", () => {
+    const answer =
+      "Lab 1 is due Friday. submissions close at noon. late work is rejected.";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "answered",
+    );
+  });
+
+  it("rejects four lowercase-start sentences", () => {
+    const answer =
+      "Lab 1 is due Friday. submissions close at noon. late work is rejected. extensions need approval.";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
+  it("allows 300 supplementary Unicode code points when grounded exactly", () => {
+    const answer = "😀".repeat(300);
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "answered",
+    );
+  });
+
+  it("rejects 301 supplementary Unicode code points", () => {
+    const answer = "😀".repeat(301);
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
+  it("rejects whitespace-only output", () => {
+    const answer = "   \n\t";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
+  it("does not count decimal dots or common abbreviations as sentences", () => {
+    const answer = "Use v1.2 of the API. Dr. Smith approved it.";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "answered",
+    );
+  });
+
+  it("accepts a valid local pack source", () => {
+    const packNotice = {
+      ...notice,
+      source: {
+        kind: "pack" as const,
+        label: "Lab 1 pack notice",
+        href: "/sources/lab-1",
+      },
+    };
+    expect(finalizeAnswer(packNotice.answer, packNotice, guildId).status).toBe(
+      "answered",
+    );
+  });
 });
