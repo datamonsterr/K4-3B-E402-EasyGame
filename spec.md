@@ -184,10 +184,10 @@ Loại: [x] Tối ưu tính năng có sẵn [x] Tính năng mới
 ## §8. Phân công & Kế hoạch
 
 - **Bảng phân công trách nhiệm chi tiết:**
-  - **Phạm Thành Đạt (2A202602721):** Product Lead — Phụ trách định hình bài toán, viết hoàn thiện Spec (§1-§4), thiết kế khảo sát và nộp các mốc form CP1–CP6.
+  - **Phạm Thành Đạt (2A202602721):** Product Lead & Product manager — Xây dựng mock/prototype viết hoàn thiện Spec (§1-§4), hoàn thiện sản phẩm cuối cùng, thiết kế khảo sát và nộp các mốc form CP1–CP6.
   - **Đậu Quang Ý (2A202602661):** AI Engineer & Data Specialist — Phụ trách mining k4_messages.csv, xây dựng bộ Golden Set 20 case, thiết lập script kiểm thử định lượng và báo cáo đo lường eval.
-  - **Trần Mạnh Hùng (2A202602708):** Fullstack & Prompt Dev — Thiết kế prompt RAG từ thông báo chính thức, xử lý 4 lớp chỗ khó, UI Mock.
-  - **Nguyễn Tiến Đạt (2A202602970):** Prototype & Validation Lead — Xây dựng mock/prototype, quay video thao tác, thực hiện user validation R6 (CP5).
+  - **Trần Mạnh Hùng (2A202602708):** Backend & Prompt Dev — Thiết kế prompt RAG từ thông báo chính thức, xử lý 4 lớp chỗ khó, UI Mock.
+  - **Nguyễn Tiến Đạt (2A202602970):** PRD & Validation Lead & Database setup — Phụ trách định hình bài toán, xử lí dữ liệu, thực hiện host data và setup authetication sso, thực hiện user validation R6 (CP5).
 - **Willing Users (≥2 người ngoài nhóm đã liên hệ và sẵn sàng test ở CP5):**
 - **Kế hoạch Multi-prototype:** Dựng 2 phương án hiển thị phản hồi: (A) Trả lời trực tiếp trên kênh chung kèm mention, (B) Trả lời dạng thẻ trích dẫn thu gọn có nút bấm thao tác. Nhóm chọn phương án (B) vì tránh làm loãng màn hình chat chung.
 
@@ -200,6 +200,5 @@ Loại: [x] Tối ưu tính năng có sẵn [x] Tính năng mới
 | 17/09 - 18:30 | Khởi tạo Spec hoàn chỉnh theo template 8 phần chuẩn                                              | Chốt đề tài Track B (Trợ lý Discord) dựa trên số liệu mining 1.092 tin nhắn                      |
 | 17/09 - 18:45 | Tích hợp 2 bộ câu hỏi khảo sát cho Học viên và Lab Coach                                         | Chuẩn bị bằng chứng Chuẩn A theo hướng dẫn của ban tổ chức                                       |
 | 17/09 - 20:50 | Hoàn thiện Golden Set 20 case & chạy đo lường kiểm thử Lượt 1 (95.0% Pass)                       | Hoàn thành toàn bộ nhiệm vụ AI Evaluation (Đậu Quang Ý) chuẩn bị cho CP3                         |
-| 18/09 - 12:40 | Cập nhật kết quả thử nghiệm người dùng (Khối R6) & xuất bản demo-slides.pdf 6 trang              | Hoàn thiện toàn bộ hồ sơ nghiệm thu CP5                                                          |
 | 18/09 - 15:10 | Tổng hợp kế hoạch & kết quả khảo sát Chuẩn A từ 2 bộ phản hồi thực tế (10 Học viên, 4 Lab Coach) | Bổ sung phân tích định lượng, định tính, quotes thực tế & đối sánh chéo Chuẩn A - Chuẩn B vào §1 |
 | 18/09 - 15:15 | Cập nhật Bảng Impact ≥3 ứng viên & luận điểm quyết định chọn bằng dữ liệu khảo sát thực tế       | Chuẩn hóa số liệu định lượng cho các ứng viên chọn/loại theo bằng chứng thực nghiệm              |
