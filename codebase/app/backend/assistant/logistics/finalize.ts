@@ -41,31 +41,46 @@ function hasAuthenticSource(notice: VerifiedNotice): boolean {
   return LOCAL_SOURCE_URL.test(notice.source.href);
 }
 
+function isMaskedDot(body: string, index: number): boolean {
+  const previous = body[index - 1];
+  const next = body[index + 1];
+  if (previous && next && /\d/.test(previous) && /\d/.test(next)) {
+    return true;
+  }
+
+  let tokenStart = index;
+  while (tokenStart > 0 && /[A-Za-z.]/.test(body[tokenStart - 1])) {
+    tokenStart -= 1;
+  }
+  let tokenEnd = index;
+  while (tokenEnd + 1 < body.length && /[A-Za-z.]/.test(body[tokenEnd + 1])) {
+    tokenEnd += 1;
+  }
+  const token = body
+    .slice(tokenStart, tokenEnd + 1)
+    .toLowerCase()
+    .replace(/\.+$/, "");
+  return COMMON_ABBREVIATIONS.has(token);
+}
+
+function sanitizeSentenceDots(body: string): string {
+  return body
+    .split("")
+    .map((character, index) =>
+      character === "." && isMaskedDot(body, index) ? "" : character,
+    )
+    .join("");
+}
+
 function conservativeSentenceCount(body: string): number {
   let count = 0;
+  let lastBoundaryEnd = 0;
   for (const match of body.matchAll(/[.!?]+(?=\s|$)/g)) {
-    const punctuation = match[0];
     const index = match.index ?? 0;
-    if (punctuation.includes(".")) {
-      const previous = body[index - 1];
-      const next = body[index + punctuation.length];
-      if (previous && next && /\d/.test(previous) && /\d/.test(next)) {
-        continue;
-      }
-
-      let tokenStart = index - 1;
-      while (tokenStart >= 0 && /[A-Za-z.]/.test(body[tokenStart])) {
-        tokenStart -= 1;
-      }
-      const token = body
-        .slice(tokenStart + 1, index)
-        .toLowerCase()
-        .replace(/\.+$/, "");
-      if (COMMON_ABBREVIATIONS.has(token)) continue;
-    }
     count += 1;
+    lastBoundaryEnd = index + match[0].length;
   }
-  return count;
+  return count + (body.slice(lastBoundaryEnd).trim() ? 1 : 0);
 }
 
 function fallback(): AnswerLogisticsResult {
@@ -85,11 +100,17 @@ export function finalizeAnswer(
 ): AnswerLogisticsResult {
   const body = typeof candidate === "string" ? candidate.trim() : "";
   const answer = typeof notice.answer === "string" ? notice.answer.trim() : "";
-  const sentences = body
-    ? [...new Intl.Segmenter("en", { granularity: "sentence" }).segment(body)]
-        .length
+  const sanitizedBody = body ? sanitizeSentenceDots(body) : "";
+  const sentences = sanitizedBody
+    ? [
+        ...new Intl.Segmenter("en", { granularity: "sentence" }).segment(
+          sanitizedBody,
+        ),
+      ].length
     : 0;
-  const conservativeSentences = body ? conservativeSentenceCount(body) : 0;
+  const conservativeSentences = sanitizedBody
+    ? conservativeSentenceCount(sanitizedBody)
+    : 0;
 
   if (
     notice.guildId !== authorizedGuildId ||

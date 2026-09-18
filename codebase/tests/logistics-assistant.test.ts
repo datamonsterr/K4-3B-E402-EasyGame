@@ -67,7 +67,7 @@ describe("finalizeAnswer", () => {
     });
   });
 
-  it("allows exactly three lowercase-start sentences", () => {
+  it("allows exactly three lowercase-start sentences with final punctuation", () => {
     const answer =
       "Lab 1 is due Friday. submissions close at noon. late work is rejected.";
     expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
@@ -75,9 +75,25 @@ describe("finalizeAnswer", () => {
     );
   });
 
-  it("rejects four lowercase-start sentences", () => {
+  it("rejects four lowercase-start sentences with final punctuation", () => {
     const answer =
       "Lab 1 is due Friday. submissions close at noon. late work is rejected. extensions need approval.";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
+  it("allows exactly three lowercase-start sentences without final punctuation", () => {
+    const answer =
+      "Lab 1 is due Friday. submissions close at noon. late work is rejected";
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "answered",
+    );
+  });
+
+  it("rejects four lowercase-start sentences without final punctuation", () => {
+    const answer =
+      "Lab 1 is due Friday. submissions close at noon. late work is rejected. extensions need approval";
     expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
       "fallback",
     );
@@ -105,7 +121,8 @@ describe("finalizeAnswer", () => {
   });
 
   it("does not count decimal dots or common abbreviations as sentences", () => {
-    const answer = "Use v1.2 of the API. Dr. Smith approved it.";
+    const answer =
+      "Use v1.2 of the API. Dr. Smith approved it. Submit by Friday.";
     expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
       "answered",
     );
