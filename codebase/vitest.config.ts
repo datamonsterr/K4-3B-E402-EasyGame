@@ -20,4 +20,11 @@ if (existsSync(envPath)) {
   }
 }
 
-export default defineConfig({ test: { include: ["tests/**/*.test.ts"] } });
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": resolve(process.cwd(), "app"),
+    },
+  },
+  test: { include: ["tests/**/*.test.ts"] },
+});

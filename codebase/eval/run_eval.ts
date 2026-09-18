@@ -4,7 +4,7 @@ import {
   runAgent,
   type AgentResult,
   validateOutputConstraints,
-} from "../src/backend/assistant";
+} from "../app/backend/assistant";
 
 export interface EvalCase {
   id: string;

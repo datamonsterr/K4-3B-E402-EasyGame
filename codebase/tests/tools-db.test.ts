@@ -21,9 +21,9 @@ import {
   type ResolveQuestionOutput,
   type DailyDigestOutput,
   type SearchWebOutput,
-} from "../src/backend/tools";
-import type { Notice } from "../src/backend/assistant";
-import type { RadarQuestion } from "../src/backend/radar";
+} from "../app/backend/tools";
+import type { Notice } from "../app/backend/assistant";
+import type { RadarQuestion } from "../app/backend/radar";
 
 describe("Database & Tool Integration", () => {
   beforeEach(async () => {

@@ -22,4 +22,4 @@ npm run test:db # Docker required; creates and removes an isolated PostgreSQL co
 
 See the [schema](../docs/architecture/DATABASE_SCHEMA.md), [architecture](../docs/architecture/NEXTJS_FOUNDATION_DESIGN.md), and [use-case coverage review](../docs/usecases/IMPLEMENTATION_COVERAGE.md).
 
-`src/frontend` owns interactive views. `src/backend` owns domain interfaces, tools, artifacts, auth and database adapters. `src/app` composes them. The root repository `index.html` is canonical; `public/mock` is generated. Archived Python tools are reference-only.
+`app/frontend` owns interactive views. `app/backend` owns domain interfaces, tools, artifacts, auth and database adapters. `app/` composes them. The root repository `index.html` is canonical; `public/mock` is generated. Archived Python tools are reference-only.

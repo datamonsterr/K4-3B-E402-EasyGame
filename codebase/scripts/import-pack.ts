@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
-import { parsePack, importPack } from "../src/backend/ingestion";
-import { SupabasePackStore } from "../src/backend/database/pack-store";
+import { parsePack, importPack } from "../app/backend/ingestion";
+import { SupabasePackStore } from "../app/backend/database/pack-store";
 const args = process.argv.slice(2);
 const write = args.includes("--write");
 const file = args.find((a) => !a.startsWith("--"));

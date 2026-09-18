@@ -4,7 +4,7 @@ import {
   loadSystemInstruction,
   loadToolDeclarations,
   validateOutputConstraints,
-} from "../src/backend/assistant";
+} from "../app/backend/assistant";
 import {
   loadEvalCases,
   evaluateSingleCase,

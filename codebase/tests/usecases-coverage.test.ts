@@ -4,13 +4,13 @@ import {
   runAgent,
   deliverAssistantReply,
   type Notice,
-} from "../src/backend/assistant";
+} from "../app/backend/assistant";
 import {
   evaluateRadar,
   evaluateStuckStudent,
   executeWithRateLimitRetry,
   type RadarQuestion,
-} from "../src/backend/radar";
+} from "../app/backend/radar";
 import {
   executeResolveQuestion,
   executeFormatDailyDigest,
@@ -18,7 +18,7 @@ import {
   clearStaffAlerts,
   getStaffAlerts,
   resetMemoryQuestions,
-} from "../src/backend/tools";
+} from "../app/backend/tools";
 
 describe("Use Case Coverage: UC-B1-01 (Verify and Answer Logistics Query)", () => {
   const verifiedNoticeOriginal: Notice = {
