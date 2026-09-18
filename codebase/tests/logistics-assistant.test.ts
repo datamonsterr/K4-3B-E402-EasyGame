@@ -144,6 +144,35 @@ describe("finalizeAnswer", () => {
     );
   });
 
+  it.each([
+    "Use etc. submissions close at noon. late work is rejected. extensions need approval.",
+    "Ask Dr. then submit by noon. late work is rejected. extensions need approval.",
+  ])("fails closed for an ambiguous abbreviation dot in %s", (answer) => {
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "fallback",
+    );
+  });
+
+  it.each(["Dr", "Mr", "Mrs", "Ms", "Prof"])(
+    "masks %s. only when it precedes a capitalized name",
+    (title) => {
+      const answer = `${title}. Smith approved it. Submit by noon. Extensions need approval.`;
+      expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+        "answered",
+      );
+    },
+  );
+
+  it.each([
+    "Read No. 3. Submit by noon. Extensions need approval.",
+    "The lab starts at 9 a.m. Submit by noon. Extensions need approval.",
+    "The lab starts at 9 p.m. Submit by noon. Extensions need approval.",
+  ])("masks only the internal abbreviation dots in %s", (answer) => {
+    expect(finalizeAnswer(answer, { ...notice, answer }, guildId).status).toBe(
+      "answered",
+    );
+  });
+
   it("accepts a valid local pack source", () => {
     const packNotice = {
       ...notice,

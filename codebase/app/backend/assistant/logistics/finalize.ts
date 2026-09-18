@@ -11,28 +11,7 @@ const ANSWERED_SUMMARY = "Selected latest verified guild notice";
 
 const DISCORD_JUMP_URL = /^https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+$/;
 const LOCAL_SOURCE_URL = /^\/sources\/[A-Za-z0-9-]+$/;
-const COMMON_ABBREVIATIONS = new Set([
-  "approx",
-  "a.m",
-  "dept",
-  "dr",
-  "e.g",
-  "etc",
-  "fig",
-  "i.e",
-  "inc",
-  "jr",
-  "mr",
-  "mrs",
-  "ms",
-  "no",
-  "p.m",
-  "prof",
-  "sr",
-  "st",
-  "u.s",
-  "vs",
-]);
+const HONORIFICS = new Set(["dr", "mr", "mrs", "ms", "prof"]);
 
 function hasAuthenticSource(notice: VerifiedNotice): boolean {
   if (notice.source.kind === "discord") {
@@ -41,8 +20,6 @@ function hasAuthenticSource(notice: VerifiedNotice): boolean {
   return LOCAL_SOURCE_URL.test(notice.source.href);
 }
 
-const HONORIFICS = new Set(["dr", "mr", "mrs", "ms", "prof"]);
-
 function isMaskedDot(body: string, index: number): boolean {
   const previous = body[index - 1];
   const next = body[index + 1];
@@ -50,42 +27,27 @@ function isMaskedDot(body: string, index: number): boolean {
     return true;
   }
 
-  let tokenStart = index;
-  while (tokenStart > 0 && /[A-Za-z.]/.test(body[tokenStart - 1])) {
-    tokenStart -= 1;
-  }
-  let tokenEnd = index;
-  while (tokenEnd + 1 < body.length && /[A-Za-z.]/.test(body[tokenEnd + 1])) {
-    tokenEnd += 1;
-  }
-  const token = body
-    .slice(tokenStart, tokenEnd + 1)
-    .toLowerCase()
-    .replace(/\.+$/, "");
-
-  if (!COMMON_ABBREVIATIONS.has(token)) {
-    return false;
-  }
-
-  if (index < tokenEnd) {
+  const timeAbbreviation = body.slice(index - 1, index + 3).toLowerCase();
+  const beforeTimeAbbreviation = body[index - 2];
+  if (
+    (timeAbbreviation === "a.m." || timeAbbreviation === "p.m.") &&
+    (!beforeTimeAbbreviation || !/\p{L}/u.test(beforeTimeAbbreviation))
+  ) {
     return true;
   }
 
-  const remainder = body.slice(index + 1).trimStart();
+  const token = body.slice(0, index).match(/\p{L}+$/u)?.[0].toLowerCase();
+  const remainder = body.slice(index + 1);
 
   if (token === "no") {
-    return /^\d/.test(remainder);
+    return /^[ \t]+\d/.test(remainder);
   }
 
-  if (HONORIFICS.has(token)) {
-    return true;
+  if (token && HONORIFICS.has(token)) {
+    return /^[ \t]+\p{Lu}[\p{L}\p{M}'’-]*/u.test(remainder);
   }
 
-  if (remainder.length === 0 || /^\p{Lu}/u.test(remainder)) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 
 function sanitizeSentenceDots(body: string): string {
