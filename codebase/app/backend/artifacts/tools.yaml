@@ -1,0 +1,94 @@
+tools:
+  - name: query_notices
+    description: "Query verified announcements, official notices, and deadlines for a given course topic or assignment within a guild."
+    parameters:
+      type: object
+      properties:
+        topicKey:
+          type: string
+          description: "Key or identifier of the lab, assignment, or course topic (e.g. lab-1, attendance, cvat)."
+        guildId:
+          type: string
+          description: "Guild or cohort identifier."
+      required:
+        - topicKey
+        - guildId
+
+  - name: evaluate_radar
+    description: "Scan active questions and calculate SLA breach tiers (Tier 1 soft warning at 120 minutes, Tier 2 urgent escalation at 240 minutes)."
+    parameters:
+      type: object
+      properties:
+        guildId:
+          type: string
+          description: "Guild or cohort identifier."
+        now:
+          type: string
+          description: "Current ISO timestamp for evaluating elapsed duration."
+      required:
+        - guildId
+
+  - name: create_staff_alert
+    description: "Queue a private, staff-only alert into #ta-radar for dropped questions, ungrounded inquiries, or student roadblocks."
+    parameters:
+      type: object
+      properties:
+        guildId:
+          type: string
+          description: "Guild or cohort identifier."
+        questionId:
+          type: string
+          description: "ID of the student question to escalate."
+        tier:
+          type: integer
+          enum: [1, 2]
+          description: "Alert tier: 1 for soft warning (>2h), 2 for urgent escalation (>4h)."
+        summary:
+          type: string
+          description: "Brief summary of the inquiry or roadblock."
+      required:
+        - guildId
+        - questionId
+        - tier
+        - summary
+
+  - name: resolve_question
+    description: "Mark an open or answered ticket as resolved by an authorized Lab Coach with optimistic concurrency protection."
+    parameters:
+      type: object
+      properties:
+        questionId:
+          type: string
+          description: "ID of the question ticket to resolve."
+        expectedVersion:
+          type: integer
+          description: "Current version number for optimistic locking."
+      required:
+        - questionId
+        - expectedVersion
+
+  - name: format_daily_digest
+    description: "Generate a consolidated 22:00 clean daily digest grouping top confused topics with zero token corruption."
+    parameters:
+      type: object
+      properties:
+        guildId:
+          type: string
+          description: "Guild or cohort identifier."
+        localDate:
+          type: string
+          description: "Local calendar date formatted as YYYY-MM-DD."
+      required:
+        - guildId
+        - localDate
+
+  - name: search_web
+    description: "Search external web sources or official course documentation repository (e.g. VinUni AI 20K materials)."
+    parameters:
+      type: object
+      properties:
+        query:
+          type: string
+          description: "Search query string or keywords to find external documentation and resources."
+      required:
+        - query

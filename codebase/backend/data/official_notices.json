@@ -47,7 +47,16 @@
     "notice_ts": "2026-09-16T18:00:00+07:00",
     "discord_link": "https://discord.com/channels/1234567890/9876543210/1003",
     "message_url": "https://discord.com/channels/1234567890/9876543210/1003",
-    "tags": ["checkpoint", "cp1", "cp2", "cp3", "cp4", "cp5", "cp6", "deadline"],
+    "tags": [
+      "checkpoint",
+      "cp1",
+      "cp2",
+      "cp3",
+      "cp4",
+      "cp5",
+      "cp6",
+      "deadline"
+    ],
     "content": "Lịch nộp các mốc Checkpoint của ca 3B: CP1 lúc 19:30 ngày 16/9; CP2 lúc 21:00 18/09; CP3 lúc 21:00 19/09; CP4 lúc 21:00 20/09; CP5 lúc 13:00 21/09 (Live Prototype); CP6 lúc 21:00 22/09/2026 (Final Pitch)."
   },
   {

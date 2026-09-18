@@ -9,7 +9,7 @@
 | **Created By:** | Pham Thanh Dat (Lead BA) |
 | **Date Created:** | 2026-09-17 |
 | **Last Updated By:** | Pham Thanh Dat (Lead BA) |
-| **Date Last Updated:** | 2026-09-17 |
+| **Date Last Updated:** | 2026-09-18 |
 
 ---
 
@@ -33,14 +33,14 @@
 | Step | Initiator | Action |
 |:---:|:---:|---|
 | 1 | **Background Message Scanner** | Triggers the scheduled 4-hour SLA audit cycle across all public discussion channels. |
-| 2 | **Background Message Scanner** | Inspects all incoming messages containing inquiry indicators (`?`, question phrases) posted within the preceding 24 hours. |
+| 2 | **Background Message Scanner** | Discovers recent question candidates and reloads every older inquiry that remains unresolved. |
 | 3 | **Background Message Scanner** | Identifies student inquiries where `reply_count == 0` and thread message count has remained inactive for $\ge 4.0$ hours. |
 | 4 | **Background Message Scanner** | Extracts the message metadata: sender username, post timestamp, elapsed wait time, excerpt snippet, and message URL. |
 | 5 | **LLM Digest Summarizer** | Compiles the overdue question items into a prioritized list, grouping identical inquiries into unified themes. |
 | 6 | **Discord Notification Service** | Dispatches an Urgent Escalation Embed Card to the private `#ta-radar` channel, mentioning `@On-duty Lab Coach`. |
 | 7 | **On-duty Lab Coach (TA)** | Views the notification in `#ta-radar`, reads the one-line inquiry summary, and clicks the direct deep link. |
 | 8 | **Discord Messaging Platform** | Navigates the On-duty Lab Coach directly to the target student's unanswered message in the public channel. |
-| 9 | **On-duty Lab Coach (TA)** | Posts the authoritative answer in the thread, resolving the student's roadblock. |
+| 9 | **On-duty Lab Coach (TA)** | Posts the authoritative answer and explicitly records resolution after confirming that the roadblock is resolved. |
 
 ---
 
@@ -62,12 +62,12 @@
   3. Under NO circumstances does the system send private unsolicited Direct Messages (DMs) to the student.
   4. The flow resumes at Step 7 of the Normal Course.
 
-#### UC-B2-01.AC.3: Automatic Thread Resolution Detection and Radar Eviction
-* **Trigger:** While an inquiry is listed in `#ta-radar`, an instructor, peer student, or bot assistant posts a response in the thread, or the original student marks the thread with a resolution reaction (`:white_check_mark:`).
+#### UC-B2-01.AC.3: Record Reply Without Premature Resolution
+* **Trigger:** While an inquiry is listed in `#ta-radar`, an instructor, peer Learner, or bot assistant posts a response in the thread.
 * **Execution Flow:**
-  1. The Background Message Scanner detects the incoming event and updates the inquiry state to `RESOLVED`.
-  2. The system updates the embed card in `#ta-radar` to display a struck-through green status: `[RESOLVED by @TA_MinhHai]`.
-  3. The item is removed from the active overdue queue and logged into the "Resolved Today" column of the Daily Digest.
+  1. The Background Message Scanner detects the incoming reply and updates the inquiry state to `ANSWERED`.
+  2. The system continues tracking the inquiry until a Lab Coach explicitly resolves it or the original Learner confirms resolution.
+  3. After authorized resolution, the system removes the item from the active queue and records the resolution event in the Daily Digest.
 
 ---
 
@@ -105,19 +105,19 @@
 | **Includes:** | None |
 | **Special Requirements:** | 1. **Deep Link Formatting:** All message links must conform strictly to `https://discord.com/channels/{guild_id}/{channel_id}/{message_id}`.<br>2. **Anti-Hallucination Filtering:** Bot messages, system welcome messages, and casual conversational banter (`"hello"`, `"thanks"`) must never be counted as unanswered inquiries.<br>3. **Privacy and Ethics:** Student names and question metrics must remain within `#ta-radar` and must never be exposed publicly as performance rankings. |
 | **Assumptions:** | 1. Teaching assistants monitor `#ta-radar` during designated shift hours.<br>2. Public discussion channels maintain standard message retention periods. |
-| **Notes and Issues:** | `[TBD-02]` Determine whether to add an interactive Discord button (`[Claimed by Me]`) on the radar card so TAs can signal to colleagues when an inquiry is actively being addressed. |
+| **Notes and Issues:** | `[TBD-02] | Product Owner | Before live integration | Decide whether to expose a Claimed by Me action.`<br>`[ISSUE-03] | BA | Open | Split scheduled detection, Lab Coach resolution, and daily digest publication into separate user-goal use cases.` |
 
 ---
 
-## 5. Quality Validation Checklist (20/20 Standard)
+## 5. Quality Validation Checklist (Review Findings)
 
 | # | Item | Status | Verification Note |
 |:---:|---|:---:|---|
 | **C1** | Name follows "verb + object", active voice | ✅ | *"Scan and Generate Unanswered Question Radar"* uses active verb + object. |
-| **C2** | User-goal level (passes coffee-break test) | ✅ | TA completes the triage and review task in a single session; passes coffee-break test. |
+| **C2** | User-goal level (passes coffee-break test) | ❌ | Combines periodic detection, staff triage, resolution, and a later daily digest across multiple sessions. Split is required. |
 | **C3** | Unique ID following naming convention | ✅ | `UC-B2-01` follows strict project naming hierarchy. |
-| **C4** | Exactly 1 primary actor + 1 clear goal | ✅ | Primary Actor: On-duty Lab Coach (TA); Goal: Triage and clear overdue inquiries. |
-| **C5** | System boundary clearly delineated | ✅ | Governs interaction between TA, Discord, Background Scanner, and Digest Generator. |
+| **C4** | Exactly 1 primary actor + 1 clear goal | ❌ | The scheduler initiates scanning while the Lab Coach initiates triage; the document contains multiple goals. |
+| **C5** | System boundary clearly delineated | ⚠️ | Scanner, notification delivery, Lab Coach resolution, and digest publication need separate use-case seams. |
 | **C6** | Specific actor role, not generic "User" | ✅ | Uses "On-duty Lab Coach (TA)" throughout. |
 | **C7** | Description covers Why + What + Outcome | ✅ | Answers why (prevent dropped questions), what (scan & report), and outcome (triage via links). |
 | **C8** | Frequency of Use is quantified | ✅ | Quantified: 15-minute periodic scan, daily digest at 22:00. |
@@ -125,11 +125,11 @@
 | **C10** | Postconditions verify success state & changes | ✅ | Validates queue status, digest card generation, and absence of corrupted strings. |
 | **C11** | Preconditions distinct from Assumptions | ✅ | Operating prerequisites clearly separated from behavioral assumptions. |
 | **C12** | Numbered list, one action per step | ✅ | Strict sequential numbering 1 through 9. |
-| **C13** | Alternates Actor / System with clear subjects | ✅ | Cleanly alternates between Scanner, LLM, Discord, and Lab Coach. |
+| **C13** | Alternates Actor / System with clear subjects | ⚠️ | Subjects are explicit, but several internal-system steps describe implementation rather than actor/system interaction. |
 | **C14** | NO embedded if/else/loop in Normal Course | ✅ | Happy path is strictly linear; branches reside in ACs and Exceptions. |
-| **C15** | Flow runs from trigger to postcondition | ✅ | Runs unbroken from 4h trigger to successful TA resolution in the thread. |
+| **C15** | Flow runs from trigger to postcondition | ❌ | The Normal Course does not reach the separate 22:00 digest postcondition. |
 | **C16** | ACs specify "at step N" + triggering condition | ✅ | AC.1, AC.2, AC.3 explicitly reference step numbers and conditions. |
 | **C17** | Exceptions define trigger + response + final state | ✅ | EX.1, EX.2, EX.3 specify condition, recovery logic, and ending state. |
 | **C18** | Common failure modes covered | ✅ | Covers rate limits, empty backlog, and string corruption anomalies. |
-| **C19** | Includes point to existing valid UCs | ✅ | Marked `None` appropriately (user-goal sea-level UC). |
-| **C20** | Special Requirements are non-functional | ✅ | Details deep link format, privacy constraints, and anti-hallucination rules. |
+| **C19** | Includes point to existing valid UCs | ⚠️ | `None` hides reusable alert-delivery and digest goals that should become separate use cases. |
+| **C20** | Special Requirements are non-functional | ⚠️ | Privacy is non-functional; inquiry classification and deep-link generation are functional rules. |

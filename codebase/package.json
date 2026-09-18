@@ -1,0 +1,61 @@
+{
+  "name": "easygame",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0 <27"
+  },
+  "scripts": {
+    "dev": "npm run sync:mock && next dev",
+    "build": "npm run sync:mock && next build",
+    "start": "next start",
+    "sync:mock": "node scripts/sync-mock.mjs",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "eval": "tsx eval/run_eval.ts",
+    "test:e2e": "playwright test",
+    "test:db": "node scripts/test-db.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run verify:structure",
+    "verify:structure": "node scripts/verify-structure.mjs",
+    "data:inspect": "tsx scripts/import-pack.ts",
+    "data:import": "tsx scripts/import-pack.ts --write",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > app/backend/database/schema.types.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.116.0",
+    "csv-parse": "7.0.2",
+    "js-yaml": "^5.4.2",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "26.6.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.5",
+    "postcss": "^8.5.28",
+    "prettier": "3.9.8",
+    "supabase": "2.117.0",
+    "tailwindcss": "^4.3.3",
+    "tsx": "4.23.13",
+    "typescript": "6.0.3",
+    "vercel": "^50.41.0",
+    "vitest": "5.0.1"
+  },
+  "type": "module"
+}

@@ -1,0 +1,50 @@
+name: Database migrations
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Supabase environment to migrate
+        type: choice
+        options: [preview, production]
+        required: true
+        default: preview
+permissions:
+  contents: read
+concurrency:
+  group: database-${{ inputs.target }}
+  cancel-in-progress: false
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+  migrate:
+    needs: checks
+    if: inputs.target != 'production' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.target }}
+    defaults:
+      run:
+        working-directory: codebase
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: codebase/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Validate migration environment
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo 'Set SUPABASE_ACCESS_TOKEN.'; exit 1; }
+          test -n "$SUPABASE_PROJECT_REF" || { echo 'Set SUPABASE_PROJECT_REF.'; exit 1; }
+          test -n "$SUPABASE_DB_PASSWORD" || { echo 'Set SUPABASE_DB_PASSWORD.'; exit 1; }
+      - run: pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      - run: pnpm exec supabase db push --dry-run
+      - run: pnpm exec supabase db push --yes

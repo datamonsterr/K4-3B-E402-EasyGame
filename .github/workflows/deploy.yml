@@ -1,0 +1,59 @@
+name: Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        options: [preview, production]
+        default: preview
+        required: true
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  checks:
+    uses: ./.github/workflows/ci.yml
+  deploy:
+    needs: checks
+    if: github.ref == 'refs/heads/main' || inputs.target == 'preview'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.event_name == 'push' && 'production' || inputs.target }}
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      DEPLOY_TARGET: ${{ github.event_name == 'push' && 'production' || inputs.target }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: codebase/pnpm-lock.yaml
+      - name: Check deployment credentials
+        run: |
+          test -n "$VERCEL_TOKEN" || { echo 'Set VERCEL_TOKEN in the selected GitHub environment.'; exit 1; }
+          test -n "$VERCEL_ORG_ID" || { echo 'Set VERCEL_ORG_ID in the selected GitHub environment.'; exit 1; }
+          test -n "$VERCEL_PROJECT_ID" || { echo 'Set VERCEL_PROJECT_ID in the selected GitHub environment.'; exit 1; }
+      - run: pnpm install --frozen-lockfile
+        working-directory: codebase
+      # Run Vercel from the Git root. The linked Vercel project's Root Directory is codebase.
+      - name: Pull project configuration
+        run: codebase/node_modules/.bin/vercel pull --yes --environment="$DEPLOY_TARGET" --token="$VERCEL_TOKEN"
+      - name: Build and deploy the tested revision
+        run: |
+          if [ "$DEPLOY_TARGET" = production ]; then
+            codebase/node_modules/.bin/vercel build --prod --token="$VERCEL_TOKEN"
+            codebase/node_modules/.bin/vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          else
+            codebase/node_modules/.bin/vercel build --token="$VERCEL_TOKEN"
+            codebase/node_modules/.bin/vercel deploy --prebuilt --token="$VERCEL_TOKEN"
+          fi

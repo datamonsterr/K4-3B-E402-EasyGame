@@ -1,0 +1,14 @@
+.next
+node_modules
+public/mock
+app/backend/artifacts/reference
+assets
+index.html
+package-lock.json
+pnpm-lock.yaml
+playwright-report
+test-results
+next-env.d.ts
+supabase/.temp
+supabase/.branches
+eval/eval_report.json
