@@ -38,9 +38,9 @@
 | 4 | **Background Message Scanner** | Extracts the message metadata: sender username, post timestamp, elapsed wait time, excerpt snippet, and message URL. |
 | 5 | **LLM Digest Summarizer** | Compiles the overdue question items into a prioritized list, grouping identical inquiries into unified themes. |
 | 6 | **Discord Notification Service** | Dispatches an Urgent Escalation Embed Card to the private `#ta-radar` channel, mentioning `@On-duty Lab Coach`. |
-| 7 | **On-duty Lab Coach (TA)** | Views the notification in `#ta-radar`, reads the one-line inquiry summary, and clicks the direct deep link. |
-| 8 | **Discord Messaging Platform** | Navigates the On-duty Lab Coach directly to the target student's unanswered message in the public channel. |
-| 9 | **On-duty Lab Coach (TA)** | Posts the authoritative answer and explicitly records resolution after confirming that the roadblock is resolved. |
+| 7 | **On-duty Lab Coach (TA)** | Views the notification in `#ta-radar`, reads the one-line inquiry summary, and clicks the message action button (**"Xem tin nhắn 💬"**). |
+| 8 | **Application Shell** | Navigates the On-duty Lab Coach directly to the in-app **Messages** view ([UC-B2-02](UC-B2-02_triage-and-reply-in-messages-view.md)) with the target message focused (no raw JSON displayed), while providing a secondary jump link to real Discord. |
+| 9 | **On-duty Lab Coach (TA)** | Posts the authoritative answer directly via the In-App Direct Reply composer (or opens real Discord) and explicitly records resolution after confirming that the roadblock is resolved. |
 
 ---
 

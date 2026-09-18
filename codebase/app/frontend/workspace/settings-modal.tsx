@@ -6,6 +6,7 @@ export interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentRole: "learner" | "lab_coach";
+  onRoleChanged?: (newRole: "learner" | "lab_coach") => void;
 }
 
 type HealthResult = {
@@ -42,67 +43,90 @@ export function SettingsModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
-      <div className="w-full max-w-md bg-[#121215] border border-[#27272a] rounded-xl p-5 shadow-2xl space-y-4 text-[#e4e4e7]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+    >
+      <div className="w-full max-w-md rounded-xl border border-[#27272a] bg-[#121215] p-5 shadow-2xl text-white space-y-4">
         <div className="flex items-center justify-between border-b border-[#27272a] pb-3">
           <div>
-            <h3 className="font-semibold text-sm text-white">
-              System configuration
-            </h3>
-            <p className="text-[11px] text-[#71717a] font-mono">
-              Server-managed provider and membership
+            <h2 id="settings-title" className="text-sm font-semibold">
+              Workspace Settings
+            </h2>
+            <p className="text-xs text-[#71717a]">
+              Active role:{" "}
+              <span className="font-mono text-cyan-400">
+                {currentRole === "lab_coach" ? "Lab Coach" : "Learner"}
+              </span>{" "}
+              (Locked)
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#71717a] hover:text-white"
+            className="text-[#71717a] hover:text-white text-xs"
           >
             ✕
           </button>
         </div>
 
-        <div className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 space-y-1">
-          <p className="text-[10px] uppercase tracking-wider text-[#71717a]">
-            Verified role
-          </p>
-          <p className="text-sm text-white">
-            {currentRole === "lab_coach" ? "Lab Coach" : "Learner"}
-          </p>
-          <p className="text-[11px] text-[#a1a1aa]">
-            Roles are provisioned by trusted operators and cannot be changed
-            here.
-          </p>
-        </div>
-
-        <div className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 space-y-3">
-          <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#71717a]">
-              AI provider
-            </p>
-            <p className="text-[11px] text-[#a1a1aa]">
-              API keys and model IDs are read from server environment variables.
-              They are never accepted from or stored in this browser.
+        <div className="space-y-3">
+          {/* Active Role notice */}
+          <div className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-white">Cohort Role</span>
+              <span
+                className={`font-mono text-[10px] px-2 py-0.5 rounded border ${
+                  currentRole === "lab_coach"
+                    ? "bg-amber-950 text-amber-400 border-amber-800"
+                    : "bg-cyan-950 text-cyan-400 border-cyan-800"
+                }`}
+              >
+                🔒 Locked
+              </span>
+            </div>
+            <p className="text-[11px] text-[#71717a]">
+              Your role was configured during first sign-in onboarding and cannot be changed from settings.
             </p>
           </div>
+
+          {/* Provider Health Check */}
+          <div className="rounded-lg border border-[#27272a] bg-[#18181b] p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium">Provider Health</span>
+              <button
+                type="button"
+                onClick={testConnection}
+                disabled={testing}
+                className="rounded border border-cyan-800 bg-cyan-950 px-2.5 py-1 text-xs text-cyan-300 hover:bg-cyan-900 disabled:opacity-50"
+              >
+                {testing ? "Testing…" : "Probe LLM"}
+              </button>
+            </div>
+            {result && (
+              <p
+                className={`text-xs font-mono ${
+                  result.ok ? "text-emerald-400" : "text-red-400"
+                }`}
+              >
+                {result.ok
+                  ? `✓ Connected (${result.latencyMs ?? 0}ms)`
+                  : `✗ ${result.error ?? "Failed"}`}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
           <button
             type="button"
-            onClick={testConnection}
-            disabled={testing}
-            className="h-8 px-3 rounded-md bg-cyan-950 border border-cyan-800 text-cyan-400 text-xs disabled:opacity-50"
+            onClick={onClose}
+            className="rounded bg-[#27272a] px-3 py-1.5 text-xs hover:bg-[#3f3f46]"
           >
-            {testing ? "Testing…" : "Test server connection"}
+            Close
           </button>
-          {result && (
-            <p
-              role="status"
-              className={`text-xs font-mono ${result.ok ? "text-emerald-400" : "text-red-400"}`}
-            >
-              {result.ok
-                ? `${result.provider} / ${result.model} (${result.latencyMs} ms)`
-                : (result.error ?? "Provider probe failed")}
-            </p>
-          )}
         </div>
       </div>
     </div>

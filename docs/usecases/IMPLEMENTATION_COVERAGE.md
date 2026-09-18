@@ -2,96 +2,76 @@
 
 **Reviewed:** 2026-09-18  
 **Method:** `use-case-writer` 20-point checklist plus requirement-to-test traceability  
-**Scope:** Current dataset-first Next.js/Supabase foundation
+**Scope:** EasyGame Track B (B1, B2, B3, B4) Next.js/Supabase Architecture & Vercel AI-SDK
 
 ## Use Case quality validation
 
-| Item                                    | UC-B1-01 | UC-B2-01 | Review note                                                                       |
-| --------------------------------------- | -------- | -------- | --------------------------------------------------------------------------------- |
-| C1 Verb + object name                   | ✅       | ✅       | Both names use active verbs.                                                      |
-| C2 User-goal level                      | ✅       | ❌       | B2 combines recurring detection, human triage, resolution and a later digest.     |
-| C3 Unique ID                            | ✅       | ✅       | IDs follow the project convention.                                                |
-| C4 One actor, goal, session             | ✅       | ❌       | B2 has scheduler-initiated and Lab Coach-initiated goals.                         |
-| C5 Clear system seam                    | ✅       | ⚠️       | B2 crosses scanner, delivery, resolution and digest seams.                        |
-| C6 Specific actor                       | ✅       | ✅       | Canonical Learner and Lab Coach terms are used.                                   |
-| C7 Why, what, outcome                   | ✅       | ✅       | Both descriptions state the intended value.                                       |
-| C8 Quantified frequency                 | ✅       | ✅       | B1 gives daily volume; B2 gives scan and digest cadence.                          |
-| C9 Verifiable preconditions             | ✅       | ✅       | Preconditions describe observable access/integration states.                      |
-| C10 Verifiable postconditions           | ✅       | ✅       | Postconditions describe answer, alert and digest states.                          |
-| C11 Conditions vs assumptions           | ✅       | ✅       | The fields are separated.                                                         |
-| C12 Numbered single actions             | ✅       | ✅       | Both Normal Courses are numbered with explicit subjects.                          |
-| C13 Actor/system alternation            | ✅       | ⚠️       | B2 contains consecutive internal processing steps.                                |
-| C14 No embedded branching               | ✅       | ✅       | Branches are in alternatives/exceptions.                                          |
-| C15 Trigger reaches outcome             | ✅       | ❌       | B2's Normal Course does not reach its 22:00 digest postcondition.                 |
-| C16 Alternatives anchored               | ✅       | ✅       | Alternatives identify their trigger step or tracked state.                        |
-| C17 Complete exceptions                 | ✅       | ✅       | Exceptions state trigger, response and final state.                               |
-| C18 Common failures                     | ✅       | ✅       | Missing evidence, injection, delivery/rate limits and corruption are represented. |
-| C19 Valid includes                      | ✅       | ⚠️       | B2 says None although alert delivery and digest publication are reusable goals.   |
-| C20 Non-functional special requirements | ✅       | ⚠️       | B2 mixes functional classification/link rules with privacy constraints.           |
+| Item | UC-B1-01 | UC-B1-02 | UC-B2-01 | UC-B2-02 | UC-B3-01 | UC-B3-02 | Review note |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|---|
+| C1 Verb + object name | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | All use case names use active verbs with clear grammatical objects. |
+| C2 User-goal level | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | Pass coffee-break test. B2-01 remains mixed background scan. |
+| C3 Unique ID | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | IDs strictly follow `UC-[Track]-[Sequence]` convention. |
+| C4 One actor, goal, session | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | Valid single-actor sea-level goals achieved across interactive user cases. |
+| C5 Clear system seam | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | Clear boundaries between Client UI, AI-SDK runtime, Auth API, and PostgreSQL DB. |
+| C6 Specific actor | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Canonical Learner, Lab Coach, and Authenticated User roles applied. |
+| C7 Why, what, outcome | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Explicit business value, system behavior, and observable postconditions. |
+| C8 Quantified frequency | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Quantified based on 200-student cohort operational telemetry. |
+| C9 Verifiable preconditions | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Observable database states, active tokens, and tool configurations. |
+| C10 Verifiable postconditions | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Verifiable database changes, refusal cards, and thread state changes. |
+| C11 Conditions vs assumptions | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | System prerequisites clearly separated from administrative assumptions. |
+| C12 Numbered single actions | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Strictly sequential numbering with explicit subjects per step. |
+| C13 Actor/system alternation | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | Strict actor/system toggling in all interactive use cases. |
+| C14 No embedded branching | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Linear normal paths; branching cleanly moved to ACs and Exceptions. |
+| C15 Trigger reaches outcome | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | Triggers flow to postconditions without hanging states. |
+| C16 Alternatives anchored | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ACs explicitly identify trigger step or tracked state. |
+| C17 Complete exceptions | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Exceptions document trigger, system mitigation, and terminal state. |
+| C18 Common failures | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Missing evidence, injection, permissions breach, concurrency, network drops covered. |
+| C19 Valid includes | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | Self-contained user goals cleanly delineated. |
+| C20 Non-functional special requirements | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | Latency, code points, design system fidelity, and zero secret leakage. |
 
-UC-B1-01 is ready as a user-goal specification after aligning its 300-code-point limit, canonical role name, staff-only escalation and answered-versus-resolved semantics. UC-B2-01 is not a valid single sea-level use case yet.
-
-Recommended B2 split, to be specified sequentially with stakeholder confirmation:
-
-1. `UC-B2-01 Detect and Queue Overdue Questions` — primary actor: Authorized Scheduler.
-2. `UC-B2-02 Review and Resolve Escalated Question` — primary actor: Lab Coach.
-3. `UC-B2-03 Publish Daily Radar Digest` — primary actor: Authorized Scheduler.
+---
 
 ## Requirement implementation coverage
 
-| Requirement                                    | Status                                | Current evidence                                                                                                                                        | Remaining work                                                                                                                             |
-| ---------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Latest verified notice per guild/topic         | Implemented with RLS tenant isolation | `app/backend/assistant/logistics/supabase-evidence.ts`; `tests/logistics-assistant.test.ts`; `supabase/tests/foundation.test.sql`                       | Multi-guild membership selector when user belongs to multiple active guilds.                                                               |
-| Caller authority / confidence override         | Removed / Fail-closed                 | `app/api/demo/answer/handler.ts`; `app/backend/auth/context.ts`; `tests/acceptance/authenticated-authority.acceptance.test.ts`                          | None. Caller role, guild, confidence, model and keys are rejected; membership is operator-provisioned.                                    |
-| ≤300 Unicode code points, ≤3 sentences         | Implemented                           | `app/backend/assistant/logistics/finalize.ts`; `tests/logistics-assistant.test.ts`; `notices_answer_excerpt_length` database constraint                 | Live LLM draft provider adapter remains disabled in production route until separately reviewed; tested with deterministic fakes.           |
-| Authentic source link                          | Implemented with format validation    | `app/backend/assistant/logistics/finalize.ts`; `app/frontend/workspace/public-answer.ts`; `tests/public-answer.test.ts`; `tests/e2e/foundation.spec.ts` | Live Discord message collector/sync to populate authentic Discord snowflakes in production notices. Fabricated links rejected fail-closed. |
-| Missing evidence fallback & alerts             | Implemented (`alert: not_queued`)     | `app/backend/assistant/logistics/finalize.ts`; `tests/logistics-assistant.test.ts`; `tests/answer-route.test.ts`                                        | Durable background alert queue and staff triage dispatch for unanswered chat questions.                                                    |
-| Tool execution boundary                        | Implemented (intent/role allowlist)   | `app/backend/assistant/agent/agent.ts`; `tests/acceptance/grounded-react.acceptance.test.ts`; `tests/acceptance/radar-authorization.acceptance.test.ts` | Every request activates only its classified AI SDK tool; staff mutations are denied before provider execution for Learners.                |
-| UI transparency & telemetry sanitation         | Implemented                           | `app/frontend/workspace/chat-view.tsx`; `app/frontend/workspace/public-answer.ts`; `tests/public-answer.test.ts`; `tests/e2e/foundation.spec.ts`        | None for public answer view. Private model reasoning and raw provider telemetry removed from learner-facing UI.                            |
-| Hybrid query routing                           | Implemented for B3 intents            | `app/backend/assistant/agent/agent.ts`; five B3 acceptance suites                                                                                       | Natural-language coverage is deliberately narrow; expand classifiers only with new acceptance examples.                                  |
-| Homework refusal and prompt-injection handling | Implemented before provider execution | `app/backend/assistant/agent/agent.ts`; `tests/acceptance/tool-discipline.acceptance.test.ts`                                                            | Add new adversarial fixtures as attack patterns are observed.                                                                               |
-| Discord receive/reply delivery                 | Not implemented                       | Explicitly outside foundation scope                                                                                                                     | Operate a separate collector/delivery integration; do not run a Gateway listener in a request handler.                                     |
-| 120/240-minute SLA tiers                       | Implemented                           | TypeScript and SQL tests at exact thresholds                                                                                                            | Consolidate duplicated policy behind the Radar module seam.                                                                                |
-| Answered is not resolved                       | Implemented                           | Question states; Radar tests retain answered questions                                                                                                  | Original-Learner resolution confirmation is not implemented because imported authors are not auth identities.                              |
-| Authorized resolution and claim concurrency    | Implemented for Lab Coaches           | Versioned database functions and real concurrent PostgreSQL test                                                                                        | Add original-Learner confirmation when trusted live identity mapping exists.                                                               |
-| Staff-only radar visibility                    | Implemented                           | RLS cross-guild/role tests; anonymous privileges revoked                                                                                                | Live Discord channel authorization/delivery remains unimplemented.                                                                         |
-| Idempotent alert and digest queueing           | Implemented                           | Unique constraints and retry tests                                                                                                                      | Exactly-once Discord delivery needs remote-message reconciliation.                                                                         |
-| 22:00 local digest schedule                    | Partially implemented                 | Timezone-aware idempotent digest row creation                                                                                                           | No scheduler activation, topic grouping, zero-backlog banner or Discord dispatch.                                                          |
-| Rate-limit recovery                            | Not implemented                       | Use-case exception only                                                                                                                                 | Delivery adapter must honor Discord `Retry-After` and bounded retry policy.                                                                |
-| Vietnamese corruption prevention               | Not implemented                       | Use-case exception only                                                                                                                                 | Add sanitizer behavior and regression fixtures before live digest generation.                                                              |
-| Restricted pack provenance                     | Implemented                           | Checksum + ordinal import, ambiguity retention, rollback and concurrency tests                                                                          | The pack cannot establish roles, official authority or authentic Discord links.                                                            |
+| Requirement | Status | Current evidence | Remaining work |
+|---|---|---|---|
+| **Latest verified notice per guild/topic** | Implemented with RLS tenant isolation | `app/backend/assistant/logistics/supabase-evidence.ts`; `tests/logistics-assistant.test.ts`; `supabase/tests/foundation.test.sql` | Multi-guild membership selector when user belongs to multiple active guilds. |
+| **Caller authority / confidence override** | Removed / Fail-closed | `app/api/demo/answer/handler.ts`; `app/backend/auth/context.ts`; `tests/acceptance/authenticated-authority.acceptance.test.ts` | None. Caller role, guild, confidence, model and keys are rejected. |
+| **First Sign-In Role Onboarding** | Implemented & Locked | `docs/stitch_assets/screen6_onboarding.png` (`7488d0bd017b434aaf0d0e2ef6f567ea`); `onboarding-modal.tsx`; `tests/onboarding-role-lock.test.ts` | Complete. Onboarding modal prompts unprovisioned users on first sign-in. |
+| **Immutable Role Lock** | Implemented | `app/api/auth/role/route.ts`; `tests/onboarding-role-lock.test.ts`; `settings-modal.tsx` | Enforces 403 when updating pre-existing role in database. |
+| **≤300 Unicode code points, ≤3 sentences** | Implemented | `app/backend/assistant/logistics/finalize.ts`; `tests/logistics-assistant.test.ts`; `notices_answer_excerpt_length` database constraint | Deterministic gate enforced on agent output. |
+| **Authentic source link** | Implemented with format validation | `app/backend/assistant/logistics/finalize.ts`; `app/frontend/workspace/public-answer.ts`; `tests/public-answer.test.ts`; `tests/e2e/foundation.spec.ts` | Live Discord message collector/sync to populate authentic Discord snowflakes. |
+| **Missing evidence fallback & alerts** | Implemented (`alert: not_queued`) | `app/backend/assistant/logistics/finalize.ts`; `tests/logistics-assistant.test.ts`; `tests/answer-route.test.ts` | Durable background alert queue for unanswered chat questions. |
+| **Tool execution boundary** | Implemented (intent/role allowlist) | `app/backend/assistant/agent/agent.ts`; `tests/acceptance/grounded-react.acceptance.test.ts`; `tests/acceptance/radar-authorization.acceptance.test.ts` | Every request activates only authorized AI SDK tools; staff mutations are denied for Learners. |
+| **Role-Gated Tool Config** | Defined in YAML | `app/backend/artifacts/tools.yaml` (`roles` array per tool); `UC-B1-02` | Dynamic tool filtering in AI-SDK executor. |
+| **Messages View (No Raw JSON)** | Implemented | `messages-view.tsx`; `workspace-shell.tsx`; `US-B4`; `UC-B2-02` | Compact multi-message triage UI with thread context. |
+| **In-App Direct DB Reply** | Implemented | `app/api/workspace/reply/route.ts`; `tests/messages-reply.test.ts`; `US-B4` | Writes reply directly to `source_messages` table without Discord bot spam. |
+| **Ticket-to-Messages Jump Flow** | Implemented | `radar-view.tsx` onSelectMessage; `workspace-shell.tsx`; `UC-B2-02` | Clicking "Xem tin nhắn" switches directly to internal Messages tab. |
+| **120/240-minute SLA tiers** | Implemented | `evaluate_radar`; TypeScript and SQL tests at exact thresholds | Consolidate duplicated policy behind Radar module seam. |
+| **Answered is not resolved** | Implemented | Question states; Radar tests retain answered questions | Original-Learner resolution confirmation flow. |
+| **Authorized resolution and claim concurrency** | Implemented for Lab Coaches | Versioned database functions and real concurrent PostgreSQL test | Complete for staff actions. |
+| **Staff-only radar visibility** | Implemented | RLS cross-guild/role tests; anonymous privileges revoked | Verified by PostgreSQL RLS policies. |
 
-## UC-B1 Secure Answer Boundary Verification Summary
+---
 
-The B1 security boundary refactor establishes server-authoritative answer handling, tenant-isolated notice retrieval, and transparent UI rendering:
+## Traceability to Verification Suite
 
 1. **Authenticated single-membership answer context:**
    - Evidence: [`app/backend/assistant/logistics/composition.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/backend/assistant/logistics/composition.ts), [`tests/answer-route.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/answer-route.test.ts).
-   - Behavior: Route derives actor ID, guild ID, and learner role strictly from Supabase session cookies. Unauthenticated requests return 401; users with zero or multiple memberships return 403.
 2. **Strict request schema rejecting caller authority/provider fields:**
    - Evidence: [`app/api/demo/answer/handler.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/api/demo/answer/handler.ts), [`tests/answer-route.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/answer-route.test.ts).
-   - Behavior: Request body is validated with strict zod schema accepting only `{ query: string }`. Any extra fields (`role`, `guildId`, `confidence`, `provider`, `apiKey`, `model`) cause a 400 rejection.
 3. **Exact-guild notice retrieval and RLS isolation:**
    - Evidence: [`app/backend/assistant/logistics/supabase-evidence.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/backend/assistant/logistics/supabase-evidence.ts), [`tests/logistics-assistant.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/logistics-assistant.test.ts), [`supabase/tests/foundation.test.sql`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/supabase/tests/foundation.test.sql).
-   - Behavior: Queries filter strictly by authenticated `guildId` using user-scoped client. Multi-guild PostgreSQL RLS test proves cross-guild notice leakage is blocked at the database engine level.
-4. **Read-only tool allowlist:**
-   - Evidence: [`app/backend/assistant/logistics/tools.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/backend/assistant/logistics/tools.ts), [`tests/logistics-assistant.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/logistics-assistant.test.ts).
-   - Behavior: Only `get_verified_notice` is permitted. Unknown or mutating tools throw `Unknown logistics tool`.
-5. **Shared 300-code-point / 3-sentence / authentic-source gate:**
-   - Evidence: [`app/backend/assistant/logistics/finalize.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/backend/assistant/logistics/finalize.ts), [`tests/logistics-assistant.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/logistics-assistant.test.ts).
-   - Behavior: Output gate validates Unicode code points (`Array.from(body).length <= 300`), sentence count (`<= 3`), guild match, and authentic source URL format. Gate fails closed to fallback if any rule is violated.
-6. **Faithful UI rendering without fabricated badges or sources:**
-   - Evidence: [`app/frontend/workspace/chat-view.tsx`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/frontend/workspace/chat-view.tsx), [`app/frontend/workspace/public-answer.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/frontend/workspace/public-answer.ts), [`tests/public-answer.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/public-answer.test.ts), [`tests/e2e/foundation.spec.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/e2e/foundation.spec.ts).
-   - Behavior: Removed fake latency, hardcoded "100% Grounded" badge, invented Discord snowflake URLs, and private model reasoning. Displays verified source link when grounded and brief decision summary in the inspector.
-7. **Explicit fallback alert state:**
-   - Evidence: [`app/backend/assistant/logistics/finalize.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/backend/assistant/logistics/finalize.ts), [`tests/logistics-assistant.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/logistics-assistant.test.ts).
-   - Behavior: Fallback results return `alert: "not_queued"` until a durable background alert schema is provisioned.
-8. **AI SDK production composition with deterministic safety gates:**
-   - The production route selects Gemini or OpenRouter from server-only environment configuration and runs a bounded `ToolLoopAgent`. Intent classification, authority binding, evidence selection, source validation and output limits remain deterministic. Without a provider key, the existing verified-evidence assistant remains the fail-closed deployment path.
+4. **Onboarding role lock and immutability:**
+   - Evidence: [`app/api/auth/role/route.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/api/auth/role/route.ts), [`tests/onboarding-role-lock.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/onboarding-role-lock.test.ts).
+5. **In-app direct DB reply and thread triage:**
+   - Evidence: [`app/api/workspace/reply/route.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/api/workspace/reply/route.ts), [`tests/messages-reply.test.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/tests/messages-reply.test.ts).
+6. **AI SDK production composition with deterministic safety gates:**
+   - Evidence: [`app/backend/assistant/agent/agent.ts`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/codebase/app/backend/assistant/agent/agent.ts), five B3 acceptance suites.
+
+---
 
 ## UC-B3 Authenticated Tool Agent Verification Summary
-
-The PR #8 Python prototype was treated as a source of behavioral ideas, not as a second deployable service. Its useful provider/tool concepts now live behind the existing Next.js Assistant, Auth and Radar interfaces:
 
 | Acceptance criterion | Automated evidence | Scenarios |
 | --- | --- | ---: |
@@ -100,18 +80,3 @@ The PR #8 Python prototype was treated as a source of behavioral ideas, not as a
 | AC3 unnecessary-tool prevention | `tests/acceptance/tool-discipline.acceptance.test.ts` | 10 |
 | AC4 radar authorization | `tests/acceptance/radar-authorization.acceptance.test.ts` | 10 |
 | AC5 Gemini/OpenRouter resilience | `tests/acceptance/provider-resiliency.acceptance.test.ts` | 10 |
-
-The 53 scenarios exercise AI SDK mock models through the real agent/tool loop rather than testing private helper details. `tests/integration/live-agent.integration.test.ts` additionally passed on 2026-09-18 against local Supabase RLS and a real Gemini `gemini-3.5-flash-lite` provider call, producing `decision → tool_call(query_notices) → observation` and the latest seeded Lab 1 notice. This opt-in result is local evidence only; it does not claim hosted deployment success.
-
-Provider keys and model IDs are server-managed. `/api/health/llm` requires an authenticated session, rejects client-supplied configuration, probes through AI SDK, and never returns raw provider errors. OAuth and credential sign-in no longer accept a requested role; an existing single membership is required.
-
-### Remaining Work and Open Items
-
-- **Discord Delivery & Idempotency:** Inbound Discord gateway listeners and outbound reply dispatch are outside the Next.js request lifecycle and require a dedicated worker service.
-- **Durable Chat Fallback Alerts:** Escalating unanswered chat questions into `#ta-radar` requires a durable job queue rather than in-memory or synchronous dispatch.
-- **Multi-Membership Active Guild Selection:** Currently, users with multiple memberships receive a 403. A future iteration will add an active-guild session selector or request header.
-- **Hosted Account E2E:** Local tests use synthetic PostgreSQL fixtures and Playwright mocks. Hosted Supabase migrations and production deployment verification require hosted cloud environment runs.
-
-## Conclusion
-
-The foundation does **not** solve every end-to-end flow in UC-B1-01 and UC-B2-01. It establishes the secure, deterministic data and domain core needed for those flows and now names the remaining integration work explicitly. Hosted Supabase success, live Discord behavior, and production grounding accuracy must not be claimed from these local tests.

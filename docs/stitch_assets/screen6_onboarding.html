@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EasyGame // Verified Logistics AI - Role Selection</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed": "#001f25",
+            "surface": "#131315",
+            "inverse-on-surface": "#313032",
+            "tertiary": "#c8c6c9",
+            "secondary-container": "#00cbe6",
+            "on-secondary": "#00363e",
+            "on-tertiary": "#303033",
+            "on-primary-fixed": "#001f26",
+            "inverse-primary": "#00687a",
+            "background": "#131315",
+            "surface-container-high": "#2a2a2c",
+            "primary-container": "#06b6d4",
+            "on-primary-fixed-variant": "#004e5c",
+            "on-primary": "#003640",
+            "surface-container-lowest": "#0e0e10",
+            "secondary": "#5de6ff",
+            "inverse-surface": "#e5e1e4",
+            "surface-bright": "#39393b",
+            "on-tertiary-fixed-variant": "#47464a",
+            "on-secondary-container": "#00515d",
+            "surface-tint": "#4cd7f6",
+            "on-error": "#690005",
+            "on-surface-variant": "#bcc9cd",
+            "error-container": "#93000a",
+            "on-tertiary-fixed": "#1b1b1e",
+            "secondary-fixed": "#a2eeff",
+            "on-error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#004e5a",
+            "tertiary-fixed-dim": "#c8c6c9",
+            "tertiary-fixed": "#e4e1e5",
+            "on-primary-container": "#00424f",
+            "surface-container": "#201f22",
+            "primary-fixed-dim": "#4cd7f6",
+            "secondary-fixed-dim": "#2fd9f4",
+            "primary-fixed": "#acedff",
+            "on-background": "#e5e1e4",
+            "outline-variant": "#3d494c",
+            "surface-variant": "#353437",
+            "surface-dim": "#131315",
+            "surface-container-highest": "#353437",
+            "primary": "#4cd7f6",
+            "surface-container-low": "#1c1b1d",
+            "on-tertiary-container": "#3c3c3f",
+            "tertiary-container": "#a8a6a9",
+            "error": "#ffb4ab",
+            "outline": "#869397",
+            "on-surface": "#e5e1e4"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-md": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1rem",
+            "gutter": "1rem",
+            "margin": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Geist"],
+            "code-sm": ["JetBrains Mono"],
+            "label-md": ["JetBrains Mono"],
+            "body-sm": ["Geist"],
+            "code-lg": ["JetBrains Mono"],
+            "code-md": ["JetBrains Mono"],
+            "body-md": ["Geist"],
+            "display": ["Geist"],
+            "body-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-md": ["Geist"],
+            "headline-lg-mobile": ["Geist"]
+          },
+          "fontSize": {
+            "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "code-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "400" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "code-lg": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "code-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 16px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    .grid-matrix-bg {
+      background-size: 24px 24px;
+      background-image: radial-gradient(circle, #27272a 1px, transparent 1px);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 20px -2px rgba(6, 182, 212, 0.25);
+    }
+    .glow-amber {
+      box-shadow: 0 0 20px -2px rgba(245, 158, 11, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-[#09090b] text-on-surface font-body-md antialiased min-h-screen flex flex-col justify-between selection:bg-primary selection:text-on-primary relative overflow-x-hidden">
+<!-- Background Technical Grid Layer -->
+<div class="fixed inset-0 grid-matrix-bg opacity-30 pointer-events-none z-0"></div>
+<div class="fixed top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-primary/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
+<!-- Top Minimal Operational Status Bar -->
+<header class="relative z-10 w-full border-b border-[#27272a] bg-[#121215]/90 backdrop-blur-md px-4 sm:px-8 py-2">
+<div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between text-code-sm font-code-sm text-on-surface-variant gap-2">
+<!-- Cluster & System Info -->
+<div class="flex items-center gap-3">
+<span class="inline-flex items-center gap-1.5 font-label-md text-label-md text-[#22d3ee]">
+<span class="w-2 h-2 rounded-full bg-[#06b6d4] animate-pulse"></span>
+          auth-cluster-sg01 // Session Active
+        </span>
+<span class="text-outline-variant">|</span>
+<span class="inline-flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-primary">lock</span>
+          Zero Trust Onboarding
+        </span>
+</div>
+<!-- Revision & Telemetry Latency -->
+<div class="flex items-center gap-4 font-code-sm">
+<span class="bg-[#18181b] px-2 py-0.5 rounded border border-[#27272a] text-on-surface">Build 2025.2-rev4</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-[#22d3ee]">sensors</span>
+          latency: <span class="text-[#22d3ee]">14ms</span>
+</span>
+<span class="bg-[#06b6d4]/10 border border-[#06b6d4]/30 text-[#22d3ee] px-1.5 py-0.5 rounded-sm text-label-sm font-label-sm">ENCRYPTED</span>
+</div>
+</div>
+</header>
+<!-- Main Canvas Container -->
+<main class="relative z-10 flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-10 max-w-6xl mx-auto w-full">
+<!-- Central Brand & Subsystem Lockup -->
+<div class="text-center mb-8 flex flex-col items-center">
+<div class="inline-flex items-center gap-2 mb-3">
+<span class="text-headline-lg font-headline-lg text-on-surface tracking-tight font-semibold">EasyGame</span>
+<span class="bg-[#06b6d4]/15 border border-[#06b6d4]/40 text-[#22d3ee] text-label-sm font-label-md px-2 py-0.5 rounded-full font-medium">Track B</span>
+<span class="text-xs font-code-sm text-outline px-1.5 py-0.5 bg-[#18181b] rounded border border-[#27272a]">v2.4</span>
+</div>
+<div class="text-code-sm font-code-sm text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+<span>Verified Logistics AI</span>
+<span class="text-[#06b6d4]">•</span>
+<span>Identity & Tool Provisioning</span>
+</div>
+</div>
+<!-- Main Heading & Subtitle -->
+<div class="text-center max-w-2xl mb-8">
+<h1 class="text-display font-display text-on-surface tracking-tight mb-2">Select Your Cohort Role</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed mb-5">
+        First-time onboarding: Choose your role to calibrate your AI assistant permissions and workspace tools. Once confirmed, this role cannot be changed.
+      </p>
+<!-- Prominent RBAC Notice Banner -->
+<div class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-[#18181b] border border-[#f59e0b]/40 text-[#f59e0b] text-code-sm font-code-sm text-left shadow-lg">
+<span class="material-symbols-outlined text-[18px] text-[#f59e0b] flex-shrink-0">warning</span>
+<span class="leading-tight">
+<strong class="font-medium text-[#f59e0b]">Permanent Provisioning:</strong> Strict Role-Based Access Control (RBAC). Role switching is permanently disabled once selected.
+        </span>
+</div>
+</div>
+<!-- Role Selection Cards Grid (Side-by-Side) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+<!-- Card 1: Learner (Left) -->
+<div class="group relative flex flex-col justify-between bg-[#121215] border border-[#27272a] hover:border-[#06b6d4] rounded-xl p-6 sm:p-7 transition-all duration-200 hover:shadow-2xl hover:glow-cyan bg-gradient-to-b from-[#18181b]/50 to-[#121215]">
+<!-- Subtle Top Accents -->
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-transparent group-hover:bg-[#06b6d4] transition-colors rounded-t-xl"></div>
+<div>
+<!-- Header Area with Badges -->
+<div class="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-[#27272a]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#06b6d4] shadow-[0_0_8px_#06b6d4]"></span>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold">Learner</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-code-sm text-code-sm bg-[#18181b] text-[#22d3ee] border border-[#06b6d4]/30 px-2 py-0.5 rounded">ROLE_LEARNER</span>
+</div>
+</div>
+<!-- User Archetype & Role Brief -->
+<div class="mb-4">
+<div class="text-label-md font-label-md text-primary mb-1 uppercase tracking-wider">Student / Course Participant</div>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+              Ask questions about lab deadlines, attendance policies, and submission rules with 100% grounded source citations.
+            </p>
+</div>
+<!-- Access Level Chip -->
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#18181b] border border-[#27272a] text-code-sm font-code-sm text-on-surface mb-6">
+<span class="material-symbols-outlined text-[14px] text-[#06b6d4]">visibility</span>
+<span>Read & Inquire Access</span>
+</div>
+<!-- Feature Checklist -->
+<div class="space-y-3 mb-8">
+<div class="text-label-sm font-label-sm uppercase tracking-wider text-outline mb-2">CALIBRATED CAPABILITIES</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#06b6d4] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Logistics Q&A with authentic citations</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#06b6d4] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Read-only official notices & pinned announcements</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#06b6d4] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Public channel question tracking</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#06b6d4] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Personal thought process & RAG inspector</span>
+</div>
+</div>
+</div>
+<!-- Call to Action Section -->
+<div class="pt-4 border-t border-[#27272a]/60">
+<button class="w-full flex items-center justify-center gap-2 bg-[#06b6d4] hover:bg-[#22d3ee] active:scale-[0.99] text-[#09090b] font-body-md font-medium py-2.5 px-4 rounded-md transition-all duration-150 shadow-[0_0_15px_-3px_rgba(6,182,212,0.4)] hover:shadow-[0_0_20px_0px_rgba(6,182,212,0.6)]" type="button">
+<span>Continue as Learner</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+<p class="text-center text-code-sm font-code-sm text-on-surface-variant mt-2">
+            Calibrates standard inquiry view
+          </p>
+</div>
+</div>
+<!-- Card 2: Lab Coach / TA (Right) -->
+<div class="group relative flex flex-col justify-between bg-[#121215] border border-[#27272a] hover:border-[#f59e0b] rounded-xl p-6 sm:p-7 transition-all duration-200 hover:shadow-2xl hover:glow-amber bg-gradient-to-b from-[#18181b]/50 to-[#121215]">
+<!-- Subtle Top Accents -->
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-transparent group-hover:bg-[#f59e0b] transition-colors rounded-t-xl"></div>
+<div>
+<!-- Header Area with Badges -->
+<div class="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-[#27272a]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_8px_#f59e0b]"></span>
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold">Lab Coach / TA</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-code-sm text-code-sm bg-[#18181b] text-[#f59e0b] border border-[#f59e0b]/30 px-2 py-0.5 rounded">ROLE_COACH</span>
+</div>
+</div>
+<!-- User Archetype & Role Brief -->
+<div class="mb-4">
+<div class="text-label-md font-label-md text-[#f59e0b] mb-1 uppercase tracking-wider">Teaching Assistant / Lab Lead</div>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+              Triage overdue student questions, inspect SLA breach radar, reply directly to messages, look up student profiles, and broadcast cohort announcements.
+            </p>
+</div>
+<!-- Access Level Chip -->
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#18181b] border border-[#27272a] text-code-sm font-code-sm text-[#f59e0b] mb-6">
+<span class="material-symbols-outlined text-[14px] text-[#f59e0b]">admin_panel_settings</span>
+<span>Elevated Triage & Dispatch</span>
+</div>
+<!-- Feature Checklist -->
+<div class="space-y-3 mb-8">
+<div class="text-label-sm font-label-sm uppercase tracking-wider text-outline mb-2">CALIBRATED CAPABILITIES</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Tickets & SLA Radar (2h/4h alerts & automated escalation)</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] mt-0.5 flex-shrink-0">check_circle</span>
+<span>In-app Messages triage & direct DB reply</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Student profiles & scores lookup</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] mt-0.5 flex-shrink-0">check_circle</span>
+<span>Broadcast official notifications to #announcements</span>
+</div>
+<div class="flex items-start gap-2.5 text-body-sm font-body-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] mt-0.5 flex-shrink-0">check_circle</span>
+<span>22:00 Clean Daily Digest generation</span>
+</div>
+</div>
+</div>
+<!-- Call to Action Section -->
+<div class="pt-4 border-t border-[#27272a]/60">
+<button class="w-full flex items-center justify-center gap-2 bg-[#f59e0b] hover:bg-[#fbbf24] active:scale-[0.99] text-[#09090b] font-body-md font-medium py-2.5 px-4 rounded-md transition-all duration-150 shadow-[0_0_15px_-3px_rgba(245,158,11,0.4)] hover:shadow-[0_0_20px_0px_rgba(245,158,11,0.6)]" type="button">
+<span>Continue as Lab Coach</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+<p class="text-center text-code-sm font-code-sm text-on-surface-variant mt-2">
+            Unlocks SLA radar and cohort triage tools
+          </p>
+</div>
+</div>
+</div>
+<!-- Security Infrastructure Trust Bar -->
+<div class="mt-10 w-full max-w-5xl">
+<div class="bg-[#121215] border border-[#27272a] rounded-lg px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-code-sm font-code-sm">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-primary">shield</span>
+<span>Protected by PostgreSQL Row-Level Security and strict role-based tool gating.</span>
+</div>
+<div class="flex items-center gap-3 text-outline text-label-sm font-label-sm">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#06b6d4]"></span>
+            DB_SCHEMA_V4
+          </span>
+<span class="text-outline-variant">•</span>
+<span>SHA-256 SESSION ANCHOR</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Technical Footer Navigation & External References -->
+<footer class="relative z-10 w-full border-t border-[#27272a] bg-[#09090b] px-4 sm:px-8 py-3.5">
+<div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-code-sm font-code-sm text-outline">
+<!-- System Attribution -->
+<div class="flex items-center gap-2">
+<span class="font-semibold text-on-surface">EasyGame Engine</span>
+<span class="text-outline-variant">/</span>
+<span>Infrastructure Track B Runtime</span>
+</div>
+<!-- Footer Quick Links -->
+<div class="flex flex-wrap items-center gap-5 text-on-surface-variant">
+<a class="hover:text-[#06b6d4] transition-colors duration-150 flex items-center gap-1" href="#">
+<span>Curriculum Repo</span>
+<span class="material-symbols-outlined text-[12px]">north_east</span>
+</a>
+<a class="hover:text-[#06b6d4] transition-colors duration-150 flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[13px]">terminal</span>
+<span>Lab E402 Terminal</span>
+</a>
+<a class="hover:text-[#06b6d4] transition-colors duration-150" href="#">RBAC Security Spec</a>
+<div class="flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[13px]">verified_user</span>
+<span>Session SSL Verified</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

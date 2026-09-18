@@ -4,14 +4,24 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChatView } from "./chat-view";
 import { RadarView } from "./radar-view";
-import { ChannelsView } from "./channels-view";
+import { MessagesView } from "./messages-view";
 import { NoticesView } from "./notices-view";
 import { DigestView } from "./digest-view";
 import { FeedbackView } from "./feedback-view";
+<<<<<<< HEAD
+=======
+import { OnboardingModal } from "./onboarding-modal";
+>>>>>>> 9ff0cf6 (feat(workspace): add first sign-in onboarding role lock and in-app messages triage with direct db reply)
 import { SettingsModal } from "./settings-modal";
 
 export type WorkspaceTab =
-  "chat" | "radar" | "channels" | "notices" | "digest" | "feedback";
+  | "chat"
+  | "radar"
+  | "channels"
+  | "messages"
+  | "notices"
+  | "digest"
+  | "feedback";
 
 export interface WorkspaceShellProps {
   initialRole?: "learner" | "lab_coach";
@@ -26,14 +36,36 @@ export function WorkspaceShell({
 }: WorkspaceShellProps = {}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("chat");
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+    null,
+  );
 
   const defaultUser =
     initialUserName ??
     initialUser ??
     (initialRole === "lab_coach" ? "@TA_MinhHai" : "@NguyenVanAn");
 
+<<<<<<< HEAD
   const role = initialRole;
   const userName = defaultUser;
+=======
+  const [role, setRole] = useState<"learner" | "lab_coach">(() => {
+    if (typeof window !== "undefined") {
+      const storedRole = localStorage.getItem("eg_demo_role") as
+        "learner" | "lab_coach" | null;
+      if (storedRole) return storedRole;
+    }
+    return initialRole;
+  });
+  const [userName, setUserName] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const storedName = localStorage.getItem("eg_demo_name");
+      if (storedName) return storedName;
+    }
+    return defaultUser;
+  });
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+>>>>>>> 9ff0cf6 (feat(workspace): add first sign-in onboarding role lock and in-app messages triage with direct db reply)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   async function handleSignOut() {
@@ -135,18 +167,18 @@ export function WorkspaceShell({
               </div>
             </button>
 
-            {/* Tab 3: Manage Channels */}
+            {/* Tab 3: Messages */}
             <button
-              onClick={() => setActiveTab("channels")}
+              onClick={() => setActiveTab("messages")}
               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md transition text-left group ${
-                activeTab === "channels"
+                activeTab === "messages" || activeTab === "channels"
                   ? "bg-[#18181b] text-cyan-400 border-l-2 border-cyan-400"
                   : "text-[#a1a1aa] hover:bg-[#18181b] hover:text-white"
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm">📡</span>
-                <span className="text-xs font-medium">Manage Channels</span>
+                <span className="text-sm">📨</span>
+                <span className="text-xs font-medium">Messages</span>
               </div>
               <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-[#27272a] text-[#a1a1aa] border border-[#3f3f46]">
                 4
@@ -268,7 +300,8 @@ export function WorkspaceShell({
                       role === "lab_coach" ? "text-amber-400" : "text-cyan-400"
                     }`}
                   >
-                    Role: {role === "lab_coach" ? "Lab Coach" : "Learner"}
+                    Role: {role === "lab_coach" ? "Lab Coach" : "Learner"}{" "}
+                    (Locked)
                   </span>
                 </div>
               </div>
@@ -302,8 +335,20 @@ export function WorkspaceShell({
         {activeTab === "chat" && (
           <ChatView onGoToFeedback={() => setActiveTab("feedback")} />
         )}
-        {activeTab === "radar" && <RadarView />}
-        {activeTab === "channels" && <ChannelsView />}
+        {activeTab === "radar" && (
+          <RadarView
+            onSelectMessage={(msgId) => {
+              setSelectedMessageId(msgId);
+              setActiveTab("messages");
+            }}
+          />
+        )}
+        {(activeTab === "messages" || activeTab === "channels") && (
+          <MessagesView
+            initialSelectedId={selectedMessageId}
+            onClearSelected={() => setSelectedMessageId(null)}
+          />
+        )}
         {activeTab === "notices" && <NoticesView />}
         {activeTab === "digest" && <DigestView />}
         {activeTab === "feedback" && (
@@ -316,6 +361,17 @@ export function WorkspaceShell({
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         currentRole={role}
+        onRoleChanged={handleRoleChanged}
+      />
+
+      {/* First Sign-in Onboarding Role Selection Modal */}
+      <OnboardingModal
+        isOpen={isOnboardingOpen}
+        onRoleConfirmed={(confirmedRole) => {
+          handleRoleChanged(confirmedRole);
+          localStorage.setItem("eg_onboarding_completed", "true");
+          setIsOnboardingOpen(false);
+        }}
       />
     </div>
   );

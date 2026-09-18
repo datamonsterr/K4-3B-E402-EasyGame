@@ -19,7 +19,8 @@ This directory stores raw hosted assets and HTML generated from Google Stitch MC
 | 3 | **EasyGame - Manage Channels & Message Ingestion View** | `5af52ceb62aa499c8a9c1a694e021e75` | `screen3_channels.png`, `screen3_channels.html` |
 | 4 | **EasyGame - Post-Demo Feedback & Scannable QR Code** | `c5c213179f64496cab1981521407b073` | `screen4_feedback.png`, `screen4_feedback.html` |
 | 5 | **EasyGame Cyan QR Code** | `46dc64e2b08b4ae1807c4dde98ef4299` | `screen5_qr.png`, `screen5_qr.svg` |
-| 6 | **Design System (Technical Cyan Minimal)** | `assets/5e469bbfda4340dfa0a6a1bf0ef384b0` | Embedded in the root `index.html` (Specs view) |
+| 6 | **EasyGame - Onboarding Role Selection (First Sign-in Lock)** | `7488d0bd017b434aaf0d0e2ef6f567ea` | `screen6_onboarding.png`, `screen6_onboarding.html` |
+| 7 | **Design System (Technical Cyan Minimal)** | `assets/5e469bbfda4340dfa0a6a1bf0ef384b0` | Embedded in the root `index.html` (Specs view) |
 
 ---
 
