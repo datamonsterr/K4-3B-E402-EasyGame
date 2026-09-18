@@ -30,3 +30,4 @@ codebase/test-results/
 codebase/supabase/.temp/
 codebase/supabase/.branches/
 coverage/
+.worktrees/
