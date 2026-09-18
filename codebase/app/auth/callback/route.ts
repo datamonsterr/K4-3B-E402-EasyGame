@@ -29,33 +29,26 @@ export async function GET(request: Request) {
   if (code && configured()) {
     try {
       const supabase = await sessionClient();
-      const { error: exchangeError } =
+      const { data, error: exchangeError } =
         await supabase.auth.exchangeCodeForSession(code);
-      if (!exchangeError) {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+      if (exchangeError) {
+        console.error("Supabase exchangeCodeForSession failed:", exchangeError);
+        return NextResponse.redirect(
+          `${baseUrl}/sign-in?error=auth_callback_failed&details=${encodeURIComponent(
+            exchangeError.message || "exchange_failed",
+          )}`,
+        );
+      }
 
-        const { data: rawMemberships, error: membershipError } = await supabase
-          .from("memberships")
-          .select("guild_id,user_id,role")
-          .eq("user_id", user?.id ?? "")
-          .order("guild_id", { ascending: true })
-          .limit(2);
-        if (membershipError) throw membershipError;
-
-        const memberships = rawMemberships ?? [];
-        if (memberships.length > 1) {
-          await supabase.auth.signOut();
-          return NextResponse.redirect(
-            `${baseUrl}/sign-in?error=membership_required`,
-          );
-        }
-
+      if (data?.session) {
         return NextResponse.redirect(`${baseUrl}${safeNext}`);
       }
-    } catch {
-      // Fall through to error redirect
+    } catch (err: unknown) {
+      console.error("Supabase auth callback exception:", err);
+      const msg = err instanceof Error ? err.message : "auth_callback_failed";
+      return NextResponse.redirect(
+        `${baseUrl}/sign-in?error=auth_callback_failed&details=${encodeURIComponent(msg)}`,
+      );
     }
   }
 

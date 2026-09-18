@@ -1,6 +1,6 @@
 tools:
   - name: query_notices
-    description: "Query verified announcements, official notices, and deadlines for a given course topic or assignment within a guild."
+    description: "Tra cứu các thông báo chính thức đã xác thực và hạn nộp bài tập cho một chủ đề hoặc bài lab trong máy chủ khóa học."
     roles:
       - learner
       - lab_coach
@@ -9,16 +9,16 @@ tools:
       properties:
         topicKey:
           type: string
-          description: "Key or identifier of the lab, assignment, or course topic (e.g. lab-1, attendance, cvat)."
+          description: "Mã hoặc từ khóa định danh của bài lab, bài tập hoặc chủ đề khóa học (ví dụ: lab-1, lab-2, checkpoint, attendance)."
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học (ví dụ: demo)."
       required:
         - topicKey
         - guildId
 
   - name: search_web
-    description: "Search external web sources or official course documentation repository (e.g. VinUni AI 20K materials)."
+    description: "Tìm kiếm tài liệu học tập trên các nguồn web bên ngoài hoặc kho tài liệu chính thức của khóa học (ví dụ: tài liệu VinUni AI 20K)."
     roles:
       - learner
       - lab_coach
@@ -27,12 +27,12 @@ tools:
       properties:
         query:
           type: string
-          description: "Search query string or keywords to find external documentation and resources."
+          description: "Chuỗi truy vấn hoặc từ khóa tìm kiếm tài liệu và tài nguyên học tập."
       required:
         - query
 
   - name: evaluate_radar
-    description: "Scan active questions and calculate SLA breach tiers (Tier 1 soft warning at 120 minutes, Tier 2 urgent escalation at 240 minutes)."
+    description: "Rà soát các câu hỏi của học viên và tính toán các mức vi phạm SLA (Cảnh báo mềm Mức 1 sau 120 phút, Leo thang khẩn cấp Mức 2 sau 240 phút)."
     roles:
       - lab_coach
       - learner
@@ -41,15 +41,15 @@ tools:
       properties:
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học (ví dụ: demo)."
         now:
           type: string
-          description: "Current ISO timestamp for evaluating elapsed duration."
+          description: "Dấu thời gian ISO hiện tại để tính toán thời gian chờ của câu hỏi."
       required:
         - guildId
 
   - name: create_staff_alert
-    description: "Queue a private, staff-only alert into #ta-radar for dropped questions, ungrounded inquiries, or student roadblocks."
+    description: "Tạo thẻ cảnh báo nội bộ chỉ dành riêng cho ban trợ giảng vào kênh #ta-radar cho câu hỏi tồn đọng, câu hỏi chưa có thông báo hoặc học viên bị tắc bài."
     roles:
       - lab_coach
     parameters:
@@ -57,17 +57,16 @@ tools:
       properties:
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học."
         questionId:
           type: string
-          description: "ID of the student question to escalate."
+          description: "Mã định danh câu hỏi của học viên cần leo thang hỗ trợ."
         tier:
           type: integer
-          enum: [1, 2]
-          description: "Alert tier: 1 for soft warning (>2h), 2 for urgent escalation (>4h)."
+          description: "Mức cảnh báo: 1 cho cảnh báo mềm (>2h), 2 cho leo thang khẩn cấp (>4h)."
         summary:
           type: string
-          description: "Brief summary of the inquiry or roadblock."
+          description: "Tóm tắt ngắn gọn thắc mắc hoặc khó khăn của học viên."
       required:
         - guildId
         - questionId
@@ -75,7 +74,7 @@ tools:
         - summary
 
   - name: resolve_question
-    description: "Mark an open or answered ticket as resolved by an authorized Lab Coach with optimistic concurrency protection."
+    description: "Đánh dấu một câu hỏi mở hoặc đã trả lời thành ĐÃ GIẢI QUYẾT (RESOLVED) bởi Lab Coach với cơ chế bảo vệ khóa lạc quan (optimistic locking)."
     roles:
       - lab_coach
     parameters:
@@ -83,16 +82,16 @@ tools:
       properties:
         questionId:
           type: string
-          description: "ID of the question ticket to resolve."
+          description: "Mã định danh câu hỏi cần giải quyết."
         expectedVersion:
           type: integer
-          description: "Current version number for optimistic locking."
+          description: "Số phiên bản hiện tại để kiểm tra khóa lạc quan."
       required:
         - questionId
         - expectedVersion
 
   - name: format_daily_digest
-    description: "Generate a consolidated 22:00 clean daily digest grouping top confused topics with zero token corruption."
+    description: "Tạo bản tin tổng hợp cuối ngày lúc 22:00 sạch lỗi, gom nhóm các chủ đề nóng nhất mà không chứa token rác."
     roles:
       - lab_coach
     parameters:
@@ -100,16 +99,16 @@ tools:
       properties:
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học."
         localDate:
           type: string
-          description: "Local calendar date formatted as YYYY-MM-DD."
+          description: "Ngày dương lịch cần xuất bản tin theo định dạng YYYY-MM-DD."
       required:
         - guildId
         - localDate
 
   - name: broadcast_notification
-    description: "Broadcast an official course announcement or deadline notice to all cohort members."
+    description: "Phát thông báo chính thức hoặc thông báo gia hạn deadline tới toàn thể học viên trong khóa học."
     roles:
       - lab_coach
     parameters:
@@ -117,19 +116,19 @@ tools:
       properties:
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học."
         topicKey:
           type: string
-          description: "Topic identifier for the notice (e.g. lab-1, attendance, announcements)."
+          description: "Mã chủ đề của thông báo (ví dụ: lab-1, lab-2, announcements)."
         title:
           type: string
-          description: "Title of the official announcement."
+          description: "Tiêu đề của thông báo chính thức."
         content:
           type: string
-          description: "Full text content of the announcement."
+          description: "Nội dung đầy đủ của thông báo."
         category:
           type: string
-          description: "Category of the notice (optional, e.g. urgent, general, logistics)."
+          description: "Danh mục thông báo (tùy chọn: urgent, general, logistics)."
       required:
         - guildId
         - topicKey
@@ -137,7 +136,7 @@ tools:
         - content
 
   - name: check_student_profile
-    description: "Inspect a student profile, assigned team, channel activity, and question history."
+    description: "Tra cứu thông tin hồ sơ học viên, đội nhóm được phân công, kênh hoạt động và lịch sử câu hỏi."
     roles:
       - lab_coach
     parameters:
@@ -145,16 +144,16 @@ tools:
       properties:
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học."
         studentQuery:
           type: string
-          description: "Student name, email, or user identifier to look up."
+          description: "Tên học viên, email hoặc định danh người dùng cần tra cứu."
       required:
         - guildId
         - studentQuery
 
   - name: check_scores
-    description: "Query lab or checkpoint scores, submission status, and grading feedback for students."
+    description: "Tra cứu điểm số bài lab hoặc checkpoint, tình trạng nộp bài và nhận xét chấm điểm của học viên."
     roles:
       - lab_coach
     parameters:
@@ -162,13 +161,13 @@ tools:
       properties:
         guildId:
           type: string
-          description: "Guild or cohort identifier."
+          description: "Mã định danh máy chủ hoặc khóa học."
         studentQuery:
           type: string
-          description: "Student name or identifier."
+          description: "Tên hoặc định danh học viên cần tra cứu điểm."
         lab:
           type: string
-          description: "Specific lab or assignment identifier (optional, e.g. lab-1, checkpoint-1)."
+          description: "Mã bài lab hoặc bài tập cụ thể (tùy chọn: lab-1, checkpoint-1)."
       required:
         - guildId
         - studentQuery

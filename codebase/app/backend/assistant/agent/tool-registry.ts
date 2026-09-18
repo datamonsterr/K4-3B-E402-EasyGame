@@ -111,10 +111,11 @@ export function validateQueryRolePermission(
 
   // 2. Check student scores
   if (
-    q.includes("xem điểm của") ||
-    q.includes("tra cứu điểm của") ||
-    q.includes("điểm số của") ||
-    q.includes("bảng điểm của") ||
+    q.includes("xem điểm") ||
+    q.includes("tra cứu điểm") ||
+    q.includes("điểm số") ||
+    q.includes("kết quả chấm") ||
+    q.includes("bảng điểm") ||
     q.includes("check score") ||
     q.includes("check_scores")
   ) {
@@ -127,7 +128,7 @@ export function validateQueryRolePermission(
 
   // 3. Check student profile
   if (
-    q.includes("xem profile của") ||
+    q.includes("profile") ||
     q.includes("thông tin học viên") ||
     q.includes("tra cứu học viên") ||
     q.includes("hồ sơ học viên") ||
@@ -145,13 +146,16 @@ export function validateQueryRolePermission(
     q.includes("đóng ticket") ||
     q.includes("resolve ticket") ||
     q.includes("resolve_question") ||
+    q.includes("staff alert") ||
+    q.includes("tạo staff alert") ||
+    q.includes("tạo cảnh báo staff") ||
     q.includes("create staff alert") ||
-    q.includes("tạo cảnh báo staff")
+    q.includes("create_staff_alert")
   ) {
     return {
       allowed: false,
-      tool: "resolve_question",
-      reason: getRolePermissionReason("resolve_question", "learner"),
+      tool: "create_staff_alert",
+      reason: getRolePermissionReason("create_staff_alert", "learner"),
     };
   }
 

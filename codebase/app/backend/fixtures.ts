@@ -7,7 +7,8 @@ export const notices: Notice[] = [
     topicKey: "lab-1",
     publishedAt: "2026-09-12T03:00:00Z",
     verified: true,
-    answer: "Lab 1 is due at 21:00 on September 17, 2026.",
+    answer:
+      "Lab 1 is due at 21:00 on September 17, 2026 (21:00 ngày 17/09/2026).",
     source: {
       kind: "synthetic",
       label: "Lab 1 original notice (synthetic)",
@@ -20,7 +21,8 @@ export const notices: Notice[] = [
     topicKey: "lab-1",
     publishedAt: "2026-09-14T03:00:00Z",
     verified: true,
-    answer: "Lab 1 is due at 12:00 on September 19, 2026.",
+    answer:
+      "Lab 1 is due at 12:00 on September 19, 2026 (12:00 ngày 19/09/2026).",
     source: {
       kind: "synthetic",
       label: "Lab 1 extension (synthetic)",
@@ -28,13 +30,41 @@ export const notices: Notice[] = [
     },
   },
   {
+    id: "checkpoint-1",
+    guildId: "demo",
+    topicKey: "checkpoint",
+    publishedAt: "2026-09-15T03:00:00Z",
+    verified: true,
+    answer:
+      "Checkpoint 1 is due at 21:00 on September 17, 2026 (21:00 ngày 17/09/2026).",
+    source: {
+      kind: "synthetic",
+      label: "Checkpoint 1 notice (synthetic)",
+      href: "/sources/checkpoint-1",
+    },
+  },
+  {
+    id: "lab-two-old",
+    guildId: "demo",
+    topicKey: "lab-2",
+    publishedAt: "2026-09-13T03:00:00Z",
+    verified: true,
+    answer:
+      "Submit Lab 2 through the course portal by 23:59 on September 18, 2026.",
+    source: {
+      kind: "synthetic",
+      label: "Lab 2 original notice (synthetic)",
+      href: "/sources/lab-two-old",
+    },
+  },
+  {
     id: "lab-two",
     guildId: "demo",
     topicKey: "lab-2",
-    publishedAt: "2026-09-14T03:00:00Z",
+    publishedAt: "2026-09-14T15:00:00Z",
     verified: true,
     answer:
-      "Submit Lab 2 through the course portal by 21:00 on September 21, 2026.",
+      "Submit Lab 2 through the course portal by 12:00 on September 19, 2026 (12:00 ngày 19/09/2026).",
     source: {
       kind: "synthetic",
       label: "Lab 2 notice (synthetic)",
@@ -48,7 +78,7 @@ export const notices: Notice[] = [
     publishedAt: "2026-09-13T03:00:00Z",
     verified: true,
     answer:
-      "Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.",
+      "Quy chế điểm danh: Học viên cần tham gia tối thiểu 80% số buổi. Các buổi workshop tối và định hướng Build Phase không tính vào số buổi nghỉ trên lớp.",
     source: {
       kind: "synthetic",
       label: "Attendance policy notice (synthetic)",

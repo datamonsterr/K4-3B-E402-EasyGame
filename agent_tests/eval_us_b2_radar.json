@@ -1,7 +1,7 @@
 {
   "dataset_id": "easygame_track_b_us_b2_radar",
   "dataset_role": "evaluation",
-  "description": "Comprehensive evaluation cases for US-B2: Unanswered Question Radar & Operations Deck, covering AC1 to AC6 (SLA Tier 1 soft warning, Tier 2 urgent escalation, daily digest generation, stuck student non-intrusive support, thread auto-resolution, and coach tool suite).",
+  "description": "Bộ ca kiểm thử đánh giá toàn diện cho US-B2: Radar Rà soát Câu hỏi Tồn & Bản tin Ngày cho TA, bao quát từ AC1 đến AC6 (Cảnh báo mềm Mức 1 sau 2h, Leo thang khẩn cấp Mức 2 sau 4h, xuất bản tin tổng hợp ngày 22:00 sạch lỗi, hỗ trợ học viên tắc bài phi xâm lấn, tự động đồng bộ gỡ bỏ câu hỏi khi đã giải quyết, và bộ công cụ siêu trợ lý cho Lab Coach).",
   "allowed_failure_types": [
     "wrong_tool",
     "wrong_arg_value",
@@ -41,7 +41,7 @@
         "user_story": "US-B2",
         "ac": "AC1",
         "difficulty": "easy",
-        "skill": "radar_scan",
+        "skill": "quet_radar_sla",
         "what_it_tests": "AC1: Quét định kỳ radar và nhận diện câu hỏi vượt ngưỡng SLA cảnh báo mềm (>2h) và khẩn cấp (>4h)."
       }
     },
@@ -73,7 +73,7 @@
         "user_story": "US-B2",
         "ac": "AC2",
         "difficulty": "medium",
-        "skill": "sla_escalation_alert",
+        "skill": "leo_thang_canh_bao_khan_cap",
         "what_it_tests": "AC2: Leo thang cảnh báo khẩn cấp sau 4 giờ: tạo cảnh báo nội bộ vào #ta-radar với tier=2 kèm questionId."
       }
     },
@@ -104,7 +104,7 @@
         "user_story": "US-B2",
         "ac": "AC3",
         "difficulty": "medium",
-        "skill": "daily_digest_formatting",
+        "skill": "xuat_ban_tin_tong_hop_ngay",
         "what_it_tests": "AC3: Xuất bản tin tổng hợp ngày 22:00 sạch lỗi rác token ('nguồn tham chiếu') với bố cục 3 phần chuẩn."
       }
     },
@@ -134,7 +134,7 @@
         "user_story": "US-B2",
         "ac": "AC4",
         "difficulty": "medium",
-        "skill": "external_knowledge_search",
+        "skill": "ho_tro_tac_bai_phi_xam_lan",
         "what_it_tests": "AC4: Hỗ trợ học viên kẹt bài một cách phi xâm lấn bằng cách tra cứu tài liệu chính thống mà không gửi DM riêng."
       }
     },
@@ -165,7 +165,7 @@
         "user_story": "US-B2",
         "ac": "AC5",
         "difficulty": "medium",
-        "skill": "optimistic_concurrency_resolution",
+        "skill": "dong_ticket_khoa_lac_quan",
         "what_it_tests": "AC5: Cập nhật trạng thái ticket sang RESOLVED với khóa lạc quan (expectedVersion) đảm bảo không xung đột dữ liệu."
       }
     },
@@ -196,7 +196,7 @@
         "user_story": "US-B2",
         "ac": "AC6",
         "difficulty": "hard",
-        "skill": "elevated_broadcast_notification",
+        "skill": "phat_thong_bao_chinh_thuc",
         "what_it_tests": "AC6: Quyền lực siêu trợ lý Lab Coach: ban hành thông báo chính thức có hiệu lực tức thì tới toàn khóa."
       }
     },
@@ -227,7 +227,7 @@
         "user_story": "US-B2",
         "ac": "AC6",
         "difficulty": "medium",
-        "skill": "coach_student_profile_lookup",
+        "skill": "tra_cuu_ho_so_hoc_vien",
         "what_it_tests": "AC6: Lab Coach tra cứu thông tin đội nhóm, kênh hoạt động và lịch sử câu hỏi của học viên."
       }
     },
@@ -258,7 +258,7 @@
         "user_story": "US-B2",
         "ac": "AC6",
         "difficulty": "medium",
-        "skill": "coach_grades_inspection",
+        "skill": "tra_cuu_diem_so_hoc_vien",
         "what_it_tests": "AC6: Lab Coach tra cứu điểm số lab/checkpoint và tình trạng nộp bài của học viên."
       }
     }

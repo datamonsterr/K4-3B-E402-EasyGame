@@ -450,7 +450,7 @@ describe("Database & Tool Integration", () => {
         query: "VinUni",
       })) as SearchWebOutput;
       expect(res.results).toBeDefined();
-    });
+    }, 15000);
 
     it("throws error on unknown tool name", async () => {
       await expect(executeTool("unknown_tool", {})).rejects.toThrow(

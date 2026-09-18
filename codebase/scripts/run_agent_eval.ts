@@ -733,11 +733,13 @@ export async function runAgentEvaluation(
   let runsDir = options.runsDir;
   if (!runsDir) {
     const candidatesRuns = [
-      resolve(process.cwd(), "agent_test_runs"),
       resolve(process.cwd(), "../agent_test_runs"),
+      resolve(process.cwd(), "agent_test_runs"),
     ];
     runsDir =
-      candidatesRuns.find((p) => existsSync(dirname(p))) || candidatesRuns[0];
+      candidatesRuns.find((p) => existsSync(p)) ||
+      candidatesRuns.find((p) => existsSync(dirname(p))) ||
+      candidatesRuns[0];
   }
   if (!existsSync(runsDir)) {
     mkdirSync(runsDir, { recursive: true });

@@ -8,11 +8,14 @@ export function SignInCard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialError = searchParams.get("error");
+  const initialDetails = searchParams.get("details");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(
-    initialError ? `Authentication error: ${initialError}` : "",
+    initialError
+      ? `Authentication error: ${initialError}${initialDetails ? ` (${initialDetails})` : ""}`
+      : "",
   );
 
   async function handleCredentialSubmit(
@@ -41,35 +44,11 @@ export function SignInCard() {
     }
   }
 
-  async function handleOAuth(provider: "discord" | "google") {
+  function handleOAuth(provider: "discord" | "google") {
     setBusy(true);
     setMessage("");
-    const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      setMessage("OAuth is not configured for this deployment.");
-      setBusy(false);
-      return;
-    }
-    try {
-      const redirectTo = `${window.location.origin}/auth/callback?provider=${provider}&next=/workspace`;
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo },
-      });
-      if (error || !data.url) {
-        setMessage(
-          `OAuth error: ${error?.message ?? "Missing authorization URL"}`,
-        );
-        setBusy(false);
-        return;
-      }
-      window.location.href = data.url;
-    } catch (error) {
-      setMessage(
-        error instanceof Error ? error.message : "SSO authentication error",
-      );
-      setBusy(false);
-    }
+    // Direct through server route to guarantee PKCE verifier cookie headers
+    window.location.href = `/api/auth/oauth?provider=${provider}&next=/workspace`;
   }
 
   return (

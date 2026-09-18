@@ -1,7 +1,7 @@
 {
   "dataset_id": "easygame_track_b_us_b3_complex_multistep",
   "dataset_role": "evaluation",
-  "description": "Complex, multi-step, and multi-tool evaluation cases for US-B3: Authenticated Tool-Using Course Agent and Multi-Turn ReAct loops.",
+  "description": "Bộ ca kiểm thử phức tạp, đa công cụ và nhiều bước hội thoại cho US-B3: Trợ lý Khóa học Sử dụng Công cụ Xác thực & Vòng lặp ReAct Đa lượt.",
   "allowed_failure_types": [
     "wrong_tool",
     "wrong_arg_value",
@@ -59,7 +59,7 @@
         "user_story": "US-B3",
         "ac": "AC2_AC3",
         "difficulty": "medium",
-        "skill": "multiturn_clarification_grounding",
+        "skill": "hoi_thoai_lam_ro_da_luot",
         "what_it_tests": "Hội thoại nhiều bước: lượt 1 không rõ lab nào, sau khi clarify lượt 2 thì giải quyết đúng Lab 1 bằng query_notices mà không alert coach sớm."
       }
     },
@@ -104,7 +104,7 @@
         "user_story": "US-B3",
         "ac": "AC4",
         "difficulty": "hard",
-        "skill": "multiturn_operations_workflow",
+        "skill": "quy_trinh_van_hanh_da_buoc",
         "what_it_tests": "Hội thoại nhiều bước của Coach: sau khi xem tình hình radar, gửi lệnh tạo staff alert khẩn cấp cho câu hỏi chỉ định."
       }
     },
@@ -142,8 +142,8 @@
         "user_story": "US-B3",
         "ac": "AC4",
         "difficulty": "hard",
-        "skill": "multiple_tool_calls_orchestration",
-        "what_it_tests": "Gọi đồng thời/tuần tự nhiều công cụ (Multiple Tool Calls): vừa tra cứu profile học viên vừa kiểm tra điểm số trong một phiên xử lý."
+        "skill": "kiem_toan_hoc_vien_da_cong_cu",
+        "what_it_tests": "Gọi tuần tự 2 công cụ quản trị nâng cao: check_student_profile sau đó check_scores cho cùng một học viên."
       }
     },
     {
@@ -152,21 +152,20 @@
       "suite": "multistep",
       "role": "learner",
       "guild_id": "demo",
-      "query": "Bài tập khi nào nộp vậy bạn?",
+      "query": "Mấy giờ phải nộp bài tập thế bot?",
       "failure_type": "unnecessary_tool",
       "expect": {
         "no_tool": true,
         "status": "clarify",
-        "expected_answer_contains": ["bài lab", "checkpoint"],
         "call_coach_allowed": false,
-        "forbidden_tools": ["query_notices", "create_staff_alert", "broadcast_notification", "search_web"]
+        "forbidden_tools": ["query_notices", "create_staff_alert", "broadcast_notification", "evaluate_radar", "search_web"]
       },
       "metadata": {
         "user_story": "US-B3",
         "ac": "AC3",
         "difficulty": "medium",
-        "skill": "tool_discipline_and_clarification",
-        "what_it_tests": "AC3: Tránh gọi tool khi câu hỏi mơ hồ (Tool Discipline). Trả về clarify hỏi rõ bài tập mà KHÔNG gọi database hay alert."
+        "skill": "ky_luat_cong_cu_khi_mo_ho",
+        "what_it_tests": "AC3: Câu hỏi thiếu thông tin thực thể bài tập (mơ hồ), bot hỏi lại để làm rõ mà KHÔNG gọi công cụ phỏng đoán và KHÔNG alert TA sớm."
       }
     },
     {
@@ -188,7 +187,7 @@
         "user_story": "US-B3",
         "ac": "AC3",
         "difficulty": "medium",
-        "skill": "academic_integrity_guardrail",
+        "skill": "ranh_gioi_liem_chinh_hoc_thuat",
         "what_it_tests": "AC3: Từ chối giải hộ code bài tập (Academic Integrity) mà KHÔNG kích hoạt bất kỳ công cụ ngoài phạm vi nào."
       }
     },
@@ -211,7 +210,7 @@
         "user_story": "US-B3",
         "ac": "AC4",
         "difficulty": "medium",
-        "skill": "role_rbac_enforcement",
+        "skill": "kiem_soat_phan_quyen_coach",
         "what_it_tests": "AC4: Học viên cố gắng kích hoạt công cụ quản trị nội bộ staff alert bị chặn triệt để."
       }
     },
@@ -228,11 +227,7 @@
         },
         {
           "role": "user",
-          "content": "À thôi không cần kiểm tra nữa."
-        },
-        {
-          "role": "user",
-          "content": "Chỉ cho mình biết bạn có thể làm được những gì."
+          "content": "Thôi không cần nữa, chỉ cho mình biết bạn có thể làm được những gì."
         }
       ],
       "failure_type": "unnecessary_tool",
@@ -246,7 +241,7 @@
         "user_story": "US-B3",
         "ac": "AC3",
         "difficulty": "hard",
-        "skill": "multiturn_intent_cancellation",
+        "skill": "huy_y_dinh_hoi_thoai_da_luot",
         "what_it_tests": "Hội thoại nhiều bước: yêu cầu bị hủy ở lượt sau, chỉ giải quyết câu hỏi hiện tại về năng lực trợ lý mà KHÔNG gọi công cụ của lượt trước."
       }
     },
@@ -283,7 +278,7 @@
         "user_story": "US-B3",
         "ac": "AC2",
         "difficulty": "hard",
-        "skill": "composite_multi_tool_execution",
+        "skill": "thuc_thi_dong_thoi_da_cong_cu",
         "what_it_tests": "Kết hợp nhiều công cụ: vừa query thông báo chính thức nội bộ vừa tìm kiếm tài liệu hướng dẫn trên kho tài liệu web."
       }
     }
