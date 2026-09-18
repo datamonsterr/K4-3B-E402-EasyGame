@@ -7,7 +7,8 @@ export type GuildId = string & { readonly [guildIdBrand]: "GuildId" };
 export type NoticeId = string & { readonly [noticeIdBrand]: "NoticeId" };
 
 export type Actor = {
-  id: ActorId;
+  userId: ActorId;
+  guildId: GuildId;
   role: "learner" | "lab_coach";
 };
 
@@ -22,7 +23,7 @@ export type NoticeSourceCard = {
 export type VerifiedNotice = {
   id: NoticeId;
   guildId: GuildId;
-  topic: LogisticsTopic;
+  topicKey: LogisticsTopic;
   publishedAt: string;
   answer: string;
   source: NoticeSourceCard;
@@ -64,24 +65,25 @@ export type AnswerLogisticsResult =
 export interface NoticeEvidenceSource {
   findVerifiedNotices(input: {
     guildId: GuildId;
-    topic: LogisticsTopic;
+    topicKey: LogisticsTopic;
   }): Promise<readonly VerifiedNotice[]>;
 }
 
 export type LogisticsToolCall = {
   name: string;
-  arguments: Record<string, unknown>;
+  args: unknown;
 };
 
-export interface LogisticsToolExecutor {
-  execute(
-    call: LogisticsToolCall,
-    authorizedGuildId: GuildId,
-  ): Promise<unknown>;
-}
+export type LogisticsToolExecutor = (
+  call: LogisticsToolCall,
+) => Promise<unknown>;
 
 export interface LogisticsDraftProvider {
-  draft(input: { message: string; notice: VerifiedNotice }): Promise<string>;
+  draft(input: {
+    message: string;
+    notice: VerifiedNotice;
+    invokeTool: LogisticsToolExecutor;
+  }): Promise<string>;
 }
 
 export interface LogisticsAssistant {

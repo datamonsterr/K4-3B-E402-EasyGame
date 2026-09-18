@@ -10,7 +10,7 @@ const guildId = "20000000-0000-0000-0000-000000000001" as GuildId;
 const notice: VerifiedNotice = {
   id: "notice-lab-1" as NoticeId,
   guildId,
-  topic: "lab-1",
+  topicKey: "lab-1",
   publishedAt: "2026-09-18T10:00:00.000Z",
   answer: "Lab 1 is due at 12:00 on September 19, 2026.",
   source: {
