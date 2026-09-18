@@ -73,3 +73,12 @@ flowchart TD
     B3 --> UCB3
     B3 --> UCB32
 ```
+
+---
+
+## 4. Quality Governance
+
+Every Use Case specification within this directory is reviewed against:
+1. **The 13-Field Standard IT BA Template:** Covering complete Actor definitions, verifiable Pre/Postconditions, strict alternating Normal Courses (Actor vs System), Alternative Courses, Exceptions, and Non-functional constraints.
+2. **Cockburn's Sea-Level Scoping:** The Coffee-Break Test (one actor, one session, one distinct business goal); failures are recorded rather than hidden.
+3. **The 20-Point Quality Checklist (C1–C20):** Evaluated and tracked in [IMPLEMENTATION_COVERAGE.md](IMPLEMENTATION_COVERAGE.md).
