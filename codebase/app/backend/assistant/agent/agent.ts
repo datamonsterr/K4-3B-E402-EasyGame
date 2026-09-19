@@ -98,13 +98,13 @@ function classifyConversational(message: string): {
 
   // 1. Well-being: "bạn có khỏe không", "khỏe không", "bạn thế nào", "hôm nay thế nào"
   if (
-    /(?:bạn có khỏe không|khỏe không|bạn thế nào|hôm nay thế nào|sức khỏe thế nào|dạo này thế nào)/i.test(
+    /(?:bạn có khỏe không|bạn khỏe không|khỏe không|bạn thế nào|hôm nay thế nào|sức khỏe thế nào|dạo này thế nào|how are you)/i.test(
       normalized,
     )
   ) {
     return {
       type: "wellbeing",
-      body: "Mình khỏe, cảm ơn bạn nhé! Còn bạn thì sao, hôm nay bạn có cần mình hỗ trợ thông tin gì về khóa học không?",
+      body: "Mình khỏe, còn bạn thì sao? Hôm nay bạn có cần giúp gì không?",
       summary: "Answered well-being inquiry in Vietnamese",
     };
   }

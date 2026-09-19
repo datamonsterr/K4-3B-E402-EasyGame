@@ -58,13 +58,13 @@ function classifyIntent(
 
   // Well-being inquiry
   if (
-    /(?:bạn có khỏe không|khỏe không|bạn thế nào|hôm nay thế nào|sức khỏe thế nào|dạo này thế nào)/i.test(
+    /(?:bạn có khỏe không|bạn khỏe không|khỏe không|bạn thế nào|hôm nay thế nào|sức khỏe thế nào|dạo này thế nào|how are you)/i.test(
       normalized,
     )
   ) {
     return {
       type: "conversational",
-      body: "Mình khỏe, cảm ơn bạn nhé! Còn bạn thì sao, hôm nay bạn có cần mình hỗ trợ thông tin gì về khóa học không?",
+      body: "Mình khỏe, còn bạn thì sao? Hôm nay bạn có cần giúp gì không?",
       reason: "Answered well-being inquiry in Vietnamese",
     };
   }
