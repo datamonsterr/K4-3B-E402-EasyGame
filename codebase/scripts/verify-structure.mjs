@@ -33,6 +33,29 @@ for (const file of await readdir(
     await read(app, `app/backend/artifacts/${file}`),
   );
 }
+for (const legacy of [
+  "agent_tests/",
+  "agent_test_runs/",
+  "codebase/agent_test_runs/",
+  "codebase/eval/",
+  "codebase/scripts/run_agent_eval.ts",
+  "validation/user_testing_log.md",
+]) {
+  await assert.rejects(
+    access(new URL(legacy, root)),
+    /ENOENT/,
+    `Legacy validation path must be absent: ${legacy}`,
+  );
+}
+for (const canonical of [
+  "validation/README.md",
+  "validation/OBSERVATION_LOG.md",
+  "validation/version_log.csv",
+  "validation/scripts/run-agent-eval.ts",
+  "validation/testsets/manifest.json",
+]) {
+  await access(new URL(canonical, root));
+}
 const html = await read(root, "index.html");
 await assert.rejects(
   access(new URL("index.html", app)),

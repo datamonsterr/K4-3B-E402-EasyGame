@@ -10,11 +10,13 @@ interface WorkspacePageProps {
   }>;
 }
 
-export default async function WorkspacePage(props?: WorkspacePageProps) {
-  const searchParams = (await props?.searchParams) || {};
+export default async function WorkspacePage({
+  searchParams,
+}: WorkspacePageProps) {
+  const resolvedSearchParams = (await searchParams) || {};
   const isSyntheticPreview =
-    searchParams.preview === "synthetic" ||
-    searchParams.preview === "true" ||
+    resolvedSearchParams.preview === "synthetic" ||
+    resolvedSearchParams.preview === "true" ||
     !configured();
 
   if (isSyntheticPreview) {

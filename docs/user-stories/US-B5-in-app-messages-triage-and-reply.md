@@ -1,6 +1,6 @@
-# User Story US-B4: Quản Lý Tin Nhắn & Trả Lời Trực Tiếp Từ Ứng Dụng (Messages View)
+# User Story US-B5: Quản Lý Tin Nhắn & Trả Lời Trực Tiếp Từ Ứng Dụng (Messages View)
 
-> **Mã Story:** `US-B4`  
+> **Mã Story:** `US-B5`
 > **Thuộc Module:** Track B2 / Operations Deck — Công cụ Triage Tin nhắn & Phản hồi Nội bộ cho Lab Coach  
 > **Nhóm thực hiện:** EasyGame · Lớp 3B · Phòng E402  
 > **Tác giả:** Phạm Thành Đạt (Lead BA)  
@@ -19,53 +19,57 @@
 
 ## 2. Bảng Đánh Giá Tiêu Chuẩn INVEST
 
-| Tiêu chí | Đánh giá | Diễn giải chi tiết |
-|---|:---:|---|
-| **I — Independent** | ✅ | Giao diện "Messages" và chức năng gửi phản hồi vào database hoạt động độc lập với pipeline tạo câu trả lời tự động của bot B1. |
-| **N — Negotiable** | ✅ | Bố cục cột danh sách và khung soạn thảo có thể tùy biến độ rộng, nhưng bắt buộc loại bỏ JSON thô và không được bắn webhook ra Discord thật. |
-| **V — Valuable** | ✅ | Rút ngắn thời gian xử lý ticket từ 2-3 phút (mở app Discord, tìm channel, gõ trả lời) xuống dưới 15 giây trực tiếp trên EasyGame. |
-| **E — Estimable** | ✅ | Dễ ước lượng: Đổi tên tab, refactor bảng `channels-view.tsx` loại bỏ ô JSON, thêm composer trả lời và endpoint `POST /api/workspace/reply`. |
-| **S — Small** | ✅ | Hoàn thành gọn trong 1 view frontend và 1 route API ghi nhận câu trả lời vào bảng `source_messages`. |
-| **T — Testable** | ✅ | Kiểm thử bằng luồng click ticket nhảy sang tab Messages, nhập câu trả lời, kiểm tra record mới trong `source_messages` có `message_type='reply'`. |
+| Tiêu chí            | Đánh giá | Diễn giải chi tiết                                                                                                                                |
+| ------------------- | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **I — Independent** |    ✅    | Giao diện "Messages" và chức năng gửi phản hồi vào database hoạt động độc lập với pipeline tạo câu trả lời tự động của bot B1.                    |
+| **N — Negotiable**  |    ✅    | Bố cục cột danh sách và khung soạn thảo có thể tùy biến độ rộng, nhưng bắt buộc loại bỏ JSON thô và không được bắn webhook ra Discord thật.       |
+| **V — Valuable**    |    ✅    | Rút ngắn thời gian xử lý ticket từ 2-3 phút (mở app Discord, tìm channel, gõ trả lời) xuống dưới 15 giây trực tiếp trên EasyGame.                 |
+| **E — Estimable**   |    ✅    | Dễ ước lượng: Đổi tên tab, refactor bảng `channels-view.tsx` loại bỏ ô JSON, thêm composer trả lời và endpoint `POST /api/workspace/reply`.       |
+| **S — Small**       |    ✅    | Hoàn thành gọn trong 1 view frontend và 1 route API ghi nhận câu trả lời vào bảng `source_messages`.                                              |
+| **T — Testable**    |    ✅    | Kiểm thử bằng luồng click ticket nhảy sang tab Messages, nhập câu trả lời, kiểm tra record mới trong `source_messages` có `message_type='reply'`. |
 
 ---
 
 ## 3. Tiêu Chí Nghiệm Thu (Acceptance Criteria - Gherkin Syntax)
 
 ### AC1: Điều hướng từ Ticket sang đúng tin nhắn trong tab Messages (Ticket-to-Message Navigation)
-* **Given** Lab Coach đang ở tab `Tickets & Radar` và thấy câu hỏi của học viên bị quá hạn (ví dụ: ticket `tk-101` của bạn `@MinhTuan_K4`),
-* **When** Coach nhấn nút thao tác trên thẻ ticket (nút **"Xem tin nhắn 💬"**),
-* **Then** Hệ thống lập tức chuyển tab đang hoạt động sang tab **"Messages"** (thay vì mở liên kết Discord ngoài),
-* **And** Hệ thống tự động cuộn đến và làm nổi bật (highlight) tin nhắn gốc của `@MinhTuan_K4` trong danh sách tin nhắn,
-* **And** Khung chi tiết bên phải tải toàn bộ ngữ cảnh trao đổi liên quan đến tin nhắn này.
+
+- **Given** Lab Coach đang ở tab `Tickets & Radar` và thấy câu hỏi của học viên bị quá hạn (ví dụ: ticket `tk-101` của bạn `@MinhTuan_K4`),
+- **When** Coach nhấn nút thao tác trên thẻ ticket (nút **"Xem tin nhắn 💬"**),
+- **Then** Hệ thống lập tức chuyển tab đang hoạt động sang tab **"Messages"** (thay vì mở liên kết Discord ngoài),
+- **And** Hệ thống tự động cuộn đến và làm nổi bật (highlight) tin nhắn gốc của `@MinhTuan_K4` trong danh sách tin nhắn,
+- **And** Khung chi tiết bên phải tải toàn bộ ngữ cảnh trao đổi liên quan đến tin nhắn này.
 
 ---
 
 ### AC2: Giao diện tinh gọn không hiển thị JSON thô (Compact UI & Zero Raw JSON)
-* **Given** Lab Coach truy cập vào tab `Messages`,
-* **When** Giao diện tải danh sách tin nhắn từ các kênh công khai,
-* **Then** Hệ thống hiển thị danh sách dạng bảng/thẻ gọn gàng gồm các thông tin: Tên kênh (`#lab-support`), Người gửi (`@MinhTuan_K4`), Đoạn trích câu hỏi, Dấu thời gian, Nhãn Intent (`Technical_Roadblock`),
-* **And** Khung hiển thị JSON thô (`Raw Discord Gateway Event (JSON)`) trước đây **HOÀN TOÀN BỊ LOẠI BỎ**,
-* **And** Thay thế bằng khung đọc tin nhắn trực quan và khu vực soạn câu trả lời (Reply Composer) chuyên nghiệp.
+
+- **Given** Lab Coach truy cập vào tab `Messages`,
+- **When** Giao diện tải danh sách tin nhắn từ các kênh công khai,
+- **Then** Hệ thống hiển thị danh sách dạng bảng/thẻ gọn gàng gồm các thông tin: Tên kênh (`#lab-support`), Người gửi (`@MinhTuan_K4`), Đoạn trích câu hỏi, Dấu thời gian, Nhãn Intent (`Technical_Roadblock`),
+- **And** Khung hiển thị JSON thô (`Raw Discord Gateway Event (JSON)`) trước đây **HOÀN TOÀN BỊ LOẠI BỎ**,
+- **And** Thay thế bằng khung đọc tin nhắn trực quan và khu vực soạn câu trả lời (Reply Composer) chuyên nghiệp.
 
 ---
 
 ### AC3: Trả lời trực tiếp vào cơ sở dữ liệu ứng dụng (In-App Direct DB Reply)
-* **Given** Lab Coach đang xem chi tiết một tin nhắn câu hỏi chưa được giải quyết trong tab `Messages`,
-* **When** Coach nhập nội dung giải đáp: `"Bạn hãy sử dụng pyarrow chunking để đọc file 4GB từng phần nhé"` vào khung soạn thảo,
-* **And** Nhấn nút **"Send Reply (Database)"**,
-* **Then** Hệ thống gửi yêu cầu `POST /api/workspace/reply` lưu câu trả lời vào bảng `public.source_messages` với `message_type = 'reply'` và `reply_to_id = tin_nhắn_gốc.id`,
-* **And** Trạng thái của ticket tương ứng trong bảng `questions` tự động chuyển sang `answered`,
-* **And** Câu trả lời của Coach lập tức xuất hiện ngay dưới tin nhắn của học viên trong khung hội thoại nội bộ,
-* **And** Hệ thống **TUYỆT ĐỐI KHÔNG** gọi Discord Webhook hoặc gửi tin nhắn ra bot Discord thật ngoài đời.
+
+- **Given** Lab Coach đang xem chi tiết một tin nhắn câu hỏi chưa được giải quyết trong tab `Messages`,
+- **When** Coach nhập nội dung giải đáp: `"Bạn hãy sử dụng pyarrow chunking để đọc file 4GB từng phần nhé"` vào khung soạn thảo,
+- **And** Nhấn nút **"Send Reply (Database)"**,
+- **Then** Hệ thống gửi yêu cầu `POST /api/workspace/reply` lưu câu trả lời vào bảng `public.source_messages` với `message_type = 'reply'` và `reply_to_id = tin_nhắn_gốc.id`,
+- **And** Trạng thái của ticket tương ứng trong bảng `questions` tự động chuyển sang `answered`,
+- **And** Câu trả lời của Coach lập tức xuất hiện ngay dưới tin nhắn của học viên trong khung hội thoại nội bộ,
+- **And** Hệ thống **TUYỆT ĐỐI KHÔNG** gọi Discord Webhook hoặc gửi tin nhắn ra bot Discord thật ngoài đời.
 
 ---
 
 ### AC4: Tùy chọn liên kết nhảy sang Discord thật (Optional Real Discord Deep Link)
-* **Given** Lab Coach nhận thấy câu hỏi cần chia sẻ màn hình hoặc hỗ trợ trực tiếp trong phòng thoại trên Discord,
-* **When** Coach bấm vào nút phụ **"Mở trên Discord thật ↗"** trên thanh tiêu đề tin nhắn,
-* **Then** Trình duyệt mở một tab mới điều hướng tới đúng URL Discord chuẩn: `https://discord.com/channels/{guild_id}/{channel_id}/{message_id}`,
-* **And** Không làm gián đoạn hay mất trạng thái làm việc của tab EasyGame hiện tại.
+
+- **Given** Lab Coach nhận thấy câu hỏi cần chia sẻ màn hình hoặc hỗ trợ trực tiếp trong phòng thoại trên Discord,
+- **When** Coach bấm vào nút phụ **"Mở trên Discord thật ↗"** trên thanh tiêu đề tin nhắn,
+- **Then** Trình duyệt mở một tab mới điều hướng tới đúng URL Discord chuẩn: `https://discord.com/channels/{guild_id}/{channel_id}/{message_id}`,
+- **And** Không làm gián đoạn hay mất trạng thái làm việc của tab EasyGame hiện tại.
 
 ---
 

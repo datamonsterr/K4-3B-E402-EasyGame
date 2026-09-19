@@ -101,7 +101,7 @@ describe("Authentication Redirect & Loop Prevention", () => {
       };
       vi.mocked(sessionClient).mockResolvedValue(mockSupabase as never);
 
-      const pageElement = await WorkspacePage();
+      const pageElement = await WorkspacePage({});
       expect(pageElement).toBeDefined();
       expect(pageElement.props.initialNeedsOnboarding).toBe(true);
     });

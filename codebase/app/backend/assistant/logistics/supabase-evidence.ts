@@ -6,6 +6,7 @@ import type {
   NoticeId,
   VerifiedNotice,
 } from "./contracts";
+import { ToolOperationError } from "../agent/operation-errors";
 
 type SelectedNoticeRow = {
   id: string;
@@ -38,9 +39,9 @@ export function createSupabaseNoticeEvidence(
         .eq("guild_id", guildId)
         .eq("topic_key", topicKey)
         .order("published_at", { ascending: false });
-      if (error || !data) throw new Error("Notice evidence unavailable");
+      if (error) throw new ToolOperationError("query_notices", "unavailable");
 
-      return (data as unknown as SelectedNoticeRow[]).map((row) => {
+      return ((data ?? []) as unknown as SelectedNoticeRow[]).map((row) => {
         const source = Array.isArray(row.source_message)
           ? row.source_message[0]
           : row.source_message;

@@ -99,36 +99,6 @@ export async function executeTool(
       return executeFormatDailyDigest(args as unknown as FormatDailyDigestArgs);
     case "search_web":
       return executeSearchWeb(args as unknown as SearchWebArgs);
-    case "broadcast_notification":
-      return {
-        ok: true,
-        guildId: args.guildId || "demo",
-        topicKey: args.topicKey || "general",
-        title: args.title || "Announcement",
-        content: args.content || "",
-        publishedAt: new Date().toISOString(),
-        message: "Announcement broadcasted successfully",
-      };
-    case "check_student_profile":
-      return {
-        studentQuery: args.studentQuery || "",
-        guildId: args.guildId || "demo",
-        studentId: String(args.studentQuery || "learner-01"),
-        role: "learner",
-        activity: "Active in #thao-luan and #lab-support",
-        verified: true,
-      };
-    case "check_scores":
-      return {
-        guildId: args.guildId || "demo",
-        studentQuery: args.studentQuery || "",
-        lab: args.lab || "lab-1",
-        score: 9.5,
-        maxScore: 10,
-        submissionStatus: "submitted_on_time",
-        gradedAt: new Date().toISOString(),
-        feedback: "All requirements met. Unit tests passed 100%.",
-      };
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

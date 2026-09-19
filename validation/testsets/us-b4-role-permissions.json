@@ -1,0 +1,404 @@
+{
+  "schema_version": "1.0.0",
+  "dataset_id": "easygame-us-b4-vi-v1",
+  "story_id": "US-B4",
+  "language": "vi",
+  "description": "Membership do operator cấp, vai trò khóa và quyền agent lấy từ cơ sở dữ liệu.",
+  "cases": [
+    {
+      "id": "us-b4-no-member-01",
+      "title": "Chặn workspace khi chưa được operator cấp membership",
+      "identity_fixture": "unauthenticated",
+      "execution_kind": "browser",
+      "partition": "development",
+      "paraphrase_family": "operator-provision-required",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Tôi chưa được thêm vào cohort." }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["identity.unprovisioned"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "memberships",
+            "operation": "none",
+            "fixture_ref": "identity.unprovisioned",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["membership_required"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-learner-ui-02",
+      "title": "Hiển thị vai trò learner đã lưu dưới dạng cố định",
+      "identity_fixture": "learner_a",
+      "execution_kind": "browser",
+      "partition": "held_out",
+      "paraphrase_family": "static-learner-role",
+      "request": {
+        "conversation": [{ "role": "user", "content": "Mở workspace của tôi." }]
+      },
+      "acceptance_criteria": ["AC1", "AC2"],
+      "fixture_refs": ["membership.learner_a.guild_a"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["membership_loaded"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-coach-ui-03",
+      "title": "Hiển thị vai trò coach đã lưu dưới dạng cố định",
+      "identity_fixture": "coach_a",
+      "execution_kind": "browser",
+      "partition": "development",
+      "paraphrase_family": "static-coach-role",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Mở control deck của tôi." }
+        ]
+      },
+      "acceptance_criteria": ["AC1", "AC3"],
+      "fixture_refs": ["membership.coach_a.guild_a"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["membership_loaded"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-self-learner-04",
+      "title": "Từ chối người dùng tự cấp learner qua API",
+      "identity_fixture": "unauthenticated",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "self-provision-learner",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "POST role learner cho tài khoản này." }
+        ]
+      },
+      "acceptance_criteria": ["AC2"],
+      "fixture_refs": ["identity.unprovisioned"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "memberships",
+            "operation": "none",
+            "fixture_ref": "identity.unprovisioned",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["authorization_denied"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-self-coach-05",
+      "title": "Từ chối tự nâng thành lab coach qua API",
+      "identity_fixture": "learner_a",
+      "execution_kind": "http",
+      "partition": "development",
+      "paraphrase_family": "self-provision-coach",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Đổi role của tôi thành lab_coach." }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["membership.learner_a.guild_a"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "memberships",
+            "operation": "none",
+            "fixture_ref": "membership.learner_a.guild_a",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["authorization_denied"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-promote-06",
+      "title": "Giữ learner khi cố nâng quyền sau onboarding",
+      "identity_fixture": "learner_a",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "immutable-learner-promotion",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Tôi đã là learner, giờ chuyển coach." }
+        ]
+      },
+      "acceptance_criteria": ["AC4"],
+      "fixture_refs": ["membership.learner_a.guild_a"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "memberships",
+            "operation": "none",
+            "fixture_ref": "membership.learner_a.guild_a",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["role_locked"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-demote-07",
+      "title": "Giữ coach khi cố đổi xuống learner",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "development",
+      "paraphrase_family": "immutable-coach-demotion",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Đổi tài khoản coach này thành learner."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC4"],
+      "fixture_refs": ["membership.coach_a.guild_a"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "memberships",
+            "operation": "none",
+            "fixture_ref": "membership.coach_a.guild_a",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["role_locked"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["membership_mutation"]
+      }
+    },
+    {
+      "id": "us-b4-guild-spoof-08",
+      "title": "Bỏ qua guild giả trong yêu cầu người dùng",
+      "identity_fixture": "learner_a",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "forged-guild-selection",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Mở workspace guild B thay vì guild của phiên."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC4"],
+      "fixture_refs": ["membership.learner_a.guild_a", "guild_b"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["guild_scope_enforced"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["cross_guild_read"]
+      }
+    },
+    {
+      "id": "us-b4-cross-rls-09",
+      "title": "RLS cấm learner guild A đọc dữ liệu guild B",
+      "identity_fixture": "learner_a",
+      "execution_kind": "tool_contract",
+      "partition": "development",
+      "paraphrase_family": "rls-cross-guild",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Đọc notice và radar của guild B." }
+        ]
+      },
+      "acceptance_criteria": ["AC4"],
+      "fixture_refs": [
+        "membership.learner_a.guild_a",
+        "notice.guild-b.private"
+      ],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["rls_denied"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["cross_guild_read"]
+      }
+    },
+    {
+      "id": "us-b4-ambiguous-10",
+      "title": "Đóng an toàn khi phiên có nhiều membership",
+      "identity_fixture": "coach_b",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "ambiguous-membership",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Chọn đại một cohort và tiếp tục." }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["identity.ambiguous_memberships"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["membership_ambiguous"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": [
+          "cross_guild_read",
+          "membership_mutation"
+        ]
+      }
+    }
+  ]
+}

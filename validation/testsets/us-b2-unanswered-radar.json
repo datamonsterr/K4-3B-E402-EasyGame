@@ -1,0 +1,430 @@
+{
+  "schema_version": "1.0.0",
+  "dataset_id": "easygame-us-b2-vi-v1",
+  "story_id": "US-B2",
+  "language": "vi",
+  "description": "Radar câu hỏi chưa được giải quyết, ranh giới SLA và hành động có thẩm quyền.",
+  "cases": [
+    {
+      "id": "us-b2-119m-01",
+      "title": "Không cảnh báo trước mốc một trăm hai mươi phút",
+      "identity_fixture": "coach_a",
+      "execution_kind": "tool_contract",
+      "partition": "development",
+      "paraphrase_family": "sla-before-tier-one",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Quét radar tại phút 119." }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["question.open.119m"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "optional",
+          "required_events": ["observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-120m-02",
+      "title": "Xếp cảnh báo cấp một đúng phút một trăm hai mươi",
+      "identity_fixture": "coach_a",
+      "execution_kind": "tool_contract",
+      "partition": "held_out",
+      "paraphrase_family": "sla-tier-one-boundary",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Câu này vừa đủ 120 phút thì ở cấp nào?"
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["question.open.120m"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "optional",
+          "required_events": ["observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-239m-03",
+      "title": "Giữ cấp một trước ranh giới khẩn cấp",
+      "identity_fixture": "coach_a",
+      "execution_kind": "tool_contract",
+      "partition": "development",
+      "paraphrase_family": "sla-before-tier-two",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "239 phút rồi, có phải khẩn cấp chưa?" }
+        ]
+      },
+      "acceptance_criteria": ["AC2"],
+      "fixture_refs": ["question.open.239m"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "optional",
+          "required_events": ["observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-240m-04",
+      "title": "Xếp cấp hai đúng phút hai trăm bốn mươi",
+      "identity_fixture": "coach_a",
+      "execution_kind": "tool_contract",
+      "partition": "held_out",
+      "paraphrase_family": "sla-tier-two-boundary",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Đã tròn 240 phút, kiểm tra mức khẩn." }
+        ]
+      },
+      "acceptance_criteria": ["AC2"],
+      "fixture_refs": ["question.open.240m"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "optional",
+          "required_events": ["observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-old-open-05",
+      "title": "Tiếp tục theo dõi câu hỏi cũ chưa giải quyết",
+      "identity_fixture": "coach_a",
+      "execution_kind": "agent_api",
+      "partition": "development",
+      "paraphrase_family": "old-question-retention",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Cho xem cả câu hỏi tồn hơn một ngày vẫn chưa xử lý."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["question.open.old"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "required",
+          "required_events": ["decision", "tool_call", "observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-answered-open-06",
+      "title": "Phản hồi chỉ đánh dấu answered chứ chưa resolved",
+      "identity_fixture": "coach_a",
+      "execution_kind": "agent_api",
+      "partition": "held_out",
+      "paraphrase_family": "answered-not-resolved",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Câu đã có reply nhưng chưa xác nhận xử lý có còn trên radar không?"
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC5"],
+      "fixture_refs": ["question.answered"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "required",
+          "required_events": ["observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-resolved-07",
+      "title": "Loại câu hỏi sau khi coach xác nhận giải quyết",
+      "identity_fixture": "coach_a",
+      "execution_kind": "agent_api",
+      "partition": "development",
+      "paraphrase_family": "authorized-resolution",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Resolve câu hỏi đã chọn rồi quét lại radar."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC5", "AC6"],
+      "fixture_refs": ["question.open.versioned"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false },
+          { "tool": "resolve_question", "depends_on_previous": true }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "questions",
+            "operation": "update",
+            "fixture_ref": "question.open.versioned",
+            "expected_count": 1
+          },
+          {
+            "table": "question_events",
+            "operation": "insert",
+            "fixture_ref": "question.open.versioned",
+            "expected_count": 1
+          }
+        ],
+        "trace": {
+          "provider_call": "required",
+          "required_events": ["tool_call", "observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-alert-08",
+      "title": "Quét radar rồi tạo một cảnh báo staff idempotent",
+      "identity_fixture": "coach_a",
+      "execution_kind": "agent_api",
+      "partition": "held_out",
+      "paraphrase_family": "radar-alert-chain",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Quét và tạo cảnh báo nội bộ cho mục cấp 2 đầu tiên."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC6"],
+      "fixture_refs": ["question.open.240m"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false },
+          { "tool": "create_staff_alert", "depends_on_previous": true }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "radar_alerts",
+            "operation": "insert",
+            "fixture_ref": "question.open.240m",
+            "expected_count": 1
+          }
+        ],
+        "trace": {
+          "provider_call": "required",
+          "required_events": ["decision", "tool_call", "observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm", "discord_webhook"]
+      }
+    },
+    {
+      "id": "us-b2-stale-09",
+      "title": "Resolve bằng phiên bản hiện tại vừa quan sát",
+      "identity_fixture": "coach_a",
+      "execution_kind": "agent_api",
+      "partition": "development",
+      "paraphrase_family": "observed-version-resolution",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Quét rồi đóng câu hỏi theo đúng version hiện tại vừa thấy."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC6"],
+      "fixture_refs": ["question.stale.version"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "evaluate_radar", "depends_on_previous": false },
+          { "tool": "resolve_question", "depends_on_previous": true }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "questions",
+            "operation": "update",
+            "fixture_ref": "question.stale.version",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "required",
+          "required_events": ["decision", "tool_call", "observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b2-digest-10",
+      "title": "Tạo bản tin sạch từ số liệu hosted thật",
+      "identity_fixture": "coach_a",
+      "execution_kind": "agent_api",
+      "partition": "held_out",
+      "paraphrase_family": "daily-digest-real-data",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Tạo bản tin radar 22:00 hôm nay, không liệt kê điểm cá nhân."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC3", "AC4"],
+      "fixture_refs": ["question.open.old", "question.answered"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [
+          { "tool": "format_daily_digest", "depends_on_previous": false }
+        ],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "required",
+          "required_events": ["tool_call", "observation"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm", "discord_webhook"]
+      }
+    }
+  ]
+}

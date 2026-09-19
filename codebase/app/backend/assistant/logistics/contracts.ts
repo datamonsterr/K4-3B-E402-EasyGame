@@ -33,6 +33,10 @@ export type AnswerLogisticsRequest = {
   actor: Actor;
   guildId: GuildId;
   message: string;
+  history?: readonly {
+    role: "user" | "assistant";
+    content: string;
+  }[];
 };
 
 export type AnswerLogisticsResult =

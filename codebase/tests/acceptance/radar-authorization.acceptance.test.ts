@@ -21,21 +21,53 @@ const actor = (role: "learner" | "lab_coach") =>
   ({ userId: `${role}-1`, guildId: "guild-a", role }) as Actor;
 
 function toolModel(toolName: string, input: Record<string, unknown>) {
+  const calls = ["create_staff_alert", "resolve_question"].includes(toolName)
+    ? [
+        {
+          content: [
+            {
+              type: "tool-call" as const,
+              toolCallId: "call-radar",
+              toolName: "evaluate_radar",
+              input: "{}",
+            },
+          ],
+          finishReason: { unified: "tool-calls" as const, raw: undefined },
+          usage,
+          warnings: [],
+        },
+        {
+          content: [
+            {
+              type: "tool-call" as const,
+              toolCallId: "call-write",
+              toolName,
+              input: JSON.stringify(input),
+            },
+          ],
+          finishReason: { unified: "tool-calls" as const, raw: undefined },
+          usage,
+          warnings: [],
+        },
+      ]
+    : [
+        {
+          content: [
+            {
+              type: "tool-call" as const,
+              toolCallId: "call-1",
+              toolName,
+              input: JSON.stringify(input),
+            },
+          ],
+          finishReason: { unified: "tool-calls" as const, raw: undefined },
+          usage,
+          warnings: [],
+        },
+      ];
   return new MockLanguageModelV3({
     doGenerate: [
-      {
-        content: [
-          {
-            type: "tool-call" as const,
-            toolCallId: "call-1",
-            toolName,
-            input: JSON.stringify(input),
-          },
-        ],
-        finishReason: { unified: "tool-calls" as const, raw: undefined },
-        usage,
-        warnings: [],
-      },
+      ...calls,
       {
         content: [{ type: "text" as const, text: "Operation completed." }],
         finishReason: { unified: "stop" as const, raw: undefined },
@@ -50,7 +82,7 @@ function operations() {
   return {
     evaluateRadar: vi.fn(async (input) => ({
       guildId: input.guildId,
-      items: [],
+      items: [{ id: "q-1", questionId: "q-1", tier: 2, version: 0 }],
     })),
     createStaffAlert: vi.fn(async (input) => ({ id: "alert-1", ...input })),
     resolveQuestion: vi.fn(async (input) => ({ success: true, ...input })),
@@ -173,14 +205,17 @@ describe("US-B3 AC4 — radar authorization and complete tool set", () => {
       expect(adapters[scenario.operation]).toHaveBeenCalledWith(
         expect.objectContaining({ guildId: "guild-a" }),
       );
-      expect(run.trace.map((event) => event.type)).toEqual([
-        "decision",
-        "tool_call",
-        "observation",
-      ]);
+      const workflow = ["create_staff_alert", "resolve_question"].includes(
+        scenario.tool,
+      );
+      expect(run.trace.map((event) => event.type)).toEqual(
+        workflow
+          ? ["decision", "tool_call", "observation", "tool_call", "observation"]
+          : ["decision", "tool_call", "observation"],
+      );
       expect(
         model.doGenerateCalls[0].tools?.map((candidate) => candidate.name),
-      ).toEqual([scenario.tool]);
+      ).toEqual(workflow ? ["evaluate_radar", scenario.tool] : [scenario.tool]);
       if (scenario.tool === "create_staff_alert") {
         expect(adapters.createStaffAlert).not.toHaveBeenCalledWith(
           expect.objectContaining({ dm: expect.anything() }),

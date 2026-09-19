@@ -16,10 +16,15 @@ export type Database = {
           confidence: number | null;
           created_at: string;
           decision_summary: string;
+          execution_mode: string;
           guild_id: string;
           id: string;
           latency_ms: number;
+          model: string | null;
           notice_id: string | null;
+          provider: string | null;
+          provider_attempted: boolean;
+          provider_succeeded: boolean;
           status: string;
         };
         Insert: {
@@ -28,10 +33,15 @@ export type Database = {
           confidence?: number | null;
           created_at?: string;
           decision_summary: string;
+          execution_mode?: string;
           guild_id: string;
           id?: string;
           latency_ms: number;
+          model?: string | null;
           notice_id?: string | null;
+          provider?: string | null;
+          provider_attempted?: boolean;
+          provider_succeeded?: boolean;
           status: string;
         };
         Update: {
@@ -40,10 +50,15 @@ export type Database = {
           confidence?: number | null;
           created_at?: string;
           decision_summary?: string;
+          execution_mode?: string;
           guild_id?: string;
           id?: string;
           latency_ms?: number;
+          model?: string | null;
           notice_id?: string | null;
+          provider?: string | null;
+          provider_attempted?: boolean;
+          provider_succeeded?: boolean;
           status?: string;
         };
         Relationships: [
@@ -419,36 +434,52 @@ export type Database = {
       };
       radar_alerts: {
         Row: {
+          actor_id: string | null;
           attempts: number;
           created_at: string;
           guild_id: string;
           id: string;
+          idempotency_key: string | null;
           question_id: string;
           sent_at: string | null;
           status: string;
+          summary: string | null;
           tier: number;
         };
         Insert: {
+          actor_id?: string | null;
           attempts?: number;
           created_at?: string;
           guild_id: string;
           id?: string;
+          idempotency_key?: string | null;
           question_id: string;
           sent_at?: string | null;
           status?: string;
+          summary?: string | null;
           tier: number;
         };
         Update: {
+          actor_id?: string | null;
           attempts?: number;
           created_at?: string;
           guild_id?: string;
           id?: string;
+          idempotency_key?: string | null;
           question_id?: string;
           sent_at?: string | null;
           status?: string;
+          summary?: string | null;
           tier?: number;
         };
         Relationships: [
+          {
+            foreignKeyName: "radar_alerts_actor_membership_fkey";
+            columns: ["guild_id", "actor_id"];
+            isOneToOne: false;
+            referencedRelation: "memberships";
+            referencedColumns: ["guild_id", "user_id"];
+          },
           {
             foreignKeyName: "radar_alerts_guild_id_fkey";
             columns: ["guild_id"];
@@ -627,11 +658,64 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      create_staff_alert: {
+        Args: {
+          p_idempotency_key: string;
+          p_question_id: string;
+          p_summary: string;
+          p_tier: number;
+        };
+        Returns: {
+          actor_id: string | null;
+          attempts: number;
+          created_at: string;
+          guild_id: string;
+          id: string;
+          idempotency_key: string | null;
+          question_id: string;
+          sent_at: string | null;
+          status: string;
+          summary: string | null;
+          tier: number;
+        };
+        SetofOptions: {
+          from: "*";
+          to: "radar_alerts";
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       enqueue_digests: { Args: { p_now?: string }; Returns: number };
       enqueue_radar: { Args: { p_now?: string }; Returns: number };
       import_pack: {
         Args: { p_name: string; p_records: Json; p_sha256: string };
         Returns: Json;
+      };
+      list_radar_items: {
+        Args: never;
+        Returns: {
+          question_id: string;
+          status: string;
+          tier: number;
+          version: number;
+        }[];
+      };
+      record_agent_run: {
+        Args: {
+          p_actor_id: string;
+          p_artifact_version: string;
+          p_decision_summary: string;
+          p_events: Json;
+          p_guild_id: string;
+          p_latency_ms: number;
+          p_model: string;
+          p_notice_id: string;
+          p_provider: string;
+          p_provider_attempted: boolean;
+          p_provider_succeeded: boolean;
+          p_status: string;
+        };
+        Returns: string;
       };
       resolve_question: {
         Args: { p_expected_version: number; p_question_id: string };

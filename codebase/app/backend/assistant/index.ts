@@ -142,23 +142,12 @@ export async function deliverAssistantReply(
 }
 
 export {
-  runAgent,
-  executeDeterministicAgent,
   validateLlmConnection,
   isQuotaOrTimeoutError,
-  loadSystemInstruction,
-  loadToolDeclarations,
-  validateQueryRolePermission,
-  validateOutputConstraints,
-  type AgentResult,
-  type AgentTelemetry,
-  type ToolInvocationTelemetry,
-  type TemporalResolutionTelemetry,
-  type RunAgentOptions,
   type LLMProvider,
   type ValidateLlmOptions,
   type ValidateLlmResult,
-} from "./gemini";
+} from "./provider-health";
 
 export * from "./logistics/contracts";
 export { finalizeAnswer } from "./logistics/finalize";

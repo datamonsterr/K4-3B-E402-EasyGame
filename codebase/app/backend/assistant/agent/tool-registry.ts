@@ -6,21 +6,53 @@ import { z } from "zod";
 export const RoleSchema = z.enum(["learner", "lab_coach"]);
 export type UserRole = z.infer<typeof RoleSchema>;
 
-export const ToolDeclarationSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  roles: z.array(RoleSchema).default(["learner", "lab_coach"]),
-  parameters: z.record(z.string(), z.unknown()),
-});
+export const ToolDeclarationSchema = z
+  .object({
+    name: z.string().trim().min(1),
+    description: z.string().trim().min(1),
+    roles: z.array(RoleSchema).min(1),
+    parameters: z.record(z.string(), z.unknown()),
+  })
+  .strict();
 
 export type ToolDeclaration = z.infer<typeof ToolDeclarationSchema>;
 
-export const ToolsConfigSchema = z.object({
-  tools: z.array(ToolDeclarationSchema),
-});
+export const ToolsConfigSchema = z
+  .object({
+    tools: z.array(ToolDeclarationSchema),
+  })
+  .strict()
+  .superRefine(({ tools }, context) => {
+    const names = new Set<string>();
+    tools.forEach((tool, index) => {
+      if (names.has(tool.name)) {
+        context.addIssue({
+          code: "custom",
+          path: ["tools", index, "name"],
+          message: "Tool names must be unique",
+        });
+      }
+      names.add(tool.name);
+    });
+  });
+
+export type AgentArtifacts = {
+  instructions: string;
+  tools: ToolDeclaration[];
+};
 
 function getToolsYamlPath(): string {
   return join(process.cwd(), "app", "backend", "artifacts", "tools.yaml");
+}
+
+function getSystemPromptPath(): string {
+  return join(process.cwd(), "app", "backend", "artifacts", "system_prompt.md");
+}
+
+export function loadAgentArtifacts(): AgentArtifacts {
+  const instructions = readFileSync(getSystemPromptPath(), "utf8").trim();
+  if (!instructions) throw new Error("Active system prompt is empty");
+  return { instructions, tools: loadConfiguredTools() };
 }
 
 /**
@@ -47,12 +79,7 @@ export function isToolAllowedForRole(
   toolName: string,
   role: UserRole = "learner",
 ): boolean {
-  if (role === "lab_coach") {
-    // Lab Coach has access to all tools (Learner tools + Coach-only tools)
-    return true;
-  }
-
-  const tools = loadConfiguredTools("learner");
+  const tools = loadConfiguredTools(role);
   return tools.some((t) => t.name === toolName);
 }
 

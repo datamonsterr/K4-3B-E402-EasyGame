@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-18T16:00:00.000Z",
+  "suites": [
+    {
+      "file": "us-b1-verified-logistics.json",
+      "story_id": "US-B1",
+      "cases": 10,
+      "sha256": "db341fde33721c5568bbe637cef8355de5ce09ba19ad7906bc575ef831e880a1"
+    },
+    {
+      "file": "us-b2-unanswered-radar.json",
+      "story_id": "US-B2",
+      "cases": 10,
+      "sha256": "c50405a0e3c2c6eb8e594e0b2e3a37e63b33962d82c7ff7a971f759253ccefe0"
+    },
+    {
+      "file": "us-b3-authenticated-agent.json",
+      "story_id": "US-B3",
+      "cases": 10,
+      "sha256": "6fffa7d1e554a6cbce35963abfd186e50d04ae3a05caa1695f33b6089a13ca28"
+    },
+    {
+      "file": "us-b4-role-permissions.json",
+      "story_id": "US-B4",
+      "cases": 10,
+      "sha256": "598266b3af6ee91bd728588f92fccf1bffc7242c38bed40c1be2c7efb83c5fc4"
+    },
+    {
+      "file": "us-b5-messages-reply.json",
+      "story_id": "US-B5",
+      "cases": 10,
+      "sha256": "3b48f7c4e5a98f28a8d5d91bc5de804c3b8f5b455bc84a8c7aa8133046e529bd"
+    }
+  ]
+}

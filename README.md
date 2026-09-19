@@ -110,8 +110,7 @@ K4-3B-E402-EasyGame/
 │       └── k4_daily_reports.md    ← 4 bản tin bot đang chạy thật kèm lỗi mẫu
 │
 ├── codebase/                      ← Mã nguồn prototype (chạy thật ≥1 lời gọi AI)
-├── eval/                          ← Golden set (≥20 case) và bảng đo lường chất lượng
-└── validation/                    ← Nhật ký người dùng ngoài nhóm dùng thử (R6 - 8 điểm)
+└── validation/                    ← 50 ca tiếng Việt, runner hosted, báo cáo an toàn và lịch sử phiên bản
 ```
 
 ---

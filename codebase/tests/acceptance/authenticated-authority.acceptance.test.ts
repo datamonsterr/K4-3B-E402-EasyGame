@@ -28,27 +28,31 @@ const source = (
 
 describe("US-B3 AC1 — authenticated authority", () => {
   it("accepts the only public answer input and uses the server actor", async () => {
-    const answer = vi.fn(async () => ({
-      status: "clarify" as const,
-      body: "Which lab are you asking about?",
-      source: null,
-      decisionSummary: "Clarifying topic",
+    const execute = vi.fn(async () => ({
+      runId: "11111111-1111-4111-8111-111111111111",
+      answer: {
+        status: "clarify" as const,
+        body: "Which lab are you asking about?",
+        source: null,
+        decisionSummary: "Clarifying topic",
+      },
     }));
     const handler = createAnswerHandler({
       openContext: async () => ({
         type: "ready",
         actor: { userId: "u" as never, guildId: "g" as never, role: "learner" },
-        assistant: { answer },
+        execute,
       }),
     });
 
     expect(
       (await handler(postAnswer({ query: "When is the deadline?" }))).status,
     ).toBe(200);
-    expect(answer).toHaveBeenCalledWith({
+    expect(execute).toHaveBeenCalledWith({
       actor: { userId: "u", guildId: "g", role: "learner" },
       guildId: "g",
       message: "When is the deadline?",
+      history: undefined,
     });
   });
 

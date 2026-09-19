@@ -65,4 +65,60 @@ describe("US-B3 AC3 — tool discipline", () => {
       /system prompt contents|api[_-]?key|providerPayload|chain.of.thought/i,
     );
   });
+
+  describe("Vietnamese conversational inquiries", () => {
+    it.each([
+      ["chào bạn", "Xin chào"],
+      ["xin chào", "Xin chào"],
+      ["chào bot", "Xin chào"],
+      ["bạn có khỏe không", "khỏe"],
+      ["bạn là ai", "Trợ lý Logistics"],
+      ["cảm ơn bạn", "Rất vui"],
+      ["tạm biệt", "Tạm biệt"],
+    ])(
+      "answers '%s' in polite Vietnamese without calling tools",
+      async (message, expectedSnippet) => {
+        const model = new MockLanguageModelV3();
+        const findVerifiedNotices = vi.fn(async () => []);
+        const run = await createCourseAgent({
+          model,
+          evidence: { findVerifiedNotices },
+        }).run({ actor, guildId: "guild-a" as GuildId, message });
+
+        expect(run.answer.status).toBe("clarify");
+        expect(run.answer.body).toContain(expectedSnippet);
+        expect(run.trace).toHaveLength(1);
+        expect(run.trace[0].type).toBe("decision");
+        expect(findVerifiedNotices).not.toHaveBeenCalled();
+        expect(model.doGenerateCalls).toHaveLength(0);
+
+        // Invariants: <= 300 code points, <= 3 sentences
+        expect(Array.from(run.answer.body).length).toBeLessThanOrEqual(300);
+        const sentences = [
+          ...new Intl.Segmenter("vi", { granularity: "sentence" }).segment(
+            run.answer.body,
+          ),
+        ].filter((s) => s.segment.trim().length > 0).length;
+        expect(sentences).toBeLessThanOrEqual(3);
+      },
+    );
+
+    it("clarifies ambiguous Vietnamese deadline without asking in English", async () => {
+      const model = new MockLanguageModelV3();
+      const findVerifiedNotices = vi.fn(async () => []);
+      const run = await createCourseAgent({
+        model,
+        evidence: { findVerifiedNotices },
+      }).run({
+        actor,
+        guildId: "guild-a" as GuildId,
+        message: "mấy giờ nộp bài ạ?",
+      });
+
+      expect(run.answer.status).toBe("clarify");
+      expect(run.answer.body).toContain("Lab hay Checkpoint");
+      expect(run.answer.body).not.toContain("Which lab, milestone");
+      expect(findVerifiedNotices).not.toHaveBeenCalled();
+    });
+  });
 });

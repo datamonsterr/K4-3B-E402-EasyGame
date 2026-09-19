@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "synthetic_only": true,
+  "guilds": [
+    { "alias": "guild_a", "allowlisted": true },
+    { "alias": "guild_b", "allowlisted": true }
+  ],
+  "identities": [
+    { "alias": "learner_a", "guild_alias": "guild_a", "role": "learner" },
+    { "alias": "coach_a", "guild_alias": "guild_a", "role": "lab_coach" },
+    { "alias": "learner_b", "guild_alias": "guild_b", "role": "learner" },
+    { "alias": "coach_b", "guild_alias": "guild_b", "role": "lab_coach" },
+    { "alias": "unauthenticated" }
+  ],
+  "preprovisioned_records": [
+    { "alias": "membership.learner_a.guild_a", "kind": "membership" },
+    { "alias": "membership.coach_a.guild_a", "kind": "membership" },
+    { "alias": "membership.learner_b.guild_b", "kind": "membership" },
+    { "alias": "membership.coach_b.guild_b", "kind": "membership" },
+    { "alias": "identity.ambiguous_memberships", "kind": "identity_contract" },
+    { "alias": "identity.unprovisioned", "kind": "identity_contract" },
+    { "alias": "provider.failure", "kind": "provider_contract" }
+  ],
+  "mutable_records": [
+    { "alias": "notice.lab1.latest", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:lab1-latest", "attributes": { "guild": "guild_a", "topic": "lab-1", "verified": true, "revision": 1, "content": "Hạn Lab 1 là 20:00 hôm nay.", "link_state": "valid" } },
+    { "alias": "notice.cp1.latest", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:cp1-latest", "attributes": { "guild": "guild_a", "topic": "checkpoint-1", "verified": true, "revision": 2, "content": "Hạn Checkpoint 1 là 21:00 ngày 17/09/2026.", "link_state": "valid" } },
+    { "alias": "notice.lab2.old", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:lab2-old", "attributes": { "guild": "guild_a", "topic": "lab-2", "verified": true, "revision": 1, "content": "Hạn Lab 2 là 23:59 ngày 18/09/2026.", "link_state": "valid" } },
+    { "alias": "notice.lab2.extended", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:lab2-extended", "attributes": { "guild": "guild_a", "topic": "lab-2", "verified": true, "revision": 2, "content": "Gia hạn Lab 2 tới 12:00 ngày 19/09/2026.", "link_state": "valid" } },
+    { "alias": "notice.lab3.tie-a", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:lab3-tie-a", "attributes": { "guild": "guild_a", "topic": "lab-3", "verified": true, "revision": 3, "timestamp_group": "tie" } },
+    { "alias": "notice.lab3.tie-b", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:lab3-tie-b", "attributes": { "guild": "guild_a", "topic": "lab-3", "verified": true, "revision": 3, "timestamp_group": "tie" } },
+    { "alias": "notice.lab4.unverified", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:lab4-unverified", "attributes": { "guild": "guild_a", "topic": "lab-4", "verified": false, "revision": 1 } },
+    { "alias": "notice.missing-link", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:missing-link", "attributes": { "guild": "guild_a", "topic": "attendance", "verified": true, "link_state": "missing" } },
+    { "alias": "notice.guild-b.private", "kind": "notice", "run_owned": true, "provenance": "validation:${run_id}:notice:guild-b", "attributes": { "guild": "guild_b", "topic": "checkpoint-1", "verified": true, "link_state": "valid" } },
+    { "alias": "question.age-119", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:119", "attributes": { "guild": "guild_a", "age_minutes": 119, "status": "unresolved", "version": 1 } },
+    { "alias": "question.open.119m", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:open-119", "attributes": { "guild": "guild_a", "age_minutes": 119, "status": "open", "version": 1 } },
+    { "alias": "question.age-120", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:120", "attributes": { "guild": "guild_a", "age_minutes": 120, "status": "unresolved", "version": 1 } },
+    { "alias": "question.open.120m", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:open-120", "attributes": { "guild": "guild_a", "age_minutes": 120, "status": "open", "version": 1 } },
+    { "alias": "question.age-239", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:239", "attributes": { "guild": "guild_a", "age_minutes": 239, "status": "unresolved", "version": 1 } },
+    { "alias": "question.open.239m", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:open-239", "attributes": { "guild": "guild_a", "age_minutes": 239, "status": "open", "version": 1 } },
+    { "alias": "question.age-240", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:240", "attributes": { "guild": "guild_a", "age_minutes": 240, "status": "unresolved", "version": 1 } },
+    { "alias": "question.open.240m", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:open-240", "attributes": { "guild": "guild_a", "age_minutes": 240, "status": "open", "version": 1 } },
+    { "alias": "question.old-unresolved", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:old", "attributes": { "guild": "guild_a", "age_minutes": 2880, "status": "unresolved", "version": 4 } },
+    { "alias": "question.open.old", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:open-old", "attributes": { "guild": "guild_a", "age_minutes": 2880, "status": "open", "version": 4 } },
+    { "alias": "question.answered", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:answered", "attributes": { "guild": "guild_a", "age_minutes": 300, "status": "answered", "version": 2 } },
+    { "alias": "question.resolved", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:resolved", "attributes": { "guild": "guild_a", "age_minutes": 300, "status": "resolved", "version": 3 } },
+    { "alias": "question.version-conflict", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:conflict", "attributes": { "guild": "guild_a", "age_minutes": 250, "status": "unresolved", "version": 7 } },
+    { "alias": "question.open.versioned", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:versioned", "attributes": { "guild": "guild_a", "age_minutes": 250, "status": "open", "version": 7 } },
+    { "alias": "question.stale.version", "kind": "question", "run_owned": true, "provenance": "validation:${run_id}:question:stale", "attributes": { "guild": "guild_a", "age_minutes": 250, "status": "open", "version": 8 } },
+    { "alias": "message.reply-target", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:target", "attributes": { "guild": "guild_a", "message_type": "question", "link_state": "valid" } },
+    { "alias": "message.target", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:target-alias", "attributes": { "guild": "guild_a", "message_type": "question", "link_state": "valid" } },
+    { "alias": "message.valid.link", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:valid-link", "attributes": { "guild": "guild_a", "message_type": "question", "link_state": "valid" } },
+    { "alias": "message.missing.link", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:missing-link", "attributes": { "guild": "guild_a", "message_type": "question", "link_state": "missing" } },
+    { "alias": "message.invalid-target", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:invalid", "attributes": { "guild": "guild_a", "message_type": "notice", "link_state": "missing" } },
+    { "alias": "message.guild-b.target", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:guild-b", "attributes": { "guild": "guild_b", "message_type": "question", "link_state": "valid" } },
+    { "alias": "message.guild-b.private", "kind": "source_message", "run_owned": true, "provenance": "validation:${run_id}:message:guild-b-private", "attributes": { "guild": "guild_b", "message_type": "question", "link_state": "valid" } }
+  ]
+}

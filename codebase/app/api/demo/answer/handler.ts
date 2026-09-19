@@ -2,15 +2,45 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type {
   Actor,
+  AnswerLogisticsRequest,
   AnswerLogisticsResult,
-  LogisticsAssistant,
 } from "@/backend/assistant/logistics/contracts";
 
 const MAX_PAYLOAD_BYTES = 8192;
 
-const requestSchema = z
-  .object({ query: z.string().trim().min(1).max(2000) })
+const historyTurnSchema = z
+  .object({
+    role: z.enum(["user", "assistant"]),
+    content: z.string().trim().min(1).max(2000),
+  })
   .strict();
+const requestSchema = z
+  .object({
+    query: z.string().trim().min(1).max(2000),
+    history: z.array(historyTurnSchema).max(10).optional(),
+  })
+  .strict()
+  .superRefine((value, context) => {
+    value.history?.forEach((turn, index) => {
+      const expected = index % 2 === 0 ? "user" : "assistant";
+      if (turn.role !== expected)
+        context.addIssue({
+          code: "custom",
+          path: ["history", index, "role"],
+          message: "History roles must alternate from user",
+        });
+    });
+    if (
+      value.history?.length &&
+      value.history[value.history.length - 1]?.role !== "assistant"
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["history", value.history.length - 1, "role"],
+        message: "History must end with an assistant turn",
+      });
+    }
+  });
 
 export type AnswerContextResult =
   | { type: "unauthenticated" }
@@ -19,17 +49,31 @@ export type AnswerContextResult =
   | {
       type: "ready";
       actor: Actor;
-      assistant: LogisticsAssistant;
+      execute(request: AnswerLogisticsRequest): Promise<{
+        answer: AnswerLogisticsResult;
+        runId: string;
+      }>;
     };
 
 export type AnswerContextOpener = () => Promise<AnswerContextResult>;
 
-function jsonError(status: number, code: string, message: string) {
+export class AnswerExecutionError extends Error {
+  constructor(readonly runId?: string) {
+    super("Assistant execution failed");
+  }
+}
+
+function jsonError(
+  status: number,
+  code: string,
+  message: string,
+  headers: Record<string, string> = {},
+) {
   return NextResponse.json(
     { error: { code, message } },
     {
       status,
-      headers: { "Cache-Control": "private, no-store" },
+      headers: { "Cache-Control": "private, no-store", ...headers },
     },
   );
 }
@@ -81,21 +125,28 @@ export function createAnswerHandler(deps: {
     }
 
     try {
-      const result: AnswerLogisticsResult = await context.assistant.answer({
+      const execution = await context.execute({
         actor: context.actor,
         guildId: context.actor.guildId,
         message: parsed.data.query,
+        history: parsed.data.history,
       });
 
-      return NextResponse.json(result, {
+      return NextResponse.json(execution.answer, {
         status: 200,
-        headers: { "Cache-Control": "private, no-store" },
+        headers: {
+          "Cache-Control": "private, no-store",
+          "X-EasyGame-Run-Id": execution.runId,
+        },
       });
-    } catch {
+    } catch (error) {
       return jsonError(
         503,
         "ASSISTANT_UNAVAILABLE",
         "The assistant is temporarily unavailable. Please try again later.",
+        error instanceof AnswerExecutionError && error.runId
+          ? { "X-EasyGame-Run-Id": error.runId }
+          : {},
       );
     }
   };

@@ -243,7 +243,10 @@ describe("createSupabaseNoticeEvidence", () => {
         guildId: notice.guildId,
         topicKey: "lab-1",
       }),
-    ).rejects.toThrow("Notice evidence unavailable");
+    ).rejects.toMatchObject({
+      operation: "query_notices",
+      kind: "unavailable",
+    });
   });
 });
 

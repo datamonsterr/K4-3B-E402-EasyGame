@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://easygame.local/schemas/eval-dataset.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dataset_id",
+    "story_id",
+    "language",
+    "description",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "dataset_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,79}$" },
+    "story_id": { "enum": ["US-B1", "US-B2", "US-B3", "US-B4", "US-B5"] },
+    "language": { "const": "vi" },
+    "description": { "type": "string", "minLength": 10, "maxLength": 500 },
+    "cases": {
+      "type": "array",
+      "minItems": 10,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "identity_fixture",
+        "execution_kind",
+        "partition",
+        "paraphrase_family",
+        "request",
+        "acceptance_criteria",
+        "fixture_refs",
+        "expected"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{4,99}$" },
+        "title": { "type": "string", "minLength": 8, "maxLength": 200 },
+        "identity_fixture": {
+          "enum": [
+            "learner_a",
+            "coach_a",
+            "learner_b",
+            "coach_b",
+            "unauthenticated"
+          ]
+        },
+        "execution_kind": {
+          "enum": ["agent_api", "tool_contract", "http", "browser"]
+        },
+        "partition": { "enum": ["development", "held_out"] },
+        "paraphrase_family": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{2,79}$"
+        },
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["conversation"],
+          "properties": {
+            "conversation": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["role", "content"],
+                "properties": {
+                  "role": { "const": "user" },
+                  "content": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^AC[1-9][0-9]*$" }
+        },
+        "fixture_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]+$" }
+        },
+        "expected": { "$ref": "#/$defs/expected" }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome",
+        "ordered_tool_workflow",
+        "public_response",
+        "database_deltas",
+        "trace",
+        "forbidden_external_effects"
+      ],
+      "properties": {
+        "outcome": {
+          "enum": [
+            "answered",
+            "clarify",
+            "fallback",
+            "refused",
+            "succeeded",
+            "denied",
+            "unavailable"
+          ]
+        },
+        "ordered_tool_workflow": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tool", "depends_on_previous"],
+            "properties": {
+              "tool": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$" },
+              "depends_on_previous": { "type": "boolean" }
+            }
+          }
+        },
+        "public_response": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_code_points", "max_sentences", "source_card"],
+          "properties": {
+            "max_code_points": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            },
+            "max_sentences": { "type": "integer", "minimum": 1, "maximum": 3 },
+            "source_card": { "enum": ["required", "forbidden", "optional"] },
+            "allowed_source_refs": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]+$" }
+            }
+          }
+        },
+        "database_deltas": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "$ref": "#/$defs/databaseDelta" }
+        },
+        "trace": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider_call", "required_events", "forbidden_fields"],
+          "properties": {
+            "provider_call": { "enum": ["required", "forbidden", "optional"] },
+            "required_events": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]+$" }
+            },
+            "forbidden_fields": {
+              "type": "array",
+              "minItems": 3,
+              "uniqueItems": true,
+              "contains": { "const": "thoughtProcess" },
+              "items": {
+                "enum": [
+                  "thoughtProcess",
+                  "chainOfThought",
+                  "accessToken",
+                  "credentials",
+                  "rawProviderResponse"
+                ]
+              }
+            }
+          }
+        },
+        "forbidden_external_effects": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "discord_dm",
+              "discord_webhook",
+              "membership_mutation",
+              "cross_guild_read",
+              "fabricated_link"
+            ]
+          }
+        }
+      }
+    },
+    "databaseDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["table", "operation", "fixture_ref", "expected_count"],
+      "properties": {
+        "table": {
+          "enum": [
+            "memberships",
+            "notices",
+            "questions",
+            "radar_alerts",
+            "source_messages",
+            "question_events"
+          ]
+        },
+        "operation": { "enum": ["insert", "update", "delete", "none"] },
+        "fixture_ref": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]+$" },
+        "expected_count": { "type": "integer", "minimum": 0, "maximum": 20 }
+      }
+    }
+  }
+}

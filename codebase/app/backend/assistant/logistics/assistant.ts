@@ -19,6 +19,7 @@ function classifyIntent(
   message: string,
 ):
   | { type: "refused"; reason: string }
+  | { type: "conversational"; body: string; reason: string }
   | { type: "clarify"; reason: string }
   | { type: "logistics"; topicKey: string } {
   const normalized = message.trim().toLowerCase();
@@ -55,6 +56,43 @@ function classifyIntent(
     return { type: "logistics", topicKey: "attendance" };
   }
 
+  // Well-being inquiry
+  if (
+    /(?:bạn có khỏe không|khỏe không|bạn thế nào|hôm nay thế nào|sức khỏe thế nào|dạo này thế nào)/i.test(
+      normalized,
+    )
+  ) {
+    return {
+      type: "conversational",
+      body: "Mình khỏe, cảm ơn bạn nhé! Còn bạn thì sao, hôm nay bạn có cần mình hỗ trợ thông tin gì về khóa học không?",
+      reason: "Answered well-being inquiry in Vietnamese",
+    };
+  }
+
+  // Conversational greetings & general intro
+  if (
+    /^(?:chào(?: bạn| bot| ad| anh| chị| mn| mọi người)?|xin chào|hello|hi|hey|alo)\b/i.test(
+      normalized,
+    )
+  ) {
+    return {
+      type: "conversational",
+      body: "Xin chào bạn! Mình là Trợ lý Hỗ trợ Logistics của EasyGame (Lớp 3B - E402). Bạn cần hỗ trợ về hạn nộp bài, điểm danh hay thông báo chính thức nào không?",
+      reason: "Greeted learner in Vietnamese",
+    };
+  }
+  if (
+    /(?:bạn là ai|bạn có thể (?:làm|giúp) (?:được )?gì|khả năng của bạn|giới thiệu về bạn)/i.test(
+      normalized,
+    )
+  ) {
+    return {
+      type: "conversational",
+      body: "Mình là Trợ lý Logistics EasyGame (Lớp 3B - E402), hỗ trợ giải đáp thông báo chính thức, hạn nộp bài tập, điểm danh và các quy chế khóa học.",
+      reason: "Provided capability overview in Vietnamese",
+    };
+  }
+
   // If vague or asking for deadline without lab entity
   return { type: "clarify", reason: "Clarifying ambiguous logistics topic" };
 }
@@ -81,10 +119,25 @@ export function createLogisticsAssistant(deps: {
         };
       }
 
-      if (classification.type === "clarify") {
+      if (classification.type === "conversational") {
         return {
           status: "clarify",
-          body: clarifyText,
+          body: classification.body,
+          source: null,
+          decisionSummary: classification.reason,
+        };
+      }
+
+      if (classification.type === "clarify") {
+        const isVi =
+          /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(
+            request.message,
+          );
+        return {
+          status: "clarify",
+          body: isVi
+            ? "Bạn đang hỏi về hạn nộp bài của Lab hay Checkpoint nào? Vui lòng nêu rõ để mình tra cứu thông báo chính xác nhé."
+            : clarifyText,
           source: null,
           decisionSummary: classification.reason,
         };

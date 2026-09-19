@@ -113,15 +113,15 @@ describe("US-B3 AC5 — provider portability and resiliency", () => {
         throw new Error("provider payload with secret details");
       },
     });
-    const run = await createCourseAgent({
-      model,
-      evidence: { findVerifiedNotices: async () => [verifiedNotice] },
-    }).run(request);
-    expect(run.answer.status).toBe("fallback");
-    expect(JSON.stringify(run)).not.toContain("secret details");
+    await expect(
+      createCourseAgent({
+        model,
+        evidence: { findVerifiedNotices: async () => [verifiedNotice] },
+      }).run(request),
+    ).rejects.toThrow("provider payload with secret details");
   });
 
-  it("uses deterministic verified evidence when the provider fails after observation", async () => {
+  it("does not substitute deterministic evidence when the provider fails after observation", async () => {
     let calls = 0;
     const model = new MockLanguageModelV3({
       doGenerate: async () => {
@@ -143,22 +143,11 @@ describe("US-B3 AC5 — provider portability and resiliency", () => {
         throw new Error("quota exhausted with raw provider payload");
       },
     });
-    const run = await createCourseAgent({
-      model,
-      evidence: { findVerifiedNotices: async () => [verifiedNotice] },
-    }).run(request);
-    expect(run.answer).toMatchObject({
-      status: "answered",
-      body: verifiedNotice.answer,
-      source: verifiedNotice.source,
-    });
-    expect(run.trace.map((event) => event.type)).toEqual([
-      "decision",
-      "tool_call",
-      "observation",
-    ]);
-    expect(JSON.stringify(run)).not.toMatch(
-      /quota exhausted|provider payload/i,
-    );
+    await expect(
+      createCourseAgent({
+        model,
+        evidence: { findVerifiedNotices: async () => [verifiedNotice] },
+      }).run(request),
+    ).rejects.toThrow("quota exhausted");
   });
 });

@@ -26,17 +26,6 @@
       "name": "format_daily_digest",
       "sideEffect": true,
       "roles": ["lab_coach"]
-    },
-    {
-      "name": "broadcast_notification",
-      "sideEffect": true,
-      "roles": ["lab_coach"]
-    },
-    {
-      "name": "check_student_profile",
-      "sideEffect": false,
-      "roles": ["lab_coach"]
-    },
-    { "name": "check_scores", "sideEffect": false, "roles": ["lab_coach"] }
+    }
   ]
 }

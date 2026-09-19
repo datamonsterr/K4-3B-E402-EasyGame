@@ -26,12 +26,19 @@ variables: `AI_PROVIDER=gemini` with `GEMINI_API_KEY`/`GEMINI_MODEL`, or
 Gemini default is `gemini-3.5-flash-lite`. Browser requests cannot provide or
 persist provider keys, models, guilds, or roles.
 
-With local Supabase running and a real Gemini key loaded, the opt-in integration
-check exercises a real RLS-protected notice query and AI SDK tool loop:
+The canonical evaluator calls the deployed production HTTP API with dedicated
+validation identities, arranges only namespaced synthetic data in hosted
+Supabase, and cleans exact owned IDs:
 
 ```bash
-RUN_LIVE_AGENT_TESTS=1 pnpm test:live-agent
+pnpm validation:datasets
+pnpm validation:test
+pnpm eval:hosted
 ```
+
+`eval:hosted` is guarded by the explicit acknowledgement and hosted-only
+settings documented in `.env.example`. It never treats deterministic fallback
+or a local database as proof of a valid hosted run.
 
 See the [schema](../docs/architecture/DATABASE_SCHEMA.md), [architecture](../docs/architecture/NEXTJS_FOUNDATION_DESIGN.md), and [use-case coverage review](../docs/usecases/IMPLEMENTATION_COVERAGE.md).
 

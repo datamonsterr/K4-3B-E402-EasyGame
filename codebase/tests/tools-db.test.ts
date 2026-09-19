@@ -16,10 +16,8 @@ import {
   type ResolveQuestionArgs,
   type FormatDailyDigestArgs,
   type QueryNoticesOutput,
-  type EvaluateRadarOutput,
   type StaffAlert,
   type ResolveQuestionOutput,
-  type DailyDigestOutput,
   type SearchWebOutput,
 } from "../app/backend/tools";
 import type { Notice } from "../app/backend/assistant";
@@ -131,10 +129,14 @@ describe("Database & Tool Integration", () => {
         return;
       }
 
-      const result = await executeEvaluateRadar({
-        guildId: "A",
-        now: scanTime,
-      });
+      const result = await executeEvaluateRadar(
+        {
+          guildId: "A",
+          now: scanTime,
+        },
+        undefined,
+        dbClient,
+      );
 
       expect(result.guildId).toBe("A");
       expect(new Date(result.evaluatedAt).toISOString()).toBe(
@@ -293,15 +295,13 @@ describe("Database & Tool Integration", () => {
       const args: FormatDailyDigestArgs = {
         guildId: "A",
         localDate: "2026-09-18",
-        topics: [
-          { topic: "Lab 1 Submission Issues", count: 12 },
-          { topic: "CVAT Docker Setup", count: 7 },
-        ],
-        rawSummary:
-          "Tổng kết ca trực  nguồn tham chiếu   ngày 18/09/2026: Đã hỗ trợ 19 câu hỏi.",
       };
 
-      const digest = await executeFormatDailyDigest(args);
+      const digest = await executeFormatDailyDigest(args, [
+        { status: "resolved", topic: "Lab 1 Submission Issues" },
+        { status: "open", topic: "Lab 1 Submission Issues" },
+        { status: "answered", topic: "CVAT Docker Setup" },
+      ]);
 
       expect(digest.guildId).toBe("A");
       expect(digest.localDate).toBe("2026-09-18");
@@ -406,13 +406,13 @@ describe("Database & Tool Integration", () => {
       expect(res.status).toBe("answered");
     });
 
-    it("dispatches evaluate_radar", async () => {
-      const res = (await executeTool("evaluate_radar", {
-        guildId: "A",
-        now: "2026-09-18T12:00:00Z",
-      })) as EvaluateRadarOutput;
-      expect(res.items).toBeDefined();
-      expect(res.metrics).toBeDefined();
+    it("fails closed when evaluate_radar has no database adapter", async () => {
+      await expect(
+        executeTool("evaluate_radar", {
+          guildId: "A",
+          now: "2026-09-18T12:00:00Z",
+        }),
+      ).rejects.toMatchObject({ operation: "evaluate_radar" });
     });
 
     it("dispatches create_staff_alert", async () => {
@@ -436,13 +436,13 @@ describe("Database & Tool Integration", () => {
       expect(res.newVersion).toBe(1);
     });
 
-    it("dispatches format_daily_digest", async () => {
-      const res = (await executeTool("format_daily_digest", {
-        guildId: "A",
-        localDate: "2026-09-18",
-      })) as DailyDigestOutput;
-      expect(res.title).toContain("2026-09-18");
-      expect(res.rankedTopics.length).toBeGreaterThan(0);
+    it("fails closed when format_daily_digest has no database rows", async () => {
+      await expect(
+        executeTool("format_daily_digest", {
+          guildId: "A",
+          localDate: "2026-09-18",
+        }),
+      ).rejects.toMatchObject({ operation: "format_daily_digest" });
     });
 
     it("dispatches search_web", async () => {
