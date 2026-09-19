@@ -39,12 +39,10 @@ export async function fetchQuestionsFromDb(
   client: SupabaseClient<Database>,
   guildId: string,
 ): Promise<RadarQuestionWithMeta[]> {
-  const isUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      guildId,
-    );
-  let query = client.from("questions").select(
-    `
+  const { data, error } = await client
+    .from("questions")
+    .select(
+      `
       id,
       guild_id,
       status,
@@ -56,11 +54,8 @@ export async function fetchQuestionsFromDb(
       source_message:source_messages(id, content, sent_at, channel_id),
       guild:guilds(id, source_label)
     `,
-  );
-  if (isUuid) {
-    query = query.eq("guild_id", guildId);
-  }
-  const { data, error } = await query;
+    )
+    .eq("guild_id", guildId);
 
   if (error) {
     throw new ToolOperationError("evaluate_radar", "unavailable");
@@ -86,19 +81,7 @@ export async function fetchQuestionsFromDb(
       | null;
   }
 
-  const rawRows = (data ?? []) as unknown as DbQuestionRow[];
-  const rows = isUuid
-    ? rawRows
-    : rawRows.filter((row) => {
-        const g = row.guild;
-        const gLabel = Array.isArray(g) ? g[0]?.source_label : g?.source_label;
-        return (
-          row.guild_id === guildId ||
-          gLabel === guildId ||
-          guildId === "demo" ||
-          guildId === "A"
-        );
-      });
+  const rows = (data ?? []) as unknown as DbQuestionRow[];
   return rows.map((row) => {
     const src = Array.isArray(row.source_message)
       ? row.source_message[0]

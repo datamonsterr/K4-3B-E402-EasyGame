@@ -634,8 +634,144 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
       const operation = classifyOperation(request.message);
       if (operation) return runOperation(deps, artifacts, request, operation);
 
+      const topicKey = classifyTopic(request.message);
+      if (topicKey) {
+        const noticeTool = requireConfiguredTool(artifacts, "query_notices");
+        if (!noticeTool.roles.includes(request.actor.role)) {
+          return {
+            answer: {
+              status: "refused",
+              body: REFUSAL_BODY,
+              source: null,
+              decisionSummary:
+                "Refused tool not allowed for authenticated role",
+            },
+            trace: [
+              {
+                type: "decision",
+                summary: "Refused tool not allowed for authenticated role",
+              },
+            ],
+            provider: providerName(deps),
+            model: modelName(deps),
+            ...executionEvidence(false, false, startedAt),
+          };
+        }
+
+        const trace: AgentTraceEvent[] = [
+          {
+            type: "decision",
+            summary: `Verified notice lookup required for ${topicKey}`,
+          },
+        ];
+        let observation: NoticeObservation | undefined;
+
+        const tools = {
+          query_notices: tool({
+            description: noticeTool.description,
+            inputSchema: z.object({
+              topicKey: z
+                .string()
+                .min(1)
+                .describe("Classified logistics topic"),
+            }),
+            execute: async ({ topicKey: requestedTopic }) => {
+              trace.push({
+                type: "tool_call",
+                tool: "query_notices",
+                summary: `Querying verified notices for ${requestedTopic}`,
+              });
+              const notices = await deps.evidence.findVerifiedNotices({
+                guildId: request.guildId,
+                topicKey,
+              });
+              observation = selectNotice(notices);
+              trace.push({
+                type: "observation",
+                tool: "query_notices",
+                summary:
+                  observation.status === "found"
+                    ? `Found ${observation.matchedCount} verified notice(s); selected latest timestamp`
+                    : observation.status === "conflict"
+                      ? `Found ${observation.matchedCount} notices with a conflicting latest timestamp`
+                      : "No verified notice found",
+              });
+              return observation;
+            },
+          }),
+        };
+
+        const agent = new ToolLoopAgent({
+          model: deps.model,
+          instructions:
+            artifacts.instructions +
+            "\n\nUse query_notices exactly once. After observing it, repeat only the selected notice answer. Never invent or modify dates, policy, guild, role, or source links.",
+          tools,
+          activeTools: ["query_notices"],
+          stopWhen: stepCountIs(3),
+          temperature: 0,
+          include: { requestBody: false, responseBody: false },
+        });
+
+        const generatedText = (await agent.generate(generationInput(request)))
+          .text;
+        let answer: AnswerLogisticsResult;
+        if (!observation || observation.status === "missing") {
+          answer = fallback("No verified evidence for topic");
+        } else if (observation.status === "conflict") {
+          answer = {
+            status: "clarify",
+            body: CLARIFY_BODY,
+            source: null,
+            decisionSummary: "Clarifying tied conflicting notices",
+          };
+        } else {
+          answer = finalizeAnswer(
+            generatedText,
+            observation.notice,
+            request.guildId,
+          );
+        }
+
+        return {
+          answer,
+          trace,
+          provider: providerName(deps),
+          model: modelName(deps),
+          ...(observation?.status === "found"
+            ? { selectedNoticeId: observation.notice.id }
+            : {}),
+          ...executionEvidence(true, true, startedAt),
+        };
+      }
+
+      // No topicKey found. Check if this is an ambiguous logistics question:
+      const ambiguous = isAmbiguousLogistics(request.message);
+      if (ambiguous) {
+        const isVi = isVietnameseText(request.message);
+        const clarifyMsg =
+          "Bạn đang hỏi về hạn nộp bài của Lab hay Checkpoint nào? Vui lòng nêu rõ để mình tra cứu thông báo chính xác giúp bạn nhé.";
+        return {
+          answer: {
+            status: "clarify",
+            body: isVi ? clarifyMsg : CLARIFY_BODY,
+            source: null,
+            decisionSummary: "Clarifying ambiguous logistics topic",
+          },
+          trace: [
+            {
+              type: "decision",
+              summary: "Clarification required before tool use",
+            },
+          ],
+          provider: providerName(deps),
+          model: modelName(deps),
+          ...executionEvidence(false, false, startedAt),
+        };
+      }
+
       const conversational = classifyConversational(request.message);
-      if (conversational && !classifyTopic(request.message)) {
+      if (conversational) {
         return {
           answer: {
             status: "clarify",
@@ -655,160 +791,30 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
         };
       }
 
-      const topicKey = classifyTopic(request.message);
-      if (!topicKey) {
-        const isVi = isVietnameseText(request.message);
-        if (!isVi) {
-          return {
-            answer: {
-              status: "clarify",
-              body: CLARIFY_BODY,
-              source: null,
-              decisionSummary: "Clarifying ambiguous logistics topic",
-            },
-            trace: [
-              {
-                type: "decision",
-                summary: "Clarification required before tool use",
-              },
-            ],
-            provider: providerName(deps),
-            model: modelName(deps),
-            ...executionEvidence(false, false, startedAt),
-          };
-        }
-
-        const ambiguous = isAmbiguousLogistics(request.message);
-        const clarifyMsg =
-          "Bạn đang hỏi về hạn nộp bài của Lab hay Checkpoint nào? Vui lòng nêu rõ để mình tra cứu thông báo chính xác giúp bạn nhé.";
-        const generalIntro =
-          "Xin chào bạn! Mình là Trợ lý Hỗ trợ Logistics của EasyGame (Lớp 3B - E402). Bạn cần hỗ trợ về hạn nộp bài, điểm danh hay thông báo chính thức nào không?";
-
-        return {
-          answer: {
-            status: "clarify",
-            body: ambiguous ? clarifyMsg : generalIntro,
-            source: null,
-            decisionSummary: ambiguous
-              ? "Clarifying ambiguous logistics topic"
-              : "Answered general assistance inquiry in Vietnamese",
-          },
-          trace: [
-            {
-              type: "decision",
-              summary: ambiguous
-                ? "Clarification required before tool use"
-                : "Answered general assistance inquiry in Vietnamese",
-            },
-          ],
-          provider: providerName(deps),
-          model: modelName(deps),
-          ...executionEvidence(false, false, startedAt),
-        };
-      }
-
-      const noticeTool = requireConfiguredTool(artifacts, "query_notices");
-      if (!noticeTool.roles.includes(request.actor.role)) {
-        return {
-          answer: {
-            status: "refused",
-            body: REFUSAL_BODY,
-            source: null,
-            decisionSummary: "Refused tool not allowed for authenticated role",
-          },
-          trace: [
-            {
-              type: "decision",
-              summary: "Refused tool not allowed for authenticated role",
-            },
-          ],
-          provider: providerName(deps),
-          model: modelName(deps),
-          ...executionEvidence(false, false, startedAt),
-        };
-      }
-
-      const trace: AgentTraceEvent[] = [
-        {
-          type: "decision",
-          summary: `Verified notice lookup required for ${topicKey}`,
-        },
-      ];
-      let observation: NoticeObservation | undefined;
-
-      const tools = {
-        query_notices: tool({
-          description: noticeTool.description,
-          inputSchema: z.object({
-            topicKey: z.string().min(1).describe("Classified logistics topic"),
-          }),
-          execute: async ({ topicKey: requestedTopic }) => {
-            trace.push({
-              type: "tool_call",
-              tool: "query_notices",
-              summary: `Querying verified notices for ${requestedTopic}`,
-            });
-            const notices = await deps.evidence.findVerifiedNotices({
-              guildId: request.guildId,
-              topicKey,
-            });
-            observation = selectNotice(notices);
-            trace.push({
-              type: "observation",
-              tool: "query_notices",
-              summary:
-                observation.status === "found"
-                  ? `Found ${observation.matchedCount} verified notice(s); selected latest timestamp`
-                  : observation.status === "conflict"
-                    ? `Found ${observation.matchedCount} notices with a conflicting latest timestamp`
-                    : "No verified notice found",
-            });
-            return observation;
-          },
-        }),
-      };
-
-      const agent = new ToolLoopAgent({
-        model: deps.model,
-        instructions:
-          artifacts.instructions +
-          "\n\nUse query_notices exactly once. After observing it, repeat only the selected notice answer. Never invent or modify dates, policy, guild, role, or source links.",
-        tools,
-        activeTools: ["query_notices"],
-        stopWhen: stepCountIs(3),
-        temperature: 0,
-        include: { requestBody: false, responseBody: false },
-      });
-
-      const generatedText = (await agent.generate(generationInput(request)))
-        .text;
-      let answer: AnswerLogisticsResult;
-      if (!observation || observation.status === "missing") {
-        answer = fallback("No verified evidence for topic");
-      } else if (observation.status === "conflict") {
-        answer = {
-          status: "clarify",
-          body: CLARIFY_BODY,
-          source: null,
-          decisionSummary: "Clarifying tied conflicting notices",
-        };
-      } else {
-        answer = finalizeAnswer(
-          generatedText,
-          observation.notice,
-          request.guildId,
-        );
-      }
+      const isVi = isVietnameseText(request.message);
+      const generalIntro =
+        "Xin chào bạn! Mình là Trợ lý Hỗ trợ Logistics của EasyGame (Lớp 3B - E402). Bạn cần hỗ trợ về hạn nộp bài, điểm danh hay thông báo chính thức nào không?";
 
       return {
-        answer,
-        trace,
+        answer: {
+          status: "clarify",
+          body: isVi ? generalIntro : CLARIFY_BODY,
+          source: null,
+          decisionSummary: isVi
+            ? "Answered general assistance inquiry in Vietnamese"
+            : "Clarifying ambiguous logistics topic",
+        },
+        trace: [
+          {
+            type: "decision",
+            summary: isVi
+              ? "Answered general assistance inquiry in Vietnamese"
+              : "Clarification required before tool use",
+          },
+        ],
         provider: providerName(deps),
         model: modelName(deps),
-        ...(observation?.status === "found"
-          ? { selectedNoticeId: observation.notice.id }
-          : {}),
-        ...executionEvidence(true, true, startedAt),
+        ...executionEvidence(false, false, startedAt),
       };
     },
   };

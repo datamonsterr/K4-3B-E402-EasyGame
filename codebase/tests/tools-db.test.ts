@@ -129,16 +129,26 @@ describe("Database & Tool Integration", () => {
         return;
       }
 
+      const { data: seededQuestion, error: seededQuestionError } =
+        await dbClient
+          .from("questions")
+          .select("guild_id")
+          .eq("id", "30000000-0000-0000-0000-000000000001")
+          .single();
+      expect(seededQuestionError).toBeNull();
+      expect(seededQuestion).not.toBeNull();
+      if (!seededQuestion) throw new Error("Seeded radar question is missing");
+
       const result = await executeEvaluateRadar(
         {
-          guildId: "A",
+          guildId: seededQuestion.guild_id,
           now: scanTime,
         },
         undefined,
         dbClient,
       );
 
-      expect(result.guildId).toBe("A");
+      expect(result.guildId).toBe(seededQuestion.guild_id);
       expect(new Date(result.evaluatedAt).toISOString()).toBe(
         new Date(scanTime).toISOString(),
       );

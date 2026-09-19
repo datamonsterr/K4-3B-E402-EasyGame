@@ -35,3 +35,4 @@ coverage/
 .env*
 validation/runs/hosted/*.json
 !validation/runs/hosted/.gitkeep
+.env*.local
