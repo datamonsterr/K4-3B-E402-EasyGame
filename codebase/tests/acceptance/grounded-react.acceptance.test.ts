@@ -125,6 +125,56 @@ describe("US-B3 AC2 — grounded logistics ReAct flow", () => {
     });
   });
 
+  it("recognizes numbered course topics without a testset-specific topic list", async () => {
+    const source = evidence([]);
+    const model = modelThatCallsQuery("No verified notice.", {
+      topicKey: "lab-47",
+    });
+    await createCourseAgent({ model, evidence: source }).run({
+      ...request,
+      message: "Lịch nộp bài lab 47 là khi nào?",
+    });
+    expect(source.findVerifiedNotices).toHaveBeenCalledWith({
+      guildId: "guild-a",
+      topicKey: "lab-47",
+    });
+  });
+
+  it("uses the active artifact prompt and tool description in provider input", async () => {
+    const model = modelThatCallsQuery(notice().answer);
+    await createCourseAgent({ model, evidence: evidence([notice()]) }).run(
+      request,
+    );
+    const providerInput = JSON.stringify(model.doGenerateCalls[0]);
+    expect(providerInput).toContain(
+      "Tool observations are the sole source of database facts",
+    );
+    expect(providerInput).toContain(
+      "Tra cứu các thông báo chính thức đã xác thực",
+    );
+  });
+
+  it("fails closed when the active policy does not allow the actor's role", async () => {
+    const model = modelThatCallsQuery(notice().answer);
+    const run = await createCourseAgent({
+      model,
+      evidence: evidence([notice()]),
+      artifacts: {
+        instructions: "Use only verified observations.",
+        tools: [
+          {
+            name: "query_notices",
+            description: "Verified notice lookup.",
+            roles: ["lab_coach"],
+            parameters: {},
+          },
+        ],
+      },
+    }).run(request);
+    expect(run.answer.status).toBe("refused");
+    expect(model.doGenerateCalls).toHaveLength(0);
+  });
+
   it("selects the latest verified notice by timestamp", async () => {
     const latest = notice({
       id: "latest" as never,

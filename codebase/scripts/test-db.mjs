@@ -123,6 +123,33 @@ try {
   sql(
     `select test.assert((select count(*)=1 from public.question_events where question_id='10000000-0000-0000-0000-000000000002'), 'racing claim emits one event');`,
   );
+  sql(`insert into public.questions(id,guild_id,message_id,intent)
+    select '10000000-0000-0000-0000-000000000003',guild_id,id,'resolution-concurrency'
+    from public.source_messages where record_ordinal=4;`);
+  const resolutions = await Promise.all(
+    [2, 3].map((actor) =>
+      concurrentSql(`
+    begin;
+    select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000${actor}',true);
+    set local role authenticated;
+    select public.resolve_question('10000000-0000-0000-0000-000000000003',0);
+    select pg_sleep(0.2);
+    commit;`),
+    ),
+  );
+  if (
+    resolutions.filter((r) => r.status === 0).length !== 1 ||
+    resolutions.filter((r) => r.status !== 0 && r.error.includes("40001"))
+      .length !== 1
+  ) {
+    throw new Error(
+      `Concurrent resolutions failed: ${JSON.stringify(resolutions)}`,
+    );
+  }
+  sql(
+    `select test.assert((select status='resolved' and version=1 from public.questions where id='10000000-0000-0000-0000-000000000003'), 'racing resolution has one winner');
+    select test.assert((select count(*)=1 from public.question_events where question_id='10000000-0000-0000-0000-000000000003' and event_type='resolved'), 'racing resolution emits one event');`,
+  );
   const imports = await Promise.all(
     [1, 2].map(() =>
       concurrentSql(`

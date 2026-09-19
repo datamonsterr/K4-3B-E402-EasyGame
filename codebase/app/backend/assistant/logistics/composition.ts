@@ -1,16 +1,37 @@
 import "server-only";
-import { configured, sessionClient } from "@/backend/database/client";
+import {
+  configured,
+  jobClient,
+  sessionClient,
+} from "@/backend/database/client";
 import { createSupabaseNoticeEvidence } from "./supabase-evidence";
-import { createLogisticsAssistant } from "./assistant";
 import {
   createAgentModelFromEnvironment,
   createCourseAgent,
   createSupabaseAgentOperations,
 } from "../agent";
-import type { AnswerContextResult } from "@/api/demo/answer/handler";
+import {
+  AnswerExecutionError,
+  type AnswerContextResult,
+} from "@/api/demo/answer/handler";
 import { resolveActorContext } from "@/backend/auth/context";
+import { recordAgentExecution, recordAgentFailure } from "../observability";
+import { cookies } from "next/headers";
+
+async function hasSessionCookie(): Promise<boolean> {
+  const jar = await cookies();
+  return jar
+    .getAll()
+    .some(({ name }) => /^sb-.+-auth-token(?:\.\d+)?$/.test(name));
+}
 
 export async function openAnswerContext(): Promise<AnswerContextResult> {
+  try {
+    if (!(await hasSessionCookie())) return { type: "unauthenticated" };
+  } catch {
+    return { type: "unavailable" };
+  }
+
   if (!configured()) {
     return { type: "unavailable" };
   }
@@ -56,27 +77,47 @@ export async function openAnswerContext(): Promise<AnswerContextResult> {
 
   const evidence = createSupabaseNoticeEvidence(client);
   const configuredModel = createAgentModelFromEnvironment();
-  const assistant = configuredModel
-    ? {
-        async answer(
-          request: Parameters<
-            ReturnType<typeof createLogisticsAssistant>["answer"]
-          >[0],
-        ) {
-          return (
-            await createCourseAgent({
-              ...configuredModel,
-              evidence,
-              operations: createSupabaseAgentOperations(client),
-            }).run(request)
-          ).answer;
-        },
-      }
-    : createLogisticsAssistant({ evidence });
+  if (!configuredModel) return { type: "unavailable" };
+  let observer;
+  try {
+    observer = jobClient();
+  } catch {
+    return { type: "unavailable" };
+  }
+  let agent;
+  try {
+    agent = createCourseAgent({
+      ...configuredModel,
+      evidence,
+      operations: createSupabaseAgentOperations(client),
+    });
+  } catch {
+    return { type: "unavailable" };
+  }
 
   return {
     type: "ready",
     actor,
-    assistant,
+    async execute(request) {
+      const startedAt = Date.now();
+      let run;
+      try {
+        run = await agent.run(request);
+      } catch {
+        let failureRunId: string | undefined;
+        try {
+          failureRunId = await recordAgentFailure(observer, actor, {
+            provider: configuredModel.provider,
+            model: configuredModel.modelId,
+            latencyMs: Date.now() - startedAt,
+          });
+        } catch {
+          // A telemetry outage must not expose or replace the safe API error.
+        }
+        throw new AnswerExecutionError(failureRunId);
+      }
+      const runId = await recordAgentExecution(observer, actor, run);
+      return { answer: run.answer, runId };
+    },
   };
 }

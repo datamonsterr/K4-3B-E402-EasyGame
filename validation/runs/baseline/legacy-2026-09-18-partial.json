@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "run_id": "legacy-2026-09-18-partial",
+  "dataset_id": "legacy-mixed-baseline",
+  "validity": {
+    "status": "partial",
+    "gates": {
+      "production_api_path": false,
+      "authenticated_identity": false,
+      "consistent_hosted_database_provenance": false,
+      "write_readback": false,
+      "row_level_security": false,
+      "no_fallback": false,
+      "cleanup_verified": false
+    },
+    "reasons": [
+      "Historical aggregate reports did not prove execution through the production HTTP API.",
+      "The evaluator could use deterministic or fixture-backed behavior, so provider and hosted-data provenance are not comparable with guarded hosted runs.",
+      "No authenticated write, permission-denial, RLS, or cleanup evidence was retained."
+    ]
+  },
+  "artifact": {
+    "version": "v1.0",
+    "artifact_version": "v1+p9203935d65bd+t29b615fc2280",
+    "prompt_hash": "9203935d65bd019bcc4cf7240a36fc0728c1fd742496c093b5d0b457dcb05f73",
+    "tools_hash": "29b615fc2280965db03e59db42266854ba09f8831e6c2804e895b5f1c98f7900"
+  },
+  "summary": {
+    "metric_name": "case_accuracy",
+    "metric_value": 1,
+    "passed_cases": 24,
+    "total_cases": 24
+  },
+  "observed_aggregates": [
+    {
+      "label": "offline_master",
+      "passed_cases": 24,
+      "total_cases": 24,
+      "reported_provider_errors": 0
+    },
+    {
+      "label": "gemini_attempt_logistics",
+      "passed_cases": 8,
+      "total_cases": 8,
+      "reported_provider_errors": 0
+    }
+  ],
+  "evidence_policy": "Aggregate counts and artifact hashes only; no prompts, queries, answers, tool payloads, identities, credentials, or provider payloads are retained."
+}

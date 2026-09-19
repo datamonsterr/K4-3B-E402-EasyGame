@@ -10,12 +10,8 @@ tools:
         topicKey:
           type: string
           description: "Mã hoặc từ khóa định danh của bài lab, bài tập hoặc chủ đề khóa học (ví dụ: lab-1, lab-2, checkpoint, attendance)."
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học (ví dụ: demo)."
       required:
         - topicKey
-        - guildId
 
   - name: search_web
     description: "Tìm kiếm tài liệu học tập trên các nguồn web bên ngoài hoặc kho tài liệu chính thức của khóa học (ví dụ: tài liệu VinUni AI 20K)."
@@ -38,15 +34,8 @@ tools:
       - learner
     parameters:
       type: object
-      properties:
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học (ví dụ: demo)."
-        now:
-          type: string
-          description: "Dấu thời gian ISO hiện tại để tính toán thời gian chờ của câu hỏi."
-      required:
-        - guildId
+      properties: {}
+      required: []
 
   - name: create_staff_alert
     description: "Tạo thẻ cảnh báo nội bộ chỉ dành riêng cho ban trợ giảng vào kênh #ta-radar cho câu hỏi tồn đọng, câu hỏi chưa có thông báo hoặc học viên bị tắc bài."
@@ -55,9 +44,6 @@ tools:
     parameters:
       type: object
       properties:
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học."
         questionId:
           type: string
           description: "Mã định danh câu hỏi của học viên cần leo thang hỗ trợ."
@@ -68,7 +54,6 @@ tools:
           type: string
           description: "Tóm tắt ngắn gọn thắc mắc hoặc khó khăn của học viên."
       required:
-        - guildId
         - questionId
         - tier
         - summary
@@ -97,77 +82,8 @@ tools:
     parameters:
       type: object
       properties:
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học."
         localDate:
           type: string
           description: "Ngày dương lịch cần xuất bản tin theo định dạng YYYY-MM-DD."
       required:
-        - guildId
         - localDate
-
-  - name: broadcast_notification
-    description: "Phát thông báo chính thức hoặc thông báo gia hạn deadline tới toàn thể học viên trong khóa học."
-    roles:
-      - lab_coach
-    parameters:
-      type: object
-      properties:
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học."
-        topicKey:
-          type: string
-          description: "Mã chủ đề của thông báo (ví dụ: lab-1, lab-2, announcements)."
-        title:
-          type: string
-          description: "Tiêu đề của thông báo chính thức."
-        content:
-          type: string
-          description: "Nội dung đầy đủ của thông báo."
-        category:
-          type: string
-          description: "Danh mục thông báo (tùy chọn: urgent, general, logistics)."
-      required:
-        - guildId
-        - topicKey
-        - title
-        - content
-
-  - name: check_student_profile
-    description: "Tra cứu thông tin hồ sơ học viên, đội nhóm được phân công, kênh hoạt động và lịch sử câu hỏi."
-    roles:
-      - lab_coach
-    parameters:
-      type: object
-      properties:
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học."
-        studentQuery:
-          type: string
-          description: "Tên học viên, email hoặc định danh người dùng cần tra cứu."
-      required:
-        - guildId
-        - studentQuery
-
-  - name: check_scores
-    description: "Tra cứu điểm số bài lab hoặc checkpoint, tình trạng nộp bài và nhận xét chấm điểm của học viên."
-    roles:
-      - lab_coach
-    parameters:
-      type: object
-      properties:
-        guildId:
-          type: string
-          description: "Mã định danh máy chủ hoặc khóa học."
-        studentQuery:
-          type: string
-          description: "Tên hoặc định danh học viên cần tra cứu điểm."
-        lab:
-          type: string
-          description: "Mã bài lab hoặc bài tập cụ thể (tùy chọn: lab-1, checkpoint-1)."
-      required:
-        - guildId
-        - studentQuery

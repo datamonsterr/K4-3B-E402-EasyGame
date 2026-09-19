@@ -1,8 +1,7 @@
 import { evaluateRadar, type RadarQuestion, type RadarItem } from "../../radar";
-import { demoQuestions, demoTime } from "../../fixtures";
-import { getToolDbClient } from "../db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../database/schema.types";
+import { ToolOperationError } from "../../assistant/agent/operation-errors";
 
 export { evaluateRadar };
 
@@ -22,11 +21,12 @@ export interface RadarMetrics {
 export interface EvaluateRadarOutput {
   guildId: string;
   evaluatedAt: string;
-  items: RadarItem[];
+  items: Array<RadarItem & { version?: number }>;
   metrics: RadarMetrics;
 }
 
 export type RadarQuestionWithMeta = RadarQuestion & {
+  version?: number;
   question?: string;
   channel?: string;
   resolvedAt?: string | null;
@@ -39,7 +39,10 @@ export async function fetchQuestionsFromDb(
   client: SupabaseClient<Database>,
   guildId: string,
 ): Promise<RadarQuestionWithMeta[]> {
-  const { data, error } = await client.from("questions").select(`
+  const { data, error } = await client
+    .from("questions")
+    .select(
+      `
       id,
       guild_id,
       status,
@@ -50,15 +53,18 @@ export async function fetchQuestionsFromDb(
       claimed_by,
       source_message:source_messages(id, content, sent_at, channel_id),
       guild:guilds(id, source_label)
-    `);
+    `,
+    )
+    .eq("guild_id", guildId);
 
-  if (error || !data) return [];
+  if (error) throw new ToolOperationError("evaluate_radar", "unavailable");
 
   interface DbQuestionRow {
     id: string;
     guild_id: string;
     status: string;
     intent: string;
+    version: number;
     created_at: string;
     resolved_at: string | null;
     guild?: { source_label?: string } | { source_label?: string }[] | null;
@@ -73,19 +79,14 @@ export async function fetchQuestionsFromDb(
       | null;
   }
 
-  const rows = data as unknown as DbQuestionRow[];
-  const matched = rows.filter((row) => {
-    const g = row.guild;
-    const gLabel = Array.isArray(g) ? g[0]?.source_label : g?.source_label;
-    return row.guild_id === guildId || gLabel === guildId;
-  });
-
-  return matched.map((row) => {
+  const rows = (data ?? []) as unknown as DbQuestionRow[];
+  return rows.map((row) => {
     const src = Array.isArray(row.source_message)
       ? row.source_message[0]
       : row.source_message;
     return {
       id: row.id,
+      version: row.version,
       sentAt: src?.sent_at || row.created_at,
       status: row.status as "open" | "claimed" | "answered" | "resolved",
       question: src?.content || row.intent,
@@ -107,33 +108,31 @@ export async function executeEvaluateRadar(
   questions?: readonly RadarQuestionWithMeta[],
   dbClient?: SupabaseClient<Database>,
 ): Promise<EvaluateRadarOutput> {
-  const now = args.now ? new Date(args.now) : demoTime;
-  let qList: readonly RadarQuestionWithMeta[] = questions ?? [];
-
-  if (!questions || questions.length === 0) {
-    const client = dbClient ?? getToolDbClient();
-    if (client) {
-      try {
-        const dbQuestions = await fetchQuestionsFromDb(client, args.guildId);
-        if (dbQuestions.length > 0) {
-          qList = dbQuestions;
-        }
-      } catch {
-        // Database query failed, fallback to fixtures below
-      }
-    }
-    if (qList.length === 0) {
-      qList = demoQuestions;
-    }
+  const now = args.now ? new Date(args.now) : new Date();
+  if (!Number.isFinite(now.getTime())) {
+    throw new ToolOperationError("evaluate_radar", "invalid");
+  }
+  let qList: readonly RadarQuestionWithMeta[];
+  if (questions !== undefined) {
+    qList = questions;
+  } else if (dbClient) {
+    qList = await fetchQuestionsFromDb(dbClient, args.guildId);
+  } else {
+    throw new ToolOperationError("evaluate_radar", "unavailable");
   }
 
-  const items = evaluateRadar(qList, now);
+  const versions = new Map(
+    qList.map((question) => [question.id, question.version]),
+  );
+  const items = evaluateRadar(qList, now).map((item) => ({
+    ...item,
+    version: versions.get(item.id),
+  }));
 
   const urgentBreaches = items.filter((i) => i.tier === 2).length;
   const softWarnings = items.filter((i) => i.tier === 1).length;
 
-  const resolvedCount =
-    qList.filter((q) => q.status === "resolved").length || 28;
+  const resolvedCount = qList.filter((q) => q.status === "resolved").length;
   const totalCount = items.length + resolvedCount;
   const compliance =
     totalCount > 0

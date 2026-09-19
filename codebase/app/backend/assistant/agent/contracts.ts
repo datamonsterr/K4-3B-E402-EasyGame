@@ -4,6 +4,9 @@ import type {
   AnswerLogisticsResult,
   NoticeEvidenceSource,
 } from "../logistics/contracts";
+import type { EvaluateRadarOutput } from "../../tools/evaluate_radar/tool";
+import type { DailyDigestOutput } from "../../tools/format_daily_digest/tool";
+import type { AgentArtifacts } from "./tool-registry";
 
 export type AgentTraceEvent =
   | { type: "decision"; summary: string }
@@ -15,6 +18,11 @@ export type CourseAgentRun = {
   trace: readonly AgentTraceEvent[];
   provider: string;
   model: string;
+  providerAttempted: boolean;
+  providerSucceeded: boolean;
+  executionMode: "live_provider";
+  latencyMs: number;
+  selectedNoticeId?: string;
 };
 
 export interface CourseAgent {
@@ -22,7 +30,14 @@ export interface CourseAgent {
 }
 
 export interface AgentOperations {
-  evaluateRadar(input: { guildId: string; now?: string }): Promise<unknown>;
+  evaluateRadar(input: { guildId: string }): Promise<{
+    guildId: string;
+    items: unknown[];
+    evaluatedAt?: string;
+    metrics?: EvaluateRadarOutput["metrics"];
+    urgentBreaches?: number;
+    softWarnings?: number;
+  }>;
   createStaffAlert(input: {
     guildId: string;
     actorId: string;
@@ -30,6 +45,7 @@ export interface AgentOperations {
     questionId: string;
     tier: 1 | 2;
     summary: string;
+    idempotencyKey?: string;
   }): Promise<unknown>;
   resolveQuestion(input: {
     guildId: string;
@@ -43,30 +59,8 @@ export interface AgentOperations {
     actorId: string;
     actorRole: "lab_coach";
     localDate: string;
-  }): Promise<unknown>;
+  }): Promise<DailyDigestOutput>;
   searchWeb(input: { guildId: string; query: string }): Promise<unknown>;
-  broadcastNotification?(input: {
-    guildId: string;
-    actorId: string;
-    actorRole: "lab_coach";
-    topicKey: string;
-    title: string;
-    content: string;
-    category?: string;
-  }): Promise<unknown>;
-  checkStudentProfile?(input: {
-    guildId: string;
-    actorId: string;
-    actorRole: "lab_coach";
-    studentQuery: string;
-  }): Promise<unknown>;
-  checkScores?(input: {
-    guildId: string;
-    actorId: string;
-    actorRole: "lab_coach";
-    studentQuery: string;
-    lab?: string;
-  }): Promise<unknown>;
 }
 
 export type CourseAgentDependencies = {
@@ -75,4 +69,5 @@ export type CourseAgentDependencies = {
   provider?: string;
   modelId?: string;
   operations?: AgentOperations;
+  artifacts?: AgentArtifacts;
 };

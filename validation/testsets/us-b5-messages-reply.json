@@ -1,0 +1,432 @@
+{
+  "schema_version": "1.0.0",
+  "dataset_id": "easygame-us-b5-vi-v1",
+  "story_id": "US-B5",
+  "language": "vi",
+  "description": "Điều hướng tin nhắn, reply vào PostgreSQL và bảo toàn ranh giới guild.",
+  "cases": [
+    {
+      "id": "us-b5-navigate-01",
+      "title": "Mở đúng message từ thẻ ticket radar",
+      "identity_fixture": "coach_a",
+      "execution_kind": "browser",
+      "partition": "development",
+      "paraphrase_family": "ticket-message-navigation",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Mở tin nhắn gốc của ticket này." }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["question.open.240m", "message.target"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["message_selected"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["cross_guild_read"]
+      }
+    },
+    {
+      "id": "us-b5-context-02",
+      "title": "Chỉ tải thread context cùng guild và channel",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "scoped-thread-context",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Tải ngữ cảnh liên quan của message mục tiêu."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC1"],
+      "fixture_refs": ["message.target", "message.guild-b.private"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["guild_scope_enforced"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["cross_guild_read"]
+      }
+    },
+    {
+      "id": "us-b5-compact-03",
+      "title": "Hiển thị message sạch mà không lộ raw JSON",
+      "identity_fixture": "coach_a",
+      "execution_kind": "browser",
+      "partition": "development",
+      "paraphrase_family": "compact-message-fields",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Hiển thị tác giả, kênh, thời gian và intent."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC2"],
+      "fixture_refs": ["message.target"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional"
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["message_rendered"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "credentials",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_webhook"]
+      }
+    },
+    {
+      "id": "us-b5-coach-reply-04",
+      "title": "Coach ghi reply thật vào source messages",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "coach-database-reply",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Gửi phản hồi hướng dẫn chunking cho tin nhắn này."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["message.target", "question.open.versioned"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional"
+        },
+        "database_deltas": [
+          {
+            "table": "source_messages",
+            "operation": "insert",
+            "fixture_ref": "message.target",
+            "expected_count": 1
+          },
+          {
+            "table": "questions",
+            "operation": "update",
+            "fixture_ref": "question.open.versioned",
+            "expected_count": 1
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["reply_persisted"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_webhook", "discord_dm"]
+      }
+    },
+    {
+      "id": "us-b5-answered-05",
+      "title": "Reply chuyển answered nhưng không tự resolved",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "development",
+      "paraphrase_family": "answered-not-resolved-reply",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Reply câu này nhưng chưa xác nhận giải quyết."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["question.open.old", "message.target"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional"
+        },
+        "database_deltas": [
+          {
+            "table": "questions",
+            "operation": "update",
+            "fixture_ref": "question.open.old",
+            "expected_count": 1
+          },
+          {
+            "table": "question_events",
+            "operation": "insert",
+            "fixture_ref": "question.open.old",
+            "expected_count": 1
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["answered_recorded"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_dm"]
+      }
+    },
+    {
+      "id": "us-b5-learner-deny-06",
+      "title": "Learner không được gửi reply bằng endpoint coach",
+      "identity_fixture": "learner_a",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "learner-reply-denial",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Gửi reply vào ticket này giúp em." }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["message.target"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "source_messages",
+            "operation": "none",
+            "fixture_ref": "message.target",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["authorization_denied"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_webhook"]
+      }
+    },
+    {
+      "id": "us-b5-cross-deny-07",
+      "title": "Coach guild A không reply message guild B",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "development",
+      "paraphrase_family": "cross-guild-reply-denial",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Reply vào message thuộc guild B." }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["message.guild-b.private"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "source_messages",
+            "operation": "none",
+            "fixture_ref": "message.guild-b.private",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["guild_scope_enforced"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["cross_guild_read", "discord_webhook"]
+      }
+    },
+    {
+      "id": "us-b5-invalid-08",
+      "title": "Từ chối reply rỗng hoặc vượt giới hạn",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "held_out",
+      "paraphrase_family": "invalid-reply-body",
+      "request": {
+        "conversation": [
+          { "role": "user", "content": "Gửi một phản hồi rỗng." }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["message.target"],
+      "expected": {
+        "outcome": "denied",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "forbidden"
+        },
+        "database_deltas": [
+          {
+            "table": "source_messages",
+            "operation": "none",
+            "fixture_ref": "message.target",
+            "expected_count": 0
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["input_rejected"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_webhook"]
+      }
+    },
+    {
+      "id": "us-b5-no-discord-09",
+      "title": "Reply cơ sở dữ liệu không gọi Discord bên ngoài",
+      "identity_fixture": "coach_a",
+      "execution_kind": "http",
+      "partition": "development",
+      "paraphrase_family": "database-only-reply",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Lưu reply nội bộ, tuyệt đối không gửi Discord."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC3"],
+      "fixture_refs": ["message.target"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional"
+        },
+        "database_deltas": [
+          {
+            "table": "source_messages",
+            "operation": "insert",
+            "fixture_ref": "message.target",
+            "expected_count": 1
+          }
+        ],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["reply_persisted"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["discord_webhook", "discord_dm"]
+      }
+    },
+    {
+      "id": "us-b5-link-10",
+      "title": "Chỉ mở Discord link xác thực đã lưu",
+      "identity_fixture": "coach_a",
+      "execution_kind": "browser",
+      "partition": "held_out",
+      "paraphrase_family": "authentic-discord-link",
+      "request": {
+        "conversation": [
+          {
+            "role": "user",
+            "content": "Mở message trên Discord nếu có link thật."
+          }
+        ]
+      },
+      "acceptance_criteria": ["AC4"],
+      "fixture_refs": ["message.valid.link", "message.missing.link"],
+      "expected": {
+        "outcome": "succeeded",
+        "ordered_tool_workflow": [],
+        "public_response": {
+          "max_code_points": 300,
+          "max_sentences": 3,
+          "source_card": "optional",
+          "allowed_source_refs": ["message.valid.link"]
+        },
+        "database_deltas": [],
+        "trace": {
+          "provider_call": "forbidden",
+          "required_events": ["stored_link_checked"],
+          "forbidden_fields": [
+            "thoughtProcess",
+            "accessToken",
+            "rawProviderResponse"
+          ]
+        },
+        "forbidden_external_effects": ["fabricated_link"]
+      }
+    }
+  ]
+}

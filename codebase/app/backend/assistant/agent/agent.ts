@@ -11,7 +11,14 @@ import type {
   CourseAgent,
   CourseAgentDependencies,
 } from "./contracts";
-import { getRolePermissionReason } from "./tool-registry";
+import {
+  getRolePermissionReason,
+  loadAgentArtifacts,
+  validateQueryRolePermission,
+  type AgentArtifacts,
+  type ToolDeclaration,
+} from "./tool-registry";
+import { ToolOperationError } from "./operation-errors";
 
 const FALLBACK_BODY =
   "There is no verified notice for this question. Please ask a Lab Coach for confirmation.";
@@ -35,12 +42,29 @@ function modelName(deps: CourseAgentDependencies): string {
   return typeof deps.model === "string" ? deps.model : deps.model.modelId;
 }
 
+function executionEvidence(
+  attempted: boolean,
+  succeeded: boolean,
+  startedAt: number,
+) {
+  return {
+    providerAttempted: attempted,
+    providerSucceeded: succeeded,
+    executionMode: "live_provider" as const,
+    latencyMs: Math.max(0, Date.now() - startedAt),
+  };
+}
+
 function classifyTopic(message: string): LogisticsTopic | null {
-  const normalized = message.toLowerCase();
-  if (/lab[ -]?1\b/.test(normalized)) return "lab-1";
-  if (/lab[ -]?2\b/.test(normalized)) return "lab-2";
+  const normalized = message.normalize("NFKC").toLowerCase();
+  const numberedTopic = normalized.match(
+    /\b(lab|checkpoint|cp|assignment|milestone|project|quiz|exam)\s*[-:#]?\s*(\d+[a-z]?)\b/iu,
+  );
+  if (numberedTopic) {
+    const family = numberedTopic[1] === "cp" ? "checkpoint" : numberedTopic[1];
+    return `${family}-${numberedTopic[2]}`;
+  }
   if (/attendance|điểm danh/.test(normalized)) return "attendance";
-  if (/checkpoint|cp[ -]?1\b/.test(normalized)) return "checkpoint";
   return null;
 }
 
@@ -51,11 +75,18 @@ function refusalReason(
   const normalized = message.trim().toLowerCase();
   if (
     /ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions/.test(normalized) ||
-    /bỏ qua (?:các )?chỉ dẫn/.test(normalized) ||
+    /bỏ (?:qua (?:các )?|mọi )chỉ dẫn/.test(normalized) ||
     /(?:reveal|show|print).{0,20}system prompt/.test(normalized) ||
     /you are now (?:the )?/.test(normalized)
   ) {
     return "Refused adversarial prompt override";
+  }
+  if (
+    /tự nhận.{0,20}(?:coach|lab coach)|pretend.{0,20}(?:coach|admin)/i.test(
+      normalized,
+    )
+  ) {
+    return "Refused caller-supplied authority";
   }
   if (
     /(?:write|solve|give|generate|fix).{0,30}(?:code|homework)/.test(
@@ -84,49 +115,43 @@ function refusalReason(
 
 type OperationIntent =
   | { tool: "evaluate_radar" }
-  | { tool: "create_staff_alert"; coachOnly: true }
-  | { tool: "resolve_question"; coachOnly: true }
-  | { tool: "format_daily_digest"; coachOnly: true }
-  | { tool: "broadcast_notification"; coachOnly: true }
-  | { tool: "check_student_profile"; coachOnly: true }
-  | { tool: "check_scores"; coachOnly: true }
+  | { workflow: "alert_overdue" }
+  | { workflow: "resolve_overdue" }
+  | { tool: "format_daily_digest" }
   | { tool: "search_web" };
+
+const WORKFLOWS = {
+  alert_overdue: ["evaluate_radar", "create_staff_alert"],
+  resolve_overdue: ["evaluate_radar", "resolve_question"],
+} as const;
+
+type RuntimeToolName =
+  | "search_web"
+  | "evaluate_radar"
+  | "create_staff_alert"
+  | "resolve_question"
+  | "format_daily_digest";
 
 function classifyOperation(message: string): OperationIntent | null {
   const normalized = message.trim().toLowerCase();
-  if (/\b(?:create|queue|send)\b.{0,30}\bstaff alert\b/.test(normalized)) {
-    return { tool: "create_staff_alert", coachOnly: true };
-  }
-  if (/\bresolve\b.{0,30}\bquestion\b/.test(normalized)) {
-    return { tool: "resolve_question", coachOnly: true };
+  if (
+    /(?:staff alert|cảnh báo|escalat)/.test(normalized) &&
+    /(?:radar|quét|scan|overdue|quá hạn|question|câu hỏi)/.test(normalized)
+  ) {
+    return { workflow: "alert_overdue" };
   }
   if (
-    /\b(?:daily|22:00)\b.{0,20}\b(?:radar )?digest\b|\bgenerate\b.{0,20}\bdigest\b/.test(
+    /(?:resolve|giải quyết|đóng)/.test(normalized) &&
+    /(?:question|câu hỏi|ticket|radar|quá hạn)/.test(normalized)
+  ) {
+    return { workflow: "resolve_overdue" };
+  }
+  if (
+    /\b(?:daily|end.of.day|generate)\b.{0,30}\b(?:radar )?digest\b|(?:bản tin|tổng hợp).{0,30}(?:cuối ngày|radar)/.test(
       normalized,
     )
   ) {
-    return { tool: "format_daily_digest", coachOnly: true };
-  }
-  if (
-    /\b(?:broadcast|phát thông báo|đăng thông báo|thông báo toàn khóa|thông báo chính thức)\b/.test(
-      normalized,
-    )
-  ) {
-    return { tool: "broadcast_notification", coachOnly: true };
-  }
-  if (
-    /\b(?:student profile|profile của|thông tin học viên|hồ sơ học viên|tra cứu học viên)\b/.test(
-      normalized,
-    )
-  ) {
-    return { tool: "check_student_profile", coachOnly: true };
-  }
-  if (
-    /\b(?:check score|xem điểm của|tra cứu điểm|bảng điểm|điểm số của)\b/.test(
-      normalized,
-    )
-  ) {
-    return { tool: "check_scores", coachOnly: true };
+    return { tool: "format_daily_digest" };
   }
   if (
     /\b(?:search|find)\b.{0,30}\b(?:official|external|documentation|resource)/.test(
@@ -135,7 +160,13 @@ function classifyOperation(message: string): OperationIntent | null {
   ) {
     return { tool: "search_web" };
   }
-  if (/\b(?:radar|scan unanswered|sla)\b/.test(normalized)) {
+  if (
+    /\b(?:radar|sla|unanswered|unresolved|overdue|reply)\b/.test(normalized) ||
+    /(?:câu(?: hỏi| này)?|ticket).{0,40}(?:phút|quá hạn|tồn đọng|chưa (?:được )?(?:trả lời|xử lý)|phản hồi|khẩn|cấp)/i.test(
+      normalized,
+    ) ||
+    /\b\d+\s*phút\b.{0,30}(?:khẩn|cấp)/i.test(normalized)
+  ) {
     return { tool: "evaluate_radar" };
   }
   return null;
@@ -150,34 +181,50 @@ function safeOperationBody(candidate: string): string {
   return sentences <= 3 ? body : "Operation completed.";
 }
 
+function generationInput(request: Parameters<CourseAgent["run"]>[0]) {
+  return request.history?.length
+    ? {
+        messages: [
+          ...request.history.map((turn) => ({
+            role: turn.role,
+            content: turn.content,
+          })),
+          { role: "user" as const, content: request.message },
+        ],
+      }
+    : { prompt: request.message };
+}
+
 async function runOperation(
   deps: CourseAgentDependencies,
+  artifacts: AgentArtifacts,
   request: Parameters<CourseAgent["run"]>[0],
   intent: OperationIntent,
 ) {
+  const startedAt = Date.now();
+  const operationName = "workflow" in intent ? intent.workflow : intent.tool;
   const trace: AgentTraceEvent[] = [
     {
       type: "decision",
-      summary: `${intent.tool} required for classified request`,
+      summary: `${operationName} required for classified request`,
     },
   ];
-  const operations = deps.operations;
-  if (!operations) {
-    return {
-      answer: fallback("Required operation adapter is unavailable"),
-      trace,
-      provider: providerName(deps),
-      model: modelName(deps),
-    };
-  }
-
-  if ("coachOnly" in intent && request.actor.role !== "lab_coach") {
+  const activeTools = (
+    "workflow" in intent ? WORKFLOWS[intent.workflow] : [intent.tool]
+  ) as readonly RuntimeToolName[];
+  const configuredTools = activeTools.map((name) =>
+    requireConfiguredTool(artifacts, name),
+  );
+  const deniedTool = configuredTools.find(
+    (configured) => !configured.roles.includes(request.actor.role),
+  );
+  if (deniedTool) {
     const isVietnamese =
       /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(
         request.message,
       );
     const body = isVietnamese
-      ? getRolePermissionReason(intent.tool, "learner")
+      ? getRolePermissionReason(deniedTool.name, request.actor.role)
       : REFUSAL_BODY;
 
     return {
@@ -192,43 +239,78 @@ async function runOperation(
       ],
       provider: providerName(deps),
       model: modelName(deps),
+      ...executionEvidence(false, false, startedAt),
+    };
+  }
+
+  const operations = deps.operations;
+  if (!operations) {
+    return {
+      answer: fallback("Required operation adapter is unavailable"),
+      trace,
+      provider: providerName(deps),
+      model: modelName(deps),
+      ...executionEvidence(false, false, startedAt),
     };
   }
 
   let observed = false;
-  const recordCall = (summary: string) => {
-    trace.push({ type: "tool_call", tool: intent.tool, summary });
+  const observedTools = new Set<string>();
+  const radarItems = new Map<string, { tier?: number; version?: number }>();
+  const recordCall = (toolName: string, summary: string) => {
+    trace.push({ type: "tool_call", tool: toolName, summary });
   };
-  const recordObservation = (summary: string) => {
+  const recordObservation = (toolName: string, summary: string) => {
     observed = true;
-    trace.push({ type: "observation", tool: intent.tool, summary });
+    observedTools.add(toolName);
+    trace.push({ type: "observation", tool: toolName, summary });
   };
 
   const allTools = {
     evaluate_radar: tool({
-      description:
-        "Evaluate unresolved guild questions against the 120/240 minute SLA tiers.",
-      inputSchema: z.object({ now: z.string().datetime().optional() }),
-      execute: async ({ now }) => {
-        recordCall("Evaluating unanswered radar questions");
+      description: requireConfiguredTool(artifacts, "evaluate_radar")
+        .description,
+      inputSchema: z.object({}),
+      execute: async () => {
+        recordCall("evaluate_radar", "Evaluating unanswered radar questions");
         const output = await operations.evaluateRadar({
           guildId: request.guildId,
-          now,
         });
-        recordObservation("Radar evaluation completed");
+        for (const candidate of output.items) {
+          if (!candidate || typeof candidate !== "object") continue;
+          const item = candidate as Record<string, unknown>;
+          const questionId =
+            typeof item.questionId === "string"
+              ? item.questionId
+              : typeof item.id === "string"
+                ? item.id
+                : undefined;
+          if (questionId) {
+            radarItems.set(questionId, {
+              tier: typeof item.tier === "number" ? item.tier : undefined,
+              version:
+                typeof item.version === "number" ? item.version : undefined,
+            });
+          }
+        }
+        recordObservation("evaluate_radar", "Radar evaluation completed");
         return output;
       },
     }),
     create_staff_alert: tool({
-      description:
-        "Queue one staff-only radar alert. Never sends a direct message.",
+      description: requireConfiguredTool(artifacts, "create_staff_alert")
+        .description,
       inputSchema: z.object({
         questionId: z.string().min(1),
         tier: z.union([z.literal(1), z.literal(2)]),
         summary: z.string().min(1).max(300),
       }),
       execute: async ({ questionId, tier, summary }) => {
-        recordCall("Queueing staff-only radar alert");
+        const candidate = radarItems.get(questionId);
+        if (!candidate || candidate.tier !== tier) {
+          throw new ToolOperationError("create_staff_alert", "invalid");
+        }
+        recordCall("create_staff_alert", "Queueing staff-only radar alert");
         const output = await operations.createStaffAlert({
           guildId: request.guildId,
           actorId: request.actor.userId,
@@ -237,19 +319,23 @@ async function runOperation(
           tier,
           summary,
         });
-        recordObservation("Staff-only alert queued");
+        recordObservation("create_staff_alert", "Staff-only alert queued");
         return output;
       },
     }),
     resolve_question: tool({
-      description:
-        "Resolve a question with optimistic concurrency after Lab Coach authorization.",
+      description: requireConfiguredTool(artifacts, "resolve_question")
+        .description,
       inputSchema: z.object({
         questionId: z.string().min(1),
         expectedVersion: z.number().int().nonnegative(),
       }),
       execute: async ({ questionId, expectedVersion }) => {
-        recordCall("Resolving question with version check");
+        const candidate = radarItems.get(questionId);
+        if (!candidate || candidate.version !== expectedVersion) {
+          throw new ToolOperationError("resolve_question", "invalid");
+        }
+        recordCall("resolve_question", "Resolving question with version check");
         const output = await operations.resolveQuestion({
           guildId: request.guildId,
           actorId: request.actor.userId,
@@ -257,133 +343,79 @@ async function runOperation(
           questionId,
           expectedVersion,
         });
-        recordObservation("Question resolution completed");
+        recordObservation("resolve_question", "Question resolution completed");
         return output;
       },
     }),
     format_daily_digest: tool({
-      description:
-        "Format the staff-only daily radar digest for a local calendar date.",
+      description: requireConfiguredTool(artifacts, "format_daily_digest")
+        .description,
       inputSchema: z.object({ localDate: z.iso.date() }),
       execute: async ({ localDate }) => {
-        recordCall("Formatting staff-only daily digest");
+        recordCall("format_daily_digest", "Formatting staff-only daily digest");
         const output = await operations.formatDailyDigest({
           guildId: request.guildId,
           actorId: request.actor.userId,
           actorRole: "lab_coach",
           localDate,
         });
-        recordObservation("Daily digest formatted");
-        return output;
-      },
-    }),
-    broadcast_notification: tool({
-      description:
-        "Broadcast an official course announcement or deadline notice to all cohort members.",
-      inputSchema: z.object({
-        topicKey: z.string().min(1),
-        title: z.string().min(1),
-        content: z.string().min(1),
-        category: z.string().optional(),
-      }),
-      execute: async ({ topicKey, title, content, category }) => {
-        recordCall("Broadcasting official course announcement");
-        const output = operations.broadcastNotification
-          ? await operations.broadcastNotification({
-              guildId: request.guildId,
-              actorId: request.actor.userId,
-              actorRole: "lab_coach",
-              topicKey,
-              title,
-              content,
-              category,
-            })
-          : { ok: true, message: "Broadcast completed" };
-        recordObservation("Announcement broadcast completed");
-        return output;
-      },
-    }),
-    check_student_profile: tool({
-      description:
-        "Inspect a student profile, assigned team, channel activity, and question history.",
-      inputSchema: z.object({
-        studentQuery: z.string().min(1),
-      }),
-      execute: async ({ studentQuery }) => {
-        recordCall("Querying student profile and activity");
-        const output = operations.checkStudentProfile
-          ? await operations.checkStudentProfile({
-              guildId: request.guildId,
-              actorId: request.actor.userId,
-              actorRole: "lab_coach",
-              studentQuery,
-            })
-          : { studentQuery, role: "learner" };
-        recordObservation("Student profile retrieval completed");
-        return output;
-      },
-    }),
-    check_scores: tool({
-      description:
-        "Query lab or checkpoint scores, submission status, and grading feedback for students.",
-      inputSchema: z.object({
-        studentQuery: z.string().min(1),
-        lab: z.string().optional(),
-      }),
-      execute: async ({ studentQuery, lab }) => {
-        recordCall("Querying student scores and submission status");
-        const output = operations.checkScores
-          ? await operations.checkScores({
-              guildId: request.guildId,
-              actorId: request.actor.userId,
-              actorRole: "lab_coach",
-              studentQuery,
-              lab,
-            })
-          : { studentQuery, score: 9.5 };
-        recordObservation("Student scores retrieval completed");
+        recordObservation("format_daily_digest", "Daily digest formatted");
         return output;
       },
     }),
     search_web: tool({
-      description:
-        "Search official external course documentation only when explicitly requested.",
+      description: requireConfiguredTool(artifacts, "search_web").description,
       inputSchema: z.object({ query: z.string().min(1).max(500) }),
       execute: async ({ query }) => {
-        recordCall("Searching official external course resources");
+        recordCall(
+          "search_web",
+          "Searching official external course resources",
+        );
         const output = await operations.searchWeb({
           guildId: request.guildId,
           query,
         });
-        recordObservation("Official resource search completed");
+        recordObservation("search_web", "Official resource search completed");
         return output;
       },
     }),
   };
 
-  const selectedTools = { [intent.tool]: allTools[intent.tool] };
+  const selectedTools = Object.fromEntries(
+    activeTools.map((name) => [name, allTools[name]]),
+  );
   const agent = new ToolLoopAgent({
     model: deps.model,
-    instructions: `Call ${intent.tool} exactly once. Authority and guild are already bound by the server. Do not call any other tool.`,
+    instructions:
+      artifacts.instructions +
+      "\n\n" +
+      (activeTools.length === 1
+        ? `Call ${activeTools[0]} exactly once. Authority and guild are already bound by the server.`
+        : `Call tools in this exact order: ${activeTools.join(" then ")}. Use only question identifiers, tiers, and versions from the radar observation. Authority and guild are server-bound.`),
     tools: selectedTools,
-    activeTools: [intent.tool],
-    stopWhen: stepCountIs(3),
+    activeTools: [...activeTools],
+    stopWhen: stepCountIs(5),
     temperature: 0,
     include: { requestBody: false, responseBody: false },
   });
-  const generated = await agent.generate({ prompt: request.message });
+  const generated = await agent.generate(generationInput(request));
+  const missingStep = activeTools.find((name) => !observedTools.has(name));
+  if (missingStep) {
+    throw new ToolOperationError(missingStep, "invalid");
+  }
   return {
     answer: observed
       ? {
           status: "completed" as const,
           body: safeOperationBody(generated.text),
           source: null,
-          decisionSummary: `${intent.tool} completed through authorized adapter`,
+          decisionSummary: `${operationName} completed through authorized adapter`,
         }
       : fallback("Required tool was not executed"),
     trace,
     provider: providerName(deps),
     model: modelName(deps),
+    ...executionEvidence(true, true, startedAt),
   };
 }
 
@@ -417,9 +449,20 @@ function selectNotice(notices: readonly VerifiedNotice[]): NoticeObservation {
   return { status: "found", notice: latest, matchedCount: sorted.length };
 }
 
+function requireConfiguredTool(
+  artifacts: AgentArtifacts,
+  name: string,
+): ToolDeclaration {
+  const declaration = artifacts.tools.find((tool) => tool.name === name);
+  if (!declaration) throw new Error("Required tool is not declared");
+  return declaration;
+}
+
 export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
+  const artifacts = deps.artifacts ?? loadAgentArtifacts();
   return {
     async run(request) {
+      const startedAt = Date.now();
       if (request.actor.guildId !== request.guildId) {
         throw new Error("Forbidden guild scope");
       }
@@ -436,11 +479,36 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
           trace: [{ type: "decision", summary: refused }],
           provider: providerName(deps),
           model: modelName(deps),
+          ...executionEvidence(false, false, startedAt),
+        };
+      }
+
+      const permission = validateQueryRolePermission(
+        request.message,
+        request.actor.role,
+      );
+      if (!permission.allowed) {
+        return {
+          answer: {
+            status: "refused",
+            body: permission.reason ?? REFUSAL_BODY,
+            source: null,
+            decisionSummary: "Refused tool not allowed for authenticated role",
+          },
+          trace: [
+            {
+              type: "decision",
+              summary: "Refused tool not allowed for authenticated role",
+            },
+          ],
+          provider: providerName(deps),
+          model: modelName(deps),
+          ...executionEvidence(false, false, startedAt),
         };
       }
 
       const operation = classifyOperation(request.message);
-      if (operation) return runOperation(deps, request, operation);
+      if (operation) return runOperation(deps, artifacts, request, operation);
 
       const topicKey = classifyTopic(request.message);
       if (!topicKey) {
@@ -459,6 +527,28 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
           ],
           provider: providerName(deps),
           model: modelName(deps),
+          ...executionEvidence(false, false, startedAt),
+        };
+      }
+
+      const noticeTool = requireConfiguredTool(artifacts, "query_notices");
+      if (!noticeTool.roles.includes(request.actor.role)) {
+        return {
+          answer: {
+            status: "refused",
+            body: REFUSAL_BODY,
+            source: null,
+            decisionSummary: "Refused tool not allowed for authenticated role",
+          },
+          trace: [
+            {
+              type: "decision",
+              summary: "Refused tool not allowed for authenticated role",
+            },
+          ],
+          provider: providerName(deps),
+          model: modelName(deps),
+          ...executionEvidence(false, false, startedAt),
         };
       }
 
@@ -472,8 +562,7 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
 
       const tools = {
         query_notices: tool({
-          description:
-            "Read verified official notices for the classified logistics topic. Use exactly once for a logistics answer.",
+          description: noticeTool.description,
           inputSchema: z.object({
             topicKey: z.string().min(1).describe("Classified logistics topic"),
           }),
@@ -506,7 +595,8 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
       const agent = new ToolLoopAgent({
         model: deps.model,
         instructions:
-          "Use query_notices exactly once. After observing it, repeat only the selected notice answer. Never invent or modify dates, policy, guild, role, or source links.",
+          artifacts.instructions +
+          "\n\nUse query_notices exactly once. After observing it, repeat only the selected notice answer. Never invent or modify dates, policy, guild, role, or source links.",
         tools,
         activeTools: ["query_notices"],
         stopWhen: stepCountIs(3),
@@ -514,13 +604,8 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
         include: { requestBody: false, responseBody: false },
       });
 
-      let generatedText: string | undefined;
-      try {
-        generatedText = (await agent.generate({ prompt: request.message }))
-          .text;
-      } catch {
-        generatedText = undefined;
-      }
+      const generatedText = (await agent.generate(generationInput(request)))
+        .text;
       let answer: AnswerLogisticsResult;
       if (!observation || observation.status === "missing") {
         answer = fallback("No verified evidence for topic");
@@ -533,7 +618,7 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
         };
       } else {
         answer = finalizeAnswer(
-          generatedText ?? observation.notice.answer,
+          generatedText,
           observation.notice,
           request.guildId,
         );
@@ -544,6 +629,10 @@ export function createCourseAgent(deps: CourseAgentDependencies): CourseAgent {
         trace,
         provider: providerName(deps),
         model: modelName(deps),
+        ...(observation?.status === "found"
+          ? { selectedNoticeId: observation.notice.id }
+          : {}),
+        ...executionEvidence(true, true, startedAt),
       };
     },
   };

@@ -33,5 +33,5 @@ coverage/
 .worktrees/
 .vercel
 .env*
-agent_test_runs/
-codebase/agent_test_runs/
+validation/runs/hosted/*.json
+!validation/runs/hosted/.gitkeep

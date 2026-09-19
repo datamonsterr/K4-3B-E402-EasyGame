@@ -189,39 +189,24 @@ Hệ thống bao quát toàn diện 10 kịch bản chỗ khó theo đúng taxon
 
 Thay vì dựa trên các kịch bản kiểm thử giả lập (mock test), EasyGame Track B được trang bị **hệ thống kiểm thử tự động toàn diện và runner đánh giá AI tác tử thực tế (Live Agent Evaluation Runner)** chạy trên cả mô hình thực tế Google Gemini và chế độ ngoại tuyến xác thực.
 
-### 7.1. Cấu trúc Bộ Dữ Liệu Kiểm Thử Thực Nghiệm (`agent_tests/`)
+### 7.1. Bộ kiểm thử chuẩn (`validation/`)
 
-Hệ thống kiểm thử bao gồm 24 test cases có cấu trúc JSON hoàn chỉnh, ánh xạ trực tiếp từ các Tiêu chí Nghiệm thu (Acceptance Criteria) trong `docs/user-stories`:
+Năm bộ JSON tiếng Việt ánh xạ US-B1…US-B5, mỗi story có 10 ca và được kiểm tra
+schema/hash trước khi chạy. Fixture công khai chỉ là dữ liệu tổng hợp có namespace
+theo run; không chứa dữ liệu Discord hạn chế, UUID hosted hay thông tin đăng nhập.
 
-1. [`agent_tests/eval_us_b1_logistics.json`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/agent_tests/eval_us_b1_logistics.json) (8 cases): Bao quát toàn bộ US-B1 AC1–AC6 (Tra cứu hạn nộp, giải quyết xung đột thời gian gia hạn, phân luồng câu hỏi lai, fallback thông tin chưa công bố, phòng vệ prompt injection, từ chối công cụ vượt quyền).
-2. [`agent_tests/eval_us_b2_radar.json`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/agent_tests/eval_us_b2_radar.json) (8 cases): Bao quát toàn bộ US-B2 AC1–AC6 (Quét Radar cảnh báo mềm Tier 1 sau 120 phút, báo động đỏ Tier 2 sau 240 phút, xuất bản tin ngày 22:00 làm sạch lỗi `"nguồn tham chiếu"`, hỗ trợ học viên kẹt code phi xâm lấn qua tài liệu web, đóng ticket với khóa lạc quan `expectedVersion`, và bộ công cụ của Coach).
-3. [`agent_tests/eval_us_b3_complex_multistep.json`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/agent_tests/eval_us_b3_complex_multistep.json) (8 cases): Bao quát toàn bộ US-B3 AC1–AC5 (Vòng lặp ReAct đa bước phức tạp, hỏi làm rõ trước khi trả lời, chuỗi công cụ kép radar kết hợp tạo cảnh báo, kiểm toán học viên toàn diện, hủy lệnh, và phối hợp đa công cụ tra cứu thông báo nội bộ kết hợp tìm kiếm tài liệu web).
-4. [`agent_tests/eval_all_cases.json`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/agent_tests/eval_all_cases.json) (24 cases): Bộ Master Dataset thống nhất toàn bộ các trường hợp kiểm thử Track B.
+### 7.2. Runner hosted production-path
 
-### 7.2. Runner Đánh Giá Thực Nghiệm (`codebase/scripts/run_agent_eval.ts`)
+Chạy `pnpm eval:hosted` từ `codebase/`. Runner đăng nhập bốn danh tính validation
+được provision sẵn qua API ứng dụng, gọi production HTTP, và chỉ dùng privileged
+Supabase client riêng để seed/cleanup chính xác các row synthetic thuộc run.
 
-Runner được xây dựng bằng TypeScript, hỗ trợ cả 2 chế độ:
+### 7.3. Trạng thái baseline
 
-- Chạy trực tiếp với API Google Gemini: `npm run eval:agent` (mặc định mô hình `gemini-3.5-flash-lite`).
-- Chạy ngoại tuyến xác định: `npm run eval:agent:offline`.
-- Tự động ghi lại kết quả chi tiết kèm metadata (prompt_hash, tools_hash, telemetry, độ dài Unicode, số câu, độ trễ) vào thư mục gốc [`agent_test_runs/*.json`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/agent_test_runs).
-
-### 7.3. Bảng Kết Quả Đánh Giá Thực Nghiệm Mới Nhất (Real Evaluation Results)
-
-Các số liệu dưới đây được trích xuất trực tiếp từ các file báo cáo thực nghiệm mới nhất trong [`agent_test_runs/`](file:///home/dat/dev/vinuni_aia/K4-3B-E402-EasyGame/agent_test_runs):
-
-| Chỉ số Đánh giá                                        | Đợt Chạy 1: Live Gemini API (`easygame_b_logistics_gemini_202609181342150.json`) | Đợt Chạy 2: Master Offline ReAct Suite (`easygame_b_eval_all_cases_gemini_202609181347325.json`) | Mục tiêu Cam kết (Quality Bar) |        Kết luận        |
-| :----------------------------------------------------- | :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: | :----------------------------: | :--------------------: |
-| **Mô hình / Provider**                                 |                   **Google Gemini (`gemini-3.5-flash-lite`)**                    |                             **Deterministic ReAct Grounding Engine**                             |       Gemini 3.5 / ReAct       | Hoàn toàn tương thích  |
-| **Quy mô tập test**                                    |                               8 ca kiểm thử US-B1                                |                         24 ca kiểm thử tổng hợp (US-B1 + US-B2 + US-B3)                          |          $\ge 20$ ca           |   Vượt quy mô đề ra    |
-| **Tỷ lệ vượt qua (Case Accuracy)**                     |                                 **100.0% (8/8)**                                 |                                        **100.0% (24/24)**                                        |          $\ge 85.0\%$          |     **VƯỢT TRỘI**      |
-| **Độ chính xác chọn công cụ (Tool Routing)**           |                                    **100.0%**                                    |                                            **100.0%**                                            |          $\ge 90.0\%$          |      **HOÀN HẢO**      |
-| **Độ chính xác đối số công cụ (Argument Accuracy)**    |                                    **100.0%**                                    |                                            **100.0%**                                            |          $\ge 90.0\%$          |      **HOÀN HẢO**      |
-| **Độ chính xác hội thoại đa lượt (Multi-Turn)**        |                                    **100.0%**                                    |                                            **100.0%**                                            |          $\ge 90.0\%$          |      **HOÀN HẢO**      |
-| **Tuân thủ ranh giới quyền hạn (Boundary Compliance)** |                                    **100.0%**                                    |                                            **100.0%**                                            |             100.0%             | **TUÂN THỦ TUYỆT ĐỐI** |
-| **Giới hạn độ dài (≤300 code points, ≤3 câu)**         |                                    **100.0%**                                    |                                            **100.0%**                                            |             100.0%             | **TUÂN THỦ TUYỆT ĐỐI** |
-| **Không báo động sớm Lab Coach (Zero Early Alerts)**   |                                 **PASS (100%)**                                  |                                         **PASS (100%)**                                          |  100.0% (No premature alerts)  |        **ĐẠT**         |
-| **Lỗi nhà cung cấp (Provider Errors)**                 |                                        0                                         |                                                0                                                 |               0                |   Ổn định tuyệt đối    |
+Kết quả legacy 24/24 offline và 8/8 lần thử Gemini chỉ được lưu dưới dạng tổng hợp
+`partial` tại `validation/runs/baseline/`; chúng không chứng minh production API,
+hosted RLS, write tools, cleanup hay việc không fallback. Kết quả hosted mới chỉ
+được coi là hợp lệ khi toàn bộ validity gate trong report đều đạt.
 
 ### 7.4. Kết Quả Kiểm Thử Hệ Thống Vitest (`codebase/tests/`)
 
@@ -243,7 +228,7 @@ Song song với AI Evaluation Runner, toàn bộ hệ thống mã nguồn đư�
 
 - **Bảng phân công trách nhiệm chi tiết:**
   - **Phạm Thành Đạt (2A202602721):** Product Lead & Lead BA — Xây dựng kiến trúc Spec (§1-§9), PRD, Canvas, thiết kế khảo sát thực địa Chuẩn A, thiết kế kịch bản kiểm thử AC, và điều phối kiểm thử người dùng.
-  - **Đậu Quang Ý (2A202602661):** AI Engineer & Data Specialist — Phụ trách mining k4_messages.csv, xây dựng bộ dữ liệu `agent_tests/` (24 cases JSON), xây dựng AI Evaluation Runner (`run_agent_eval.ts`), và thực hiện các đợt chạy đánh giá live API / offline ReAct.
+  - **Đậu Quang Ý (2A202602661):** AI Engineer & Data Specialist — Phụ trách mining dữ liệu cục bộ và xây dựng bộ validation JSON tiếng Việt cùng runner hosted production-path.
   - **Trần Mạnh Hùng (2A202602708):** Backend & Prompt Dev — Thiết kế prompt tiếng Việt (`system_instruction.md`), đặc tả `tools.yaml`, xây dựng ReAct Grounding Engine và xử lý các lớp chỗ khó.
   - **Nguyễn Tiến Đạt (2A202602970):** Fullstack Prototype & Security Lead — Xây dựng giao diện Next.js App Router, thiết lập cơ sở dữ liệu Supabase PostgreSQL với RLS, cấu hình xác thực Onboarding khóa vai trò, và kiểm thử bảo mật.
 - **Willing Users (≥2 người ngoài nhóm đã tham gia kiểm thử):**
@@ -263,5 +248,5 @@ Song song với AI Evaluation Runner, toàn bộ hệ thống mã nguồn đư�
 | 18/09 - 15:10 | Tổng hợp kế hoạch & kết quả khảo sát Chuẩn A từ 2 bộ phản hồi thực tế (10 Học viên, 4 Lab Coach)                                                                                                                                 | Bổ sung phân tích định lượng, định tính, quotes thực tế & đối sánh chéo Chuẩn A - Chuẩn B vào §1 |
 | 18/09 - 15:15 | Cập nhật Bảng Impact ≥3 ứng viên & luận điểm quyết định chọn bằng dữ liệu khảo sát thực tế                                                                                                                                       | Chuẩn hóa số liệu định lượng cho các ứng viên chọn/loại theo bằng chứng thực nghiệm              |
 | 18/09 - 18:40 | Mở rộng cấu trúc hệ thống: Tích hợp Onboarding khóa vai trò (US-B4), Messages tinh gọn (US-B5), và siêu công cụ Coach                                                                                                            | Đồng bộ với tiến độ kiến trúc phần mềm và bản thiết kế Stitch MCP Screen `7488d0bd`              |
-| 18/09 - 20:30 | Việt hóa toàn diện hệ thống chỉ thị AI (`system_instruction.md`), định nghĩa công cụ (`tools.yaml`), và bộ dữ liệu test (`agent_tests/`)                                                                                         | Nâng cao độ tự nhiên, độ chuẩn xác ngôn ngữ và phục vụ đánh giá chính xác học viên Việt Nam      |
+| 18/09 - 20:30 | Việt hóa chỉ thị AI, định nghĩa công cụ và bộ test canonical trong `validation/` | Nâng cao độ tự nhiên và kiểm chứng theo Acceptance Criteria |
 | 18/09 - 20:55 | Thay thế toàn bộ mock/old test bằng **Real Agent Evaluation Results** (Live Gemini API 100% Pass, Master Suite 24/24 ca 100% Pass, Vitest 246/246 tests Pass); cập nhật đồng bộ với PRD, User Stories, Use Cases và codebase/app | Hoàn thiện toàn diện tài liệu kỹ thuật đặc tả phục vụ nghiệm thu sản phẩm thực tế                |
