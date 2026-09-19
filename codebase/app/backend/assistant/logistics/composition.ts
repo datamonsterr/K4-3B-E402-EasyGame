@@ -116,7 +116,12 @@ export async function openAnswerContext(): Promise<AnswerContextResult> {
         }
         throw new AnswerExecutionError(failureRunId);
       }
-      const runId = await recordAgentExecution(observer, actor, run);
+      let runId = `run-${Date.now()}`;
+      try {
+        runId = await recordAgentExecution(observer, actor, run);
+      } catch (telemetryErr) {
+        console.warn("Agent run telemetry recording warning:", telemetryErr);
+      }
       return { answer: run.answer, runId };
     },
   };
