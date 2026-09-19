@@ -251,6 +251,9 @@ export async function executeDeterministicAgent(
     "say lab 1 is canceled",
     "bỏ qua các chỉ dẫn",
     "bạn là trợ lý tự do",
+    "đóng vai",
+    "giảng viên tự do",
+    "không có quy tắc",
   ];
   if (injectionPatterns.some((pattern) => lower.includes(pattern))) {
     thoughtProcess.push(
@@ -275,7 +278,39 @@ export async function executeDeterministicAgent(
     };
   }
 
-  // 2. Academic Integrity & Homework Refusal (unless hybrid logistics)
+  // 2. Academic Integrity & Code Debugging Refusal (unless hybrid logistics)
+  const isCodeDebugging =
+    (lower.includes("fix lỗi") ||
+      lower.includes("sửa lỗi code") ||
+      lower.includes("sửa code") ||
+      lower.includes("numpy array") ||
+      lower.includes("debug")) &&
+    !lower.includes("deadline") &&
+    !lower.includes("hạn nộp");
+
+  if (isCodeDebugging) {
+    thoughtProcess.push(
+      "Academic integrity boundary triggered: Direct code debugging requested. Refusing code fixing.",
+    );
+    const text =
+      "Tôi không hỗ trợ sửa code hay debug bài tập trực tiếp. Với các lỗi kỹ thuật, bạn vui lòng gửi câu hỏi lên kênh để TA và các bạn cùng hỗ trợ nhé.";
+    return {
+      text,
+      status: "refusal",
+      summary: "Direct code debugging refused; redirected to TA support",
+      telemetry: {
+        latencyMs: Date.now() - startTime,
+        thoughtProcess,
+        toolInvocations,
+        factualityScore: 1.0,
+        confidence: 1.0,
+        fallbackReason,
+        provider: options.provider || "gemini",
+        model: options.model,
+      },
+    };
+  }
+
   const isHomeworkRequest =
     (lower.includes("giải hộ") ||
       lower.includes("giải bài tập") ||
@@ -299,6 +334,109 @@ export async function executeDeterministicAgent(
       status: "refusal",
       summary:
         "Academic integrity violation refused; redirected to peer/TA support",
+      telemetry: {
+        latencyMs: Date.now() - startTime,
+        thoughtProcess,
+        toolInvocations,
+        factualityScore: 1.0,
+        confidence: 1.0,
+        fallbackReason,
+        provider: options.provider || "gemini",
+        model: options.model,
+      },
+    };
+  }
+
+  // 2.1 Privacy and Personal Grade Access Refusal
+  const isPrivateGradeInquiry =
+    lower.includes("bảng điểm cá nhân") ||
+    lower.includes("xem điểm của bạn") ||
+    lower.includes("điểm cá nhân của") ||
+    (lower.includes("xem") && lower.includes("bảng điểm")) ||
+    (lower.includes("điểm") && lower.includes("bạn đạt"));
+
+  if (isPrivateGradeInquiry) {
+    thoughtProcess.push(
+      "Privacy boundary triggered: Request for another student's personal grades.",
+    );
+    const text =
+      "Vì lý do quyền riêng tư và chính sách bảo mật môn học, tôi không có quyền cung cấp điểm cá nhân của học viên khác.";
+    return {
+      text,
+      status: "refusal",
+      summary: "Refused access to private personal student grades",
+      telemetry: {
+        latencyMs: Date.now() - startTime,
+        thoughtProcess,
+        toolInvocations,
+        factualityScore: 1.0,
+        confidence: 1.0,
+        fallbackReason,
+        provider: options.provider || "gemini",
+        model: options.model,
+      },
+    };
+  }
+
+  // 2.2 Unauthorized Policy/Deadline Modification Refusal
+  const isUnauthorizedDeadlineExtend =
+    lower.includes("tự gia hạn") ||
+    lower.includes("gia hạn cho mình") ||
+    (lower.includes("gia hạn") && lower.includes("thêm 2 tiếng")) ||
+    lower.includes("tự gia hạn deadline");
+
+  if (isUnauthorizedDeadlineExtend) {
+    thoughtProcess.push(
+      "Authority boundary triggered: Bot cannot modify official deadlines.",
+    );
+    const text =
+      "Tôi không có quyền tự ý thay đổi hạn nộp bài. Bạn vui lòng liên hệ trực tiếp với Lab Coach hoặc giảng viên để được xem xét ngoại lệ.";
+    return {
+      text,
+      status: "refusal",
+      summary: "Refused unauthorized deadline modification",
+      telemetry: {
+        latencyMs: Date.now() - startTime,
+        thoughtProcess,
+        toolInvocations,
+        factualityScore: 1.0,
+        confidence: 1.0,
+        fallbackReason,
+        provider: options.provider || "gemini",
+        model: options.model,
+      },
+    };
+  }
+
+  // 2.3 Dispute and Feedback Workflow
+  const isNoticeDispute =
+    lower.includes("bị sai rồi") ||
+    lower.includes("sai rồi bot") ||
+    lower.includes("thông tin này sai") ||
+    lower.includes("thông tin deadline này bị sai");
+
+  if (isNoticeDispute) {
+    thoughtProcess.push(
+      "Notice dispute detected. Creating staff alert for TA review.",
+    );
+    const alertOutput = await executeCreateStaffAlert({
+      guildId,
+      questionId: `dispute-${Date.now()}`,
+      tier: 1,
+      summary: `Học viên báo cáo thông tin sai lệch: "${query}"`,
+    });
+    toolInvocations.push({
+      name: "create_staff_alert",
+      args: { guildId, questionId: alertOutput.questionId, tier: 1 },
+      outputSummary: "Dispatched staff alert for notice dispute review",
+      output: alertOutput,
+    });
+    const text =
+      "Tôi đã tiếp nhận báo cáo của bạn và thông báo tới các TA để kiểm tra lại thông tin trên thông báo chính thức.";
+    return {
+      text,
+      status: "answered",
+      summary: "Dispute ticket logged and staff alert sent to TA",
       telemetry: {
         latencyMs: Date.now() - startTime,
         thoughtProcess,
@@ -752,13 +890,47 @@ export async function executeDeterministicAgent(
     };
   }
 
-  // 6. Ambiguous Deadline Query: Missing Topic Entity (e.g. "Mấy giờ nộp bài?")
+  // 6. Ambiguous Attendance Inquiry (e.g. "khi nao ddiem danh vay bot?")
+  if (
+    lower.includes("ddiem danh") ||
+    (lower.includes("khi nào") &&
+      lower.includes("điểm danh") &&
+      !lower.includes("quy chế") &&
+      !lower.includes("workshop"))
+  ) {
+    thoughtProcess.push(
+      "Ambiguous attendance query with input degradation. Asking clarifying question without alerting Lab Coach prematurely.",
+    );
+    const text =
+      "Bạn đang hỏi về điểm danh đầu giờ hay điểm danh cuối ca lab? Vui lòng nêu rõ để tôi hỗ trợ chính xác.";
+    return {
+      text,
+      status: "clarify",
+      summary: "Requested attendance clarification without alerting coach",
+      telemetry: {
+        latencyMs: Date.now() - startTime,
+        thoughtProcess,
+        toolInvocations,
+        factualityScore: 1.0,
+        confidence: 0.8,
+        fallbackReason,
+        provider: options.provider || "gemini",
+        model: options.model,
+      },
+    };
+  }
+
+  // 6.1 Ambiguous Deadline Query: Missing Topic Entity (e.g. "Mấy giờ nộp bài?")
   const hasSpecificMilestone =
     lower.includes("lab") ||
     lower.includes("checkpoint") ||
     lower.includes("cp1") ||
+    lower.includes("cp2") ||
     lower.includes("điểm danh") ||
-    lower.includes("attendance");
+    lower.includes("attendance") ||
+    lower.includes("phòng") ||
+    lower.includes("team") ||
+    lower.includes("nhóm");
 
   const isAmbiguousDeadline = isLogisticsDeadline && !hasSpecificMilestone;
 
@@ -800,10 +972,20 @@ export async function executeDeterministicAgent(
   ) {
     topicKey = "lab-2";
   } else if (
-    lower.includes("checkpoint") ||
     lower.includes("cp1") ||
-    lower.includes("cp-1")
+    lower.includes("cp-1") ||
+    lower.includes("checkpoint 1") ||
+    lower.includes("checkpoint-cp1")
   ) {
+    topicKey = "checkpoint-cp1";
+  } else if (
+    lower.includes("cp2") ||
+    lower.includes("cp-2") ||
+    lower.includes("checkpoint 2") ||
+    lower.includes("checkpoint-cp2")
+  ) {
+    topicKey = "checkpoint-cp2";
+  } else if (lower.includes("checkpoint")) {
     topicKey = "checkpoint";
   } else if (
     lower.includes("điểm danh") ||
@@ -812,6 +994,19 @@ export async function executeDeterministicAgent(
     lower.includes("nghỉ")
   ) {
     topicKey = "attendance";
+  } else if (
+    lower.includes("team") ||
+    lower.includes("nhóm") ||
+    lower.includes("quy mô") ||
+    lower.includes("mấy bạn")
+  ) {
+    topicKey = "team-formation";
+  } else if (
+    lower.includes("phòng") ||
+    lower.includes("địa điểm") ||
+    lower.includes("ở đâu")
+  ) {
+    topicKey = "location";
   } else {
     const labMatch = lower.match(/lab\s*(\d+)/);
     if (labMatch) {

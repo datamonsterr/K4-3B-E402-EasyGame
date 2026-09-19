@@ -1,19 +1,15 @@
 import { NextResponse } from "next/server";
 import { sessionClient, configured } from "@/backend/database/client";
+import { resolveBaseUrl } from "@/backend/auth/http";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const requestedNext = searchParams.get("next");
   const error = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
 
-  // Determine base URL, respecting reverse proxy and forwarded headers
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
-  const isLocal = origin.includes("localhost") || origin.includes("127.0.0.1");
-  const host = forwardedHost?.split(",")[0]?.trim();
-  const baseUrl = host && !isLocal ? `${forwardedProto}://${host}` : origin;
+  const baseUrl = resolveBaseUrl(request);
 
   // Sanitized redirect destination to prevent open redirects
   const safeNext =

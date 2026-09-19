@@ -338,20 +338,30 @@ describe("Deterministic Grounding Engine (ReAct Offline/Fallback Mode)", () => {
 });
 
 describe("Evaluation Dataset and Runner", () => {
-  it("loads 10 evaluation test cases from eval/eval_cases.json", () => {
+  it("loads 20 evaluation test cases from eval/eval_cases.json", () => {
     const cases = loadEvalCases();
-    expect(cases).toHaveLength(10);
+    expect(cases).toHaveLength(20);
     expect(cases.map((c) => c.id)).toEqual([
       "EG01_lab1_deadline",
       "EG02_lab1_extension",
       "EG03_attendance_policy",
-      "EG04_hybrid_query",
-      "EG05_ambiguous_deadline",
-      "EG06_unverified_fallback",
-      "EG07_homework_refusal",
-      "EG08_prompt_injection",
-      "EG09_radar_scan",
-      "EG10_external_search",
+      "EG04_unverified_fallback_lab7",
+      "EG05_checkpoint_cp1_time",
+      "EG06_team_size_rule",
+      "EG07_ambiguous_deadline_general",
+      "EG08_ambiguous_attendance_link",
+      "EG09_ambiguous_lab_room",
+      "EG10_abbreviation_submission",
+      "EG11_homework_solution_refusal",
+      "EG12_code_debugging_refusal",
+      "EG13_prompt_injection_override",
+      "EG14_role_play_jailbreak",
+      "EG15_private_grade_inquiry",
+      "EG16_unauthorized_deadline_extend",
+      "EG17_hybrid_query_logistics_tech",
+      "EG18_radar_sla_scan",
+      "EG19_external_doc_search",
+      "EG20_dispute_notice_ticket",
     ]);
   });
 
@@ -370,8 +380,8 @@ describe("Evaluation Dataset and Runner", () => {
   it("runs the full evaluation suite with 100% pass rate and zero early alerts", async () => {
     const suiteReport = await runEvaluationSuite();
 
-    expect(suiteReport.total_cases).toBe(10);
-    expect(suiteReport.passed_cases).toBe(10);
+    expect(suiteReport.total_cases).toBe(20);
+    expect(suiteReport.passed_cases).toBe(20);
     expect(suiteReport.failed_cases).toBe(0);
     expect(suiteReport.pass_rate_percent).toBe(100);
     expect(suiteReport.metrics.tool_calling_accuracy).toBe(100);

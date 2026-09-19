@@ -85,6 +85,61 @@ export const notices: Notice[] = [
       href: "/sources/attendance-policy",
     },
   },
+  {
+    id: "checkpoint-cp1",
+    guildId: "demo",
+    topicKey: "checkpoint-cp1",
+    publishedAt: "2026-09-15T03:00:00Z",
+    verified: true,
+    answer:
+      "Hạn nộp mốc Checkpoint 1 CP1 là 19:30 ngày 16/09/2026 trên hệ thống LMS.",
+    source: {
+      kind: "synthetic",
+      label: "Checkpoint CP1 notice (synthetic)",
+      href: "/sources/checkpoint-cp1",
+    },
+  },
+  {
+    id: "checkpoint-cp2",
+    guildId: "demo",
+    topicKey: "checkpoint-cp2",
+    publishedAt: "2026-09-17T03:00:00Z",
+    verified: true,
+    answer:
+      "Hạn nộp mốc Checkpoint CP2 là 12:00 ngày 21/09/2026 (12 giờ trưa).",
+    source: {
+      kind: "synthetic",
+      label: "Checkpoint CP2 notice (synthetic)",
+      href: "/sources/checkpoint-cp2",
+    },
+  },
+  {
+    id: "team-formation",
+    guildId: "demo",
+    topicKey: "team-formation",
+    publishedAt: "2026-09-11T03:00:00Z",
+    verified: true,
+    answer:
+      "Quy định quy mô nhóm dự án Hackathon là từ 3 đến 4 thành viên mỗi nhóm.",
+    source: {
+      kind: "synthetic",
+      label: "Team formation policy (synthetic)",
+      href: "/sources/team-formation",
+    },
+  },
+  {
+    id: "location-e402",
+    guildId: "demo",
+    topicKey: "location",
+    publishedAt: "2026-09-10T03:00:00Z",
+    verified: true,
+    answer: "Phòng thực hành lab cho lớp 3B được bố trí tại phòng E402.",
+    source: {
+      kind: "synthetic",
+      label: "Lab location notice (synthetic)",
+      href: "/sources/location-e402",
+    },
+  },
 ];
 export const demoTime = new Date("2026-09-18T12:00:00Z");
 export const demoQuestions: (RadarQuestion & {

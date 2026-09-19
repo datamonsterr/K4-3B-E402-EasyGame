@@ -129,6 +129,44 @@ describe("OAuth SSO & Model Customization Suite", () => {
         "https://easygame.vercel.app/sign-in?error=Denied",
       );
     });
+
+    it("enforces canonical domain https://ai20k-easy-game.vercel.app when accessed on Vercel preview domains", async () => {
+      process.env.VERCEL = "1";
+      const req = new Request(
+        "https://preview-branch-123.vercel.app/auth/callback?error=server_error&error_description=Denied",
+        {
+          headers: {
+            "x-forwarded-host": "preview-branch-123.vercel.app",
+            "x-forwarded-proto": "https",
+          },
+        },
+      );
+      const res = await callbackGet(req);
+      const location = res.headers.get("location") || "";
+      expect(location).toContain(
+        "https://ai20k-easy-game.vercel.app/sign-in?error=Denied",
+      );
+      delete process.env.VERCEL;
+    });
+
+    it("prioritizes configured NEXT_PUBLIC_APP_URL for redirects", async () => {
+      process.env.NEXT_PUBLIC_APP_URL = "https://custom.easygame.org";
+      const req = new Request(
+        "https://some-host.internal/auth/callback?error=server_error&error_description=Denied",
+        {
+          headers: {
+            "x-forwarded-host": "some-host.internal",
+            "x-forwarded-proto": "https",
+          },
+        },
+      );
+      const res = await callbackGet(req);
+      const location = res.headers.get("location") || "";
+      expect(location).toContain(
+        "https://custom.easygame.org/sign-in?error=Denied",
+      );
+      delete process.env.NEXT_PUBLIC_APP_URL;
+    });
   });
 
   describe("Root Page OAuth Callback Interceptor (app/page)", () => {

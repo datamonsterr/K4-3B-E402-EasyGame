@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { configured, sessionClient } from "@/backend/database/client";
+import { resolveBaseUrl } from "@/backend/auth/http";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const provider = searchParams.get("provider");
   const requestedNext = searchParams.get("next");
   const next =
@@ -10,12 +11,7 @@ export async function GET(request: Request) {
       ? requestedNext
       : "/workspace";
 
-  // Resolve base URL even behind reverse proxy / forwarded headers
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
-  const isLocal = origin.includes("localhost") || origin.includes("127.0.0.1");
-  const host = forwardedHost?.split(",")[0]?.trim();
-  const baseUrl = host && !isLocal ? `${forwardedProto}://${host}` : origin;
+  const baseUrl = resolveBaseUrl(request);
 
   if (provider !== "discord" && provider !== "google") {
     return NextResponse.redirect(

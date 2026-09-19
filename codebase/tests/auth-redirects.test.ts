@@ -105,5 +105,54 @@ describe("Authentication Redirect & Loop Prevention", () => {
       expect(pageElement).toBeDefined();
       expect(pageElement.props.initialNeedsOnboarding).toBe(true);
     });
+
+    it("opens synthetic preview cleanly when preview parameter is provided even if Supabase is configured", async () => {
+      const pageElement = await WorkspacePage({
+        searchParams: Promise.resolve({ preview: "synthetic" }),
+      });
+      expect(pageElement).toBeDefined();
+      expect(pageElement.props.initialUser).toBe("@SyntheticPreview");
+      expect(pageElement.props.initialRole).toBe("learner");
+    });
+
+    it("handles database membership fetch errors gracefully without throwing authentication_unavailable", async () => {
+      const mockSupabase = {
+        auth: {
+          getUser: vi.fn().mockResolvedValue({
+            data: {
+              user: {
+                id: "user-existing",
+                email: "exist@example.com",
+                user_metadata: { full_name: "Existing User" },
+              },
+            },
+            error: null,
+          }),
+        },
+        from: vi.fn(() => ({
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockResolvedValue({
+                  data: null,
+                  error: {
+                    message: "database relation missing or RLS error",
+                    code: "42P01",
+                  },
+                }),
+              }),
+            }),
+          }),
+        })),
+      };
+      vi.mocked(sessionClient).mockResolvedValue(mockSupabase as never);
+
+      const pageElement = await WorkspacePage({
+        searchParams: Promise.resolve({}),
+      });
+      expect(pageElement).toBeDefined();
+      // Should not throw or crash; falls back to onboarding safely
+      expect(pageElement.props.initialNeedsOnboarding).toBe(true);
+    });
   });
 });

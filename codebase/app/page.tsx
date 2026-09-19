@@ -7,12 +7,17 @@ interface PageProps {
     next?: string;
     error?: string;
     error_description?: string;
+    preview?: string;
     [key: string]: string | undefined;
   }>;
 }
 
 export default async function Home(props: PageProps) {
   const searchParams = (await props?.searchParams) || {};
+
+  if (searchParams.preview === "synthetic" || searchParams.preview === "true") {
+    redirect(`/workspace?preview=${searchParams.preview}`);
+  }
 
   // If OAuth code or error returned to root / (e.g. via Supabase default Site URL fallback)
   if (searchParams.code || searchParams.error) {

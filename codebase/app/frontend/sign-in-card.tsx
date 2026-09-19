@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getSupabaseBrowserClient } from "./supabase-browser";
 
 export function SignInCard() {
   const router = useRouter();
@@ -136,7 +135,7 @@ export function SignInCard() {
 
       <button
         type="button"
-        onClick={() => router.push("/workspace")}
+        onClick={() => router.push("/workspace?preview=synthetic")}
         className="w-full h-8 rounded-md border border-[#3f3f46] text-xs text-[#a1a1aa] hover:text-white"
       >
         Open synthetic preview
